@@ -66,3 +66,23 @@ test('@claim:demo-reset discards the sample demo namespace', async ({ page }) =>
   await expect(page.getByText('checkout-totals.diff.png')).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem('demo:color-signal-lens:started'))).toBe('1');
 });
+
+test('@claim:macos-installer-architecture offers correctly labelled DMGs for Intel and Apple-Silicon Macs', async ({ browser }) => {
+  const assets = [
+    { name: 'Color.Signal.Lens_0.1.6_aarch64.dmg', browser_download_url: 'https://example.test/Color.Signal.Lens_0.1.6_aarch64.dmg' },
+    { name: 'Color.Signal.Lens_0.1.6_x64.dmg', browser_download_url: 'https://example.test/Color.Signal.Lens_0.1.6_x64.dmg' },
+  ];
+  for (const [kind, userAgent] of [
+    ['Intel', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 Chrome/128 Safari/537.36'],
+    ['Apple Silicon', 'Mozilla/5.0 (Macintosh; ARM Mac OS X 14_0) AppleWebKit/537.36 Chrome/128 Safari/537.36'],
+  ]) {
+    const context = await browser.newContext({ userAgent });
+    const page = await context.newPage();
+    await page.route('https://api.github.com/repos/B-Divyesh/sf-color-signal-lens/releases?per_page=1', (route) => route.fulfill({ contentType: 'application/json', body: JSON.stringify([{ assets }]) }));
+    await page.goto('/');
+    await expect(page.getByRole('link', { name: 'Download for Intel Mac' }), `${kind} Mac can choose the Intel installer`).toHaveAttribute('href', /_x64\.dmg$/);
+    await expect(page.getByRole('link', { name: 'Download for Apple Silicon' }), `${kind} Mac can choose the Apple-Silicon installer`).toHaveAttribute('href', /_aarch64\.dmg$/);
+    await expect(page.locator('#download-state')).toHaveText('Choose the macOS installer that matches your chip.');
+    await context.close();
+  }
+});

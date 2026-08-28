@@ -217,7 +217,55 @@ function render404() { layout(`<article class="legal paper-edge"><p class="eyebr
 function showRestore() { const area = document.querySelector('#license-area')!; area.innerHTML = `<label for="license-input">Paste your license</label><div class="restore"><input id="license-input" autocomplete="off"><button class="button secondary" id="save-license">Restore license</button></div><p id="license-note" aria-live="polite"></p>`; document.querySelector('#save-license')?.addEventListener('click', () => { const value = (document.querySelector<HTMLInputElement>('#license-input')?.value || '').trim(); if (!value) return; localStorage.setItem('sb_license:color-signal-lens', value); document.querySelector('#license-note')!.textContent = 'License saved. It will be checked when you are online.'; void verifyLicense(value, document.querySelector('#license-note')!); }); }
 function acceptLicense() { const params = new URLSearchParams(location.search); const value = params.get('license'); if (value) { localStorage.setItem('sb_license:color-signal-lens', value); params.delete('license'); history.replaceState({}, '', `${location.pathname}${params.size ? `?${params}` : ''}`); } const stored = localStorage.getItem('sb_license:color-signal-lens'); if (stored) void verifyLicense(stored); }
 async function verifyLicense(license: string, note?: Element) { const key = 'sb_license_check:color-signal-lens'; const cache = JSON.parse(localStorage.getItem(key) || 'null') as { checked: number; valid: boolean } | null; if (cache && Date.now() - cache.checked < 86_400_000) { if (!cache.valid && note) note.textContent = 'This license is no longer active.'; return; } try { const response = await fetch(`https://api.sociobot.in/api/v1/products/color-signal-lens/verify?license=${encodeURIComponent(license)}`); const result = await response.json() as { valid: boolean }; localStorage.setItem(key, JSON.stringify({ checked: Date.now(), valid: result.valid })); if (!result.valid) { localStorage.removeItem('sb_license:color-signal-lens'); if (note) note.textContent = 'This license is no longer active. You can buy Lens Plus again.'; } else if (note) note.textContent = 'License is active.'; } catch { if (note) note.textContent = 'License saved. It will be checked when you are online.'; } }
-async function hydrateDownload() { const state = document.querySelector('#download-state'); const button = document.querySelector<HTMLAnchorElement>('#download-button'); if (!state || !button) return; const cacheKey = 'color-signal-lens:release'; let release: { cached: number; assets: { name: string; browser_download_url: string }[] } | null = null; try { release = JSON.parse(localStorage.getItem(cacheKey) || 'null'); if (!release || Date.now() - release.cached > 3_600_000) { const response = await fetch('https://api.github.com/repos/B-Divyesh/sf-color-signal-lens/releases?per_page=1'); if (!response.ok) throw new Error('Could not list releases'); const releases = await response.json() as { assets: { name: string; browser_download_url: string }[] }[]; if (!releases[0]) return; release = { cached: Date.now(), assets: releases[0].assets }; localStorage.setItem(cacheKey, JSON.stringify(release)); } const agent = navigator.userAgent; const wanted = agent.includes('Windows') ? /\.msi$|\.exe$|windows.*\.zip$/i : agent.includes('Mac') ? /\.dmg$/i : /\.appimage$|\.deb$/i; const download = release.assets.find((item) => wanted.test(item.name)); if (!download) return; button.href = download.browser_download_url; button.textContent = `Download ${download.name}`; state.textContent = 'The current download matches your computer.'; } catch { /* Keep the calm fallback if the release list is unavailable. */ } }
+type ReleaseAsset = { name: string; browser_download_url: string };
+type CachedRelease = { cached: number; assets: ReleaseAsset[] };
+
+function macDownload(assets: ReleaseAsset[], architecture: 'aarch64' | 'x64') {
+  return assets.find((item) => new RegExp(`_${architecture}\\.dmg$`, 'i').test(item.name));
+}
+
+function showMacChoices(state: Element, button: HTMLAnchorElement, assets: ReleaseAsset[]) {
+  const intel = macDownload(assets, 'x64');
+  const appleSilicon = macDownload(assets, 'aarch64');
+  if (!intel || !appleSilicon) return false;
+  state.textContent = 'Choose the macOS installer that matches your chip.';
+  button.replaceWith(Object.assign(document.createElement('span'), {
+    id: 'download-button',
+    className: 'download-choices',
+    innerHTML: `<a class="button secondary" href="${esc(intel.browser_download_url)}">Download for Intel Mac</a><a class="button secondary" href="${esc(appleSilicon.browser_download_url)}">Download for Apple Silicon</a>`,
+  }));
+  return true;
+}
+
+async function hydrateDownload() {
+  const state = document.querySelector('#download-state');
+  const button = document.querySelector<HTMLAnchorElement>('#download-button');
+  if (!state || !button) return;
+  const cacheKey = 'color-signal-lens:release';
+  let release: CachedRelease | null = null;
+  try {
+    release = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+    if (!release || Date.now() - release.cached > 3_600_000) {
+      const response = await fetch('https://api.github.com/repos/B-Divyesh/sf-color-signal-lens/releases?per_page=1');
+      if (!response.ok) throw new Error('Could not list releases');
+      const releases = await response.json() as { assets: ReleaseAsset[] }[];
+      if (!releases[0]) return;
+      release = { cached: Date.now(), assets: releases[0].assets };
+      localStorage.setItem(cacheKey, JSON.stringify(release));
+    }
+    const agent = navigator.userAgent;
+    if (agent.includes('Mac')) {
+      showMacChoices(state, button, release.assets);
+      return;
+    }
+    const wanted = agent.includes('Windows') ? /\.msi$|\.exe$|windows.*\.zip$/i : /\.appimage$|\.deb$/i;
+    const download = release.assets.find((item) => wanted.test(item.name));
+    if (!download) return;
+    button.href = download.browser_download_url;
+    button.textContent = `Download ${download.name}`;
+    state.textContent = 'The current download matches your computer.';
+  } catch { /* Keep the calm fallback if the release list is unavailable. */ }
+}
 function wireNavigation() { document.querySelectorAll<HTMLAnchorElement>('a[data-nav]').forEach((a) => a.addEventListener('click', (event) => { const href = a.getAttribute('href')!; if (!href.startsWith('/')) return; event.preventDefault(); history.pushState({}, '', href); renderRoute(); })); }
 function renderRoute() { if (location.search.includes('demo=1')) { demo = true; renderDemo(); return; } if (!siteBuild && (location.pathname === '/' || location.pathname === '/lens')) { demo = false; renderLens(); return; } if (location.pathname === '/') renderLanding(); else if (location.pathname === '/lens') { demo = false; renderLens(); } else if (location.pathname === '/demo') renderDemo(); else if (location.pathname === '/privacy') renderPrivacy(); else if (location.pathname === '/terms') renderTerms(); else render404(); }
 window.addEventListener('popstate', renderRoute);

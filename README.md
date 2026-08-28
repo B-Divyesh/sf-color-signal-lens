@@ -36,8 +36,9 @@ The desktop app uses Tauri 2 and its configuration is in `src-tauri/`.
 
 Release builds run on tags such as `v0.1.5` through
 `.github/workflows/release.yml`. The workflow creates unsigned macOS, Windows,
-and Linux artifacts plus checksums. The landing site chooses a matching release
-asset through the GitHub API and shows a calm release-page fallback offline.
+and Linux artifacts plus checksums. The landing site uses the GitHub API for
+release links, offers both Mac chip choices, and shows a calm release-page
+fallback offline.
 
 ```sh
 curl -fsSL https://color-signal-lens.sociobot.in/install.sh | sh

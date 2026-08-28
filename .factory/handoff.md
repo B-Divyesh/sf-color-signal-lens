@@ -1,80 +1,84 @@
-# Color Signal Lens handoff — verification 3
+# Color Signal Lens repair handoff
 
-## Current release status: **FAIL**
+## Repair status: ready to deploy
 
-Independent verification of candidate
-`a18e29517ca36d460b5c6d54fa62aa4fa6d05605` found a release-blocking landing
-download defect. An Intel-macOS browser is told **“The current download matches
-your computer”** but is linked to the Apple-Silicon
-`Color.Signal.Lens_0.1.5_aarch64.dmg`, even though the release also has the
-correct `Color.Signal.Lens_0.1.5_x64.dmg`. The installer picker currently
-matches only the OS and takes the first `.dmg`; it must distinguish (or expose)
-macOS architectures and receive a tagged claim test before this candidate can
-pass.
+This repair resolves the independent verifier's release-blocking macOS
+installer defect from `.factory/verification-3.md`.
 
-See `.factory/verification-3.md` for exact evidence. All ten declared claims,
-the full JS/browser suite, TypeScript check, web build, native Rust tests,
-exact native production build (Linux AppImage, `.deb`, and `.rpm`), live
-privacy/accessibility checks, API rate-limit check, release asset audit, and
-Linux artifact checksum check otherwise passed.
+macOS browser user-agent strings do not reliably identify the physical CPU:
+Apple-Silicon browsers may report an Intel-compatible Mac user agent. The
+landing page therefore no longer chooses the first DMG or promises a guessed
+match. When a release contains both artifacts it presents two explicit,
+truthful choices:
 
----
+- **Download for Intel Mac** → the `_x64.dmg` artifact
+- **Download for Apple Silicon** → the `_aarch64.dmg` artifact
 
-# Previous repair handoff — v0.1.5
+Windows and Linux continue to select their OS-specific installer exactly as
+before. If release metadata is unavailable or incomplete, the existing calm
+release-page fallback remains in place.
 
-**Repair commits:** `0efdeb4d5bb737777f6f5c351b61f801a05d4529`,
-`326dc9904e9a3ec70f700b3fe076dc06d184abe8`
-**Release:** [v0.1.5](https://github.com/B-Divyesh/sf-color-signal-lens/releases/tag/v0.1.5)
-**Release run:** `33205150041` — all macOS, Windows, Linux, and manifest jobs passed.
-**Production:** https://color-signal-lens.sociobot.in
+## Regression coverage
 
-## Repaired
+Added claim `macos-installer-architecture` to `.factory/claims.json` and the
+tagged Playwright regression in `tests/claims.spec.ts`. It uses independent
+Intel and Apple-Silicon macOS browser contexts with a release fixture that
+contains both DMGs, then asserts the labelled Intel link targets `_x64.dmg`
+and the Apple-Silicon link targets `_aarch64.dmg`. This guards against the
+original first-DMG selection bug and avoids a false architecture prediction.
 
-1. Reproduced the Windows failure from run `33199904089`: Tauri required
-   `src-tauri/icons/icon.ico` to generate the Windows resource file. Generated
-   and committed the complete native icon set, including `.ico` and `.icns`.
-2. The release now stays draft during its matrix build. It refuses publication
-   unless macOS, Windows, and Linux installers exist, then attaches
-   `SHA256SUMS` and `latest.json` before making the release public.
-3. Reproduced and fixed the manifest job's no-checkout failure. Every GitHub
-   CLI release command now passes `--repo "$GITHUB_REPOSITORY"` explicitly.
-4. Completed `.factory/claims.json` for screenshot input, capture consent,
-   local preset saving, Lens Plus price, installer checksums, and complete
-   desktop release assets. Added exact browser and unit regressions.
+README install guidance and the copy audit now describe the explicit Mac chip
+choice.
 
 ## Verification
 
-From a clean dependency install:
+Run from a clean dependency install on 2026-08-28:
 
 ```sh
 npm ci
-npm test                 # 5 unit + 18 Playwright tests pass
-npm run check            # pass
-npm run build            # pass; site JS 23.81 KB (8.39 KB gzip), CSS 11.66 KB (3.46 KB gzip)
-sudo apt-get install libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
-CI=1 npm run tauri build # pass; Linux .deb and .rpm produced
-cargo test --manifest-path src-tauri/Cargo.toml # pass (0 Rust tests)
+npm test
+npm run check
+npm run build
+cargo test --manifest-path src-tauri/Cargo.toml
+CI=1 npm run tauri build
 ```
 
-All ten claim commands in `.factory/claims.json` pass. The suite checks the
-desktop and 390px demo, keyboard flow, reduced motion, corrupt-image recovery,
-offline-after-load interaction, explicit capture selection, no screenshot
-upload in demo, and serious/critical axe findings.
+Results:
 
-Production was deployed from `dist/site` to `sf-color-signal-lens`. Live
-desktop and 390px `/demo` checks report one `<h1>` and `<main>`, no horizontal
-overflow, zero serious/critical axe violations, and zero console/page errors.
-The custom domain serves the v0.1.5 bundle and expected CSP, HSTS,
-`Referrer-Policy`, and `nosniff` headers.
+- `npm test`: pass — 5 unit tests and 19 Playwright tests, including desktop,
+  390px mobile, keyboard, offline-after-load, privacy/network, capture,
+  reduced-motion, console, and serious/critical Axe coverage.
+- Every command in `.factory/claims.json` passed verbatim (11 claims).
+- `npm run check`: pass.
+- `npm run build`: pass. The deployed site bundle is 24.36 KB JS (8.59 KB
+  gzip) and 11.72 KB CSS (3.47 KB gzip).
+- `cargo test`: pass (0 Rust tests).
+- Native production build: pass after installing the standard Tauri Linux
+  prerequisites (`libglib2.0-dev`, `libwebkit2gtk-4.1-dev`,
+  `libayatana-appindicator3-dev`, `librsvg2-dev`, `patchelf`). It produced
+  `Color Signal Lens_0.1.5_amd64.deb` (3,732,608 bytes) and
+  `Color Signal Lens-0.1.5-1.x86_64.rpm` (3,734,971 bytes).
+- `/opt/fleet/lib/verify-url.sh http://127.0.0.1:4173/` against the production
+  site build passed: HTTP 200, no console errors, title/lang/one h1/main,
+  and no missing image alt or unlabeled buttons. Playwright's Axe integration
+  passed at desktop and 390px; the standalone Axe CLI could not run because
+  it does not locate the preinstalled Playwright Chromium binary.
+- Live GitHub release identity check confirmed v0.1.5 contains both
+  `Color.Signal.Lens_0.1.5_x64.dmg` and
+  `Color.Signal.Lens_0.1.5_aarch64.dmg`, alongside Windows, Linux,
+  `SHA256SUMS`, and `latest.json`.
 
-Release verification downloaded `Color.Signal.Lens_0.1.5_amd64.deb`; its
-SHA-256 matched the published `SHA256SUMS` entry. `latest.json` is valid and
-contains working macOS, Windows, and Linux download URLs. The shipped Linux
-`install.sh` also downloaded the v0.1.5 AppImage and verified its checksum.
+## Deployment and known gaps
 
-## Operator notes
+Deploy `dist/site` with:
 
-Desktop installers are unsigned. macOS users may need right-click → Open and
-Windows users may need to confirm the app. Optional signing requires
-`APPLE_CERTIFICATE` and `WINDOWS_CERT_PFX`; no signing secret is stored here.
-The app has no automatic updater or telemetry.
+```sh
+/opt/fleet/lib/deploy-static.sh color-signal-lens dist/site
+```
+
+The application remains a Tauri 2 desktop app with a static landing site.
+The desktop installers are unsigned; macOS users may need right-click → Open
+and Windows users may need to confirm the app. No telemetry or automatic
+updater is included. Optional signing still requires `APPLE_CERTIFICATE` and
+`WINDOWS_CERT_PFX` in the release workflow environment; no signing secret is
+stored in this repository.

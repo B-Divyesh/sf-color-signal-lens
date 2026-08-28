@@ -21,6 +21,7 @@ the 22-word limit and banned marketing words.
 | Save custom lenses for $12 once. | 7 | Pass |
 | The free lens includes screenshot reading, labels, patterns, and remapping. | 10 | Pass |
 | Plus saves named presets. | 4 | Pass |
+| Choose the macOS installer that matches your chip. | 8 | Pass |
 
 ## Terminology table
 
