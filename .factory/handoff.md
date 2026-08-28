@@ -8,7 +8,8 @@
 
 1. Desktop release workflow now waits for every platform build before creating
    `SHA256SUMS` and `latest.json`, including per-platform download URLs. The
-   repair is released as tag `v0.1.3`.
+   repair is tagged as `v0.1.3`; its cross-platform GitHub Actions run is the
+   publishing authority for the downloadable artifacts.
 2. Landing download discovery calls the GitHub releases collection endpoint,
    which returns `200 []` before a release exists, rather than requesting the
    404-producing `releases/latest` endpoint. The calm fallback remains.
