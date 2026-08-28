@@ -49,6 +49,22 @@ uses the token-bound cache format. `.factory/claims.json` contains 13 claims.
 - Public release `v0.1.5` still contains macOS x64/aarch64, Windows EXE/MSI,
   Linux AppImage/DEB/RPM, `SHA256SUMS`, and valid `latest.json`; its downloaded
   AMD64 DEB passed `sha256sum --check`.
+- Repair commit `320b489c543ceff0b3d6ee93516516272cd50d50` was pushed to
+  `origin/main`.
+- `dist/site` was deployed to the existing `sf-color-signal-lens` Static Web
+  App. Azure deployment ID:
+  `4e85a08c-977e-4d4b-ac3e-8fc276ca10d4`; default host:
+  `nice-pebble-0ccaf2710.7.azurestaticapps.net`.
+- Live `verify-url.sh` passed with a 1,097 ms network-idle load and no console
+  errors. The live JavaScript SHA-256 is
+  `a91cbe048991337e410d0dabd397301d41bb8504c024d8be56fb1f64969a3903`;
+  CSS is
+  `49fdf5caeb5db6d1708877e5e183b9757a3e61c27c7f7bf97054403890c5ea4d`.
+  Both match `dist/site` byte-for-byte and use one-year immutable caching.
+- Fresh live Chromium contexts at 1440×900 and 390×844 set only the verifier's
+  `definitely-invalid` token, opened `/lens`, made exactly one Sociobot verify
+  request each, rendered zero preset-name controls, removed the token, and
+  logged zero console/page errors.
 
 Run the clean gates with:
 
