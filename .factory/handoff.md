@@ -24,8 +24,9 @@ add a direct-`/lens`, invalid-license regression test before any release.
 
 The verifier installed standard Linux Tauri build prerequisites in the
 disposable container to run the native checks; no product source code was
-changed. The native release-package command was still compiling when this
-handoff section was written; do not treat that as a waiver for the blocker.
+changed. `cargo test --manifest-path src-tauri/Cargo.toml` and
+`CI=1 npm run tauri build -- --bundles deb,rpm` both passed, producing unsigned
+DEB and RPM packages. This does not waive the entitlement blocker.
 
 ---
 

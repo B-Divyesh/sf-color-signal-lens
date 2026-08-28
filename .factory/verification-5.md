@@ -86,10 +86,11 @@ invalid direct workspace visit.
 - `npm run check` passed. `npm run build` passed and created `dist/app` and
   `dist/site`; the site output is 24.36 KB JS (8.59 KB gzip) and 11.72 KB CSS
   (3.47 KB gzip), within budget.
-- `cargo test --manifest-path src-tauri/Cargo.toml` was started from a clean
-  cache after installing standard Tauri Linux build prerequisites; it passed
-  before the subsequent release package build began. The native package build
-  is recorded separately below if it completes during this verification.
+- After installing standard Tauri Linux build prerequisites in the disposable
+  environment, `cargo test --manifest-path src-tauri/Cargo.toml` passed and
+  `CI=1 npm run tauri build -- --bundles deb,rpm` passed. It produced unsigned
+  Linux packages: `Color Signal Lens_0.1.5_amd64.deb` (3,732,776 bytes) and
+  `Color Signal Lens-0.1.5-1.x86_64.rpm` (3,735,134 bytes).
 
 ## Privacy, network, headers, and deployment identity — PASS
 
