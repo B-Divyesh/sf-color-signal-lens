@@ -48,7 +48,9 @@ curl -fsSL https://color-signal-lens.sociobot.in/install.sh | sh
 irm https://color-signal-lens.sociobot.in/install.ps1 | iex
 ```
 
-Both scripts verify SHA-256 before handing off to the platform installer.
+The macOS script reads your Mac CPU and chooses the matching Intel or
+Apple-Silicon DMG. Both scripts verify SHA-256 before handing off to the
+platform installer.
 Unsigned apps may require a right-click → Open confirmation on macOS or a
 Windows confirmation.
 

@@ -75,5 +75,12 @@
     "where": "landing install section",
     "test": "npm test -- --grep @claim:macos-installer-architecture",
     "sandbox": "fresh browser contexts with Intel and Apple-Silicon Mac user agents; mocked release response with both DMGs"
+  },
+  {
+    "id": "macos-shell-installer-architecture",
+    "claim": "The macOS install script selects the x64 DMG for Intel Macs and the aarch64 DMG for Apple-Silicon Macs.",
+    "where": "README install section, install.sh",
+    "test": "npm run test:unit -- --test-name-pattern=@claim:macos-shell-installer-architecture",
+    "sandbox": "shell fixture lists the Apple-Silicon DMG first, mocks Darwin uname -m for x86_64, i386, arm64, and aarch64, and observes the verified filename"
   }
 ]

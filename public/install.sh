@@ -5,7 +5,13 @@ repo='B-Divyesh/sf-color-signal-lens'
 os=$(uname -s | tr '[:upper:]' '[:lower:]')
 arch=$(uname -m)
 case "$os" in
-  darwin) match='\.dmg$' ;;
+  darwin)
+    case "$arch" in
+      x86_64|i386) match='_x64\.dmg$' ;;
+      arm64|aarch64) match='_aarch64\.dmg$' ;;
+      *) echo "Unsupported macOS CPU: $arch. Download the matching installer from the release page." >&2; exit 1 ;;
+    esac
+    ;;
   linux) match='\.appimage$|\.deb$' ;;
   *) echo "Use install.ps1 on Windows." >&2; exit 1 ;;
 esac

@@ -45,3 +45,58 @@ fi
   assert.equal(verified.status, 0, verified.stderr);
   assert.match(verified.stdout, /Verified ColorSignalLens\.deb/);
 });
+
+test('@claim:macos-shell-installer-architecture install.sh selects the DMG that matches uname -m', () => {
+  const fixture = mkdtempSync(join(tmpdir(), 'color-signal-lens-macos-installer-'));
+  const bin = join(fixture, 'bin');
+  mkdirSync(bin);
+  const curl = join(bin, 'curl');
+  const uname = join(bin, 'uname');
+
+  writeFileSync(curl, `#!/usr/bin/env sh
+out=''
+for arg in "$@"; do
+  if [ "$previous" = '-o' ]; then out="$arg"; fi
+  previous="$arg"
+done
+if [ -z "$out" ]; then
+  printf '%s' '{"assets":[{"browser_download_url":"https://example.invalid/Color.Signal.Lens_0.1.6_aarch64.dmg"},{"browser_download_url":"https://example.invalid/Color.Signal.Lens_0.1.6_x64.dmg"},{"browser_download_url":"https://example.invalid/SHA256SUMS"}]}'
+elif printf '%s' "$*" | grep -q SHA256SUMS; then
+  { printf '%s\\n' 'Apple fixture installer' | sha256sum | sed 's/  -$/  Color.Signal.Lens_0.1.6_aarch64.dmg/'; printf '%s\\n' 'Intel fixture installer' | sha256sum | sed 's/  -$/  Color.Signal.Lens_0.1.6_x64.dmg/'; } > "$out"
+elif printf '%s' "$*" | grep -q aarch64.dmg; then
+  printf '%s\\n' 'Apple fixture installer' > "$out"
+elif printf '%s' "$*" | grep -q x64.dmg; then
+  printf '%s\\n' 'Intel fixture installer' > "$out"
+else
+  exit 1
+fi
+`);
+  chmodSync(curl, 0o755);
+
+  for (const [cpu, expected] of [
+    ['x86_64', 'Color.Signal.Lens_0.1.6_x64.dmg'],
+    ['i386', 'Color.Signal.Lens_0.1.6_x64.dmg'],
+    ['arm64', 'Color.Signal.Lens_0.1.6_aarch64.dmg'],
+    ['aarch64', 'Color.Signal.Lens_0.1.6_aarch64.dmg'],
+  ]) {
+    writeFileSync(uname, `#!/usr/bin/env sh\nif [ "$1" = '-s' ]; then printf Darwin; else printf '${cpu}'; fi\n`);
+    chmodSync(uname, 0o755);
+    const result = spawnSync('sh', ['public/install.sh'], {
+      cwd: process.cwd(),
+      env: { ...process.env, PATH: `${bin}:${process.env.PATH}` },
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, `${cpu}: ${result.stderr}`);
+    assert.match(result.stdout, new RegExp(`Verified ${expected.replaceAll('.', '\\.')}`), `${cpu} selects ${expected}`);
+  }
+
+  writeFileSync(uname, "#!/usr/bin/env sh\nif [ \"$1\" = '-s' ]; then printf Darwin; else printf mips64; fi\n");
+  chmodSync(uname, 0o755);
+  const unknown = spawnSync('sh', ['public/install.sh'], {
+    cwd: process.cwd(),
+    env: { ...process.env, PATH: `${bin}:${process.env.PATH}` },
+    encoding: 'utf8',
+  });
+  assert.equal(unknown.status, 1);
+  assert.match(unknown.stderr, /Unsupported macOS CPU: mips64/);
+});
