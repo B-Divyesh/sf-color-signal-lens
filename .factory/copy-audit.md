@@ -22,6 +22,8 @@ the 22-word limit and banned marketing words.
 | The free lens includes screenshot reading, labels, patterns, and remapping. | 10 | Pass |
 | Plus saves named presets. | 4 | Pass |
 | Choose the macOS installer that matches your chip. | 8 | Pass |
+| Lens Plus presets are unavailable in the demo. | 8 | Pass |
+| The reading controls stay free. | 5 | Pass |
 
 ## Terminology table
 

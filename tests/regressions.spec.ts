@@ -7,6 +7,33 @@ test('real workspace deep link loads after a cold navigation', async ({ page }) 
   await expect(page.getByText('This paper layer is missing.')).toHaveCount(0);
 });
 
+test('a valid verdict cached for another token cannot unlock Lens Plus', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('sb_license:color-signal-lens', 'replacement-invalid');
+    localStorage.setItem('sb_license_check:color-signal-lens', JSON.stringify({ checked: Date.now(), valid: true, license: 'different-license' }));
+  });
+  await page.route('https://api.sociobot.in/api/v1/products/color-signal-lens/verify?license=replacement-invalid', (route) => route.fulfill({
+    contentType: 'application/json',
+    body: JSON.stringify({ valid: false, reason: 'invalid' }),
+  }));
+  await page.goto('/lens');
+  await expect(page.locator('#preset-name')).toHaveCount(0);
+  await expect(page.getByText('This license is no longer active. Buy Lens Plus to save named presets.')).toBeVisible();
+});
+
+test('an uncached active license unlocks Lens Plus only after verification', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('sb_license:color-signal-lens', 'active-fixture'));
+  await page.route('https://api.sociobot.in/api/v1/products/color-signal-lens/verify?license=active-fixture', (route) => route.fulfill({
+    contentType: 'application/json',
+    body: JSON.stringify({ valid: true, reason: 'ok' }),
+  }));
+  await page.goto('/lens');
+  await expect(page.locator('#preset-name')).toBeVisible();
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('sb_license_check:color-signal-lens') || 'null'))).toEqual(
+    expect.objectContaining({ valid: true, license: 'active-fixture' }),
+  );
+});
+
 test('Start for real discards the demo image and opens the reloadable workspace', async ({ page }) => {
   await page.goto('/demo');
   await page.getByRole('button', { name: 'Start for real' }).click();

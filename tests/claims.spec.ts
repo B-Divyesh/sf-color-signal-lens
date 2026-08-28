@@ -42,7 +42,7 @@ test('@claim:screenshot-input opens a screenshot from the device', async ({ page
 test('@claim:named-presets saves a named preset in the local app storage', async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem('sb_license:color-signal-lens', 'fixture-license');
-    localStorage.setItem('sb_license_check:color-signal-lens', JSON.stringify({ checked: Date.now(), valid: true }));
+    localStorage.setItem('sb_license_check:color-signal-lens', JSON.stringify({ checked: Date.now(), valid: true, license: 'fixture-license' }));
   });
   await page.goto('/lens');
   await page.locator('#preset-name').fill('Code review');
@@ -51,6 +51,20 @@ test('@claim:named-presets saves a named preset in the local app storage', async
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('color-signal-lens:presets') || '[]'))).toEqual([
     expect.objectContaining({ name: 'Code review', colour: '#9c2d20', mode: 'patterns', mapping: 'blue' }),
   ]);
+});
+
+test('@claim:license-entitlement rejects an invalid license on a direct workspace visit', async ({ page }) => {
+  let verificationRequests = 0;
+  await page.addInitScript(() => localStorage.setItem('sb_license:color-signal-lens', 'definitely-invalid'));
+  await page.route('https://api.sociobot.in/api/v1/products/color-signal-lens/verify?license=definitely-invalid', async (route) => {
+    verificationRequests += 1;
+    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ valid: false, reason: 'invalid' }) });
+  });
+  await page.goto('/lens');
+  await expect(page.locator('#preset-name')).toHaveCount(0);
+  await expect(page.getByText('This license is no longer active. Buy Lens Plus to save named presets.')).toBeVisible();
+  expect(verificationRequests).toBe(1);
+  expect(await page.evaluate(() => localStorage.getItem('sb_license:color-signal-lens'))).toBeNull();
 });
 
 test('@claim:lens-plus-price displays the exact one-time Lens Plus price', async ({ page }) => {

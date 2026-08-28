@@ -1,4 +1,75 @@
-# Color Signal Lens verification handoff — FAIL
+# Color Signal Lens repair handoff — repaired
+
+## Repair status (2026-08-28 UTC)
+
+Work order `color-signal-lens-repair-5` repairs the release blocker in
+independent verification 5. The direct `/lens` route no longer treats a stored
+token as entitlement. Lens Plus controls require a cached valid verdict for
+that exact token. An uncached token stays locked while Sociobot verification
+runs. An invalid response removes the token and leaves the free controls
+available. A stale matching valid verdict supports offline use and is checked
+when the daily verification is due. Preset saving repeats the entitlement
+check instead of relying only on hidden controls.
+
+The demo does not read or expose the real Lens Plus state. Exact regression
+coverage now rejects an invalid token on a cold direct `/lens` visit, rejects
+a valid cache belonging to another token, and proves that an uncached active
+fixture unlocks only after verification. The existing named-preset fixture now
+uses the token-bound cache format. `.factory/claims.json` contains 13 claims.
+
+## Verification evidence for this repair
+
+- `npm ci`: 29 packages installed, 0 vulnerabilities.
+- All 13 exact commands in `.factory/claims.json`: passed.
+- Final `CI=1 npm test`: 6 unit and 22 Playwright tests passed.
+- `npm run check` and `npm run build`: passed; `dist/app` and `dist/site`
+  produced.
+- Site output: JS 25.65 KB (8.99 KB gzip), CSS 11.72 KB (3.47 KB gzip), hero
+  WebP 50.72 KB.
+- Browser coverage passed at desktop and 390×844: keyboard skip/focus, touch
+  targets, reduced motion, offline-after-load, demo isolation/reset, corrupt
+  image recovery, selected-region capture, privacy request logging, route
+  reload, release fallback, and console checks.
+- Playwright Axe found zero serious or critical issues on desktop and 390px.
+  The standalone Axe CLI was also invoked, but this container has no Selenium
+  `chromedriver`; the pinned Playwright/Axe checks used the preinstalled
+  Chromium successfully.
+- Local `verify-url.sh`: HTTP 200, 1,037 ms network-idle load, no console
+  errors, `lang=en`, one h1, main landmark, all image alt text, and no unnamed
+  buttons.
+- Lighthouse mobile: performance 100, accessibility 100, best practices 100,
+  SEO 100; LCP 1.5 s, CLS 0, total blocking time 0 ms.
+- `cargo test --manifest-path src-tauri/Cargo.toml`: passed.
+- `CI=1 npm run tauri build -- --bundles deb,rpm`: passed. DEB is 3,733,064
+  bytes (`960c03eaed64fffe729bb89fca02816c8fcfc68c3f9737166d8731012add95c1`);
+  RPM is 3,735,342 bytes
+  (`9d1706a7fcffdc995faf78634347011033ba892a223559fe359b1f3e408291ec`).
+- Live Sociobot verification returned HTTP 200 with `valid:false` and
+  `reason:"invalid"` for the invalid test value.
+- Public release `v0.1.5` still contains macOS x64/aarch64, Windows EXE/MSI,
+  Linux AppImage/DEB/RPM, `SHA256SUMS`, and valid `latest.json`; its downloaded
+  AMD64 DEB passed `sha256sum --check`.
+
+Run the clean gates with:
+
+```sh
+npm ci
+CI=1 npm test
+npm run check
+npm run build
+cargo test --manifest-path src-tauri/Cargo.toml
+CI=1 npm run tauri build -- --bundles deb,rpm
+```
+
+Known operator action is unchanged: installers are unsigned. macOS signing
+requires `APPLE_CERTIFICATE`; Windows Authenticode requires
+`WINDOWS_CERT_PFX`. No secrets are stored here. A real valid customer license
+was unavailable; valid and invalid client behavior uses deterministic
+fixtures, and the live invalid response was checked directly.
+
+---
+
+# Independent verification history — FAIL before this repair
 
 ## Independent verification 5 (2026-08-28 UTC)
 

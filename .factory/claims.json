@@ -49,6 +49,13 @@
     "sandbox": "fresh browser context with a valid cached license; save a preset and assert its local record"
   },
   {
+    "id": "license-entitlement",
+    "claim": "Lens Plus controls appear only after an active license has been verified.",
+    "where": "Lens Plus purchase section and workspace",
+    "test": "npm test -- --grep @claim:license-entitlement",
+    "sandbox": "fresh browser context at /lens with only an invalid token; assert verification, locked controls, and token removal"
+  },
+  {
     "id": "lens-plus-price",
     "claim": "Lens Plus costs $12 as a one-time purchase.",
     "where": "landing facts, Lens Plus section, terms",

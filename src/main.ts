@@ -4,8 +4,12 @@ import { detectStatusName, parseHex, rgbToHex, sampleSvg, svgDataUrl, type LensM
 declare const __SITE_BUILD__: boolean;
 
 type Source = { url: string; name: string; kind: 'sample' | 'file' | 'capture' };
+type LicenseVerdict = { checked: number; valid: boolean; license: string };
+type LicenseResult = 'valid' | 'invalid' | 'unavailable';
 const app = document.querySelector<HTMLDivElement>('#app')!;
 const siteBuild = __SITE_BUILD__;
+const licenseKey = 'sb_license:color-signal-lens';
+const licenseCheckKey = 'sb_license_check:color-signal-lens';
 let source: Source | null = null;
 let mode: LensMode = 'patterns';
 let target: Rgb = parseHex('#9c2d20');
@@ -50,7 +54,7 @@ function renderLanding() {
   <section class="plus"><p class="eyebrow">LENS PLUS</p><h2>Save custom lenses for $12 once.</h2><p>The free lens includes screenshot reading, labels, patterns, and remapping. Plus saves named presets.</p><a class="button primary" href="https://api.sociobot.in/api/v1/products/color-signal-lens/checkout">Buy Lens Plus</a><button class="link-button" id="restore-license">Have a license?</button><div id="license-area"></div></section>
   <section class="install"><p class="eyebrow">DESKTOP APP</p><h2>Install the lens on your computer.</h2><p id="download-state">Downloads are being published. <a href="https://github.com/B-Divyesh/sf-color-signal-lens/releases">Open the release page</a>.</p><a id="download-button" class="button secondary" href="https://github.com/B-Divyesh/sf-color-signal-lens/releases">See downloads</a><p class="download-note">Installers are unsigned. Your computer may ask you to confirm the app.</p></section>`, 'Color Signal Lens — Make status colors distinct');
   document.querySelector('#restore-license')?.addEventListener('click', showRestore);
-  acceptLicense();
+  void acceptLicense();
   hydrateDownload();
 }
 
@@ -205,18 +209,122 @@ async function captureScreen() {
     await useImage(canvas.toDataURL('image/png'), 'Selected screen region', 'capture');
   } catch (error) { setSourceStatus(error instanceof Error ? error.message : 'Capture did not complete. Open a screenshot instead.'); }
 }
-function renderLens() { layout(workspace(), 'Color Signal Lens — Inspect a screenshot signal'); wireWorkspace(); }
+function renderLens() {
+  layout(workspace(), 'Color Signal Lens — Inspect a screenshot signal');
+  wireWorkspace();
+  void acceptLicense((result) => {
+    const message = result === 'invalid'
+      ? 'This license is no longer active. Buy Lens Plus to save named presets.'
+      : result === 'unavailable'
+        ? 'The license could not be checked. Connect to the internet and reload.'
+        : undefined;
+    refreshPremiumPanel(message);
+  });
+}
 
-function premiumPanel() { return localStorage.getItem('sb_license:color-signal-lens') ? `<div class="preset"><label for="preset-name">Lens Plus preset name</label><div class="preset-row"><input id="preset-name" maxlength="32" placeholder="Code review"><button id="save-preset" class="button secondary">Save preset</button></div><p id="preset-note" aria-live="polite">Saved presets stay on this device.</p></div>` : `<p class="plus-note"><a href="/" data-nav>Lens Plus</a> saves named presets. The reading controls stay free.</p>`; }
-function savePreset() { const name = (document.querySelector<HTMLInputElement>('#preset-name')?.value || '').trim(); const note = document.querySelector('#preset-note')!; if (!name) { note.textContent = 'Name the preset, then save it.'; return; } const presets = JSON.parse(localStorage.getItem('color-signal-lens:presets') || '[]') as { name: string; colour: string; mode: LensMode; mapping: string }[]; presets.push({ name, colour: rgbToHex(target), mode, mapping }); localStorage.setItem('color-signal-lens:presets', JSON.stringify(presets.slice(-12))); note.textContent = `${name} is saved on this device.`; }
+function cachedLicenseVerdict(license: string) {
+  try {
+    const verdict = JSON.parse(localStorage.getItem(licenseCheckKey) || 'null') as Partial<LicenseVerdict> | null;
+    if (!verdict || verdict.license !== license || typeof verdict.checked !== 'number' || typeof verdict.valid !== 'boolean') return null;
+    return verdict as LicenseVerdict;
+  } catch {
+    localStorage.removeItem(licenseCheckKey);
+    return null;
+  }
+}
+
+function hasValidLicense() {
+  const license = localStorage.getItem(licenseKey);
+  return Boolean(license && cachedLicenseVerdict(license)?.valid);
+}
+
+function premiumContent(message?: string) {
+  if (demo) return '<p class="plus-note">Lens Plus presets are unavailable in the demo. The reading controls stay free.</p>';
+  if (hasValidLicense()) return '<div class="preset"><label for="preset-name">Lens Plus preset name</label><div class="preset-row"><input id="preset-name" maxlength="32" placeholder="Code review"><button id="save-preset" class="button secondary">Save preset</button></div><p id="preset-note" aria-live="polite">Saved presets stay on this device.</p></div>';
+  const checking = localStorage.getItem(licenseKey) ? 'Checking the Lens Plus license. The reading controls stay free.' : '<a href="/" data-nav>Lens Plus</a> saves named presets. The reading controls stay free.';
+  return `<p class="plus-note" role="status" aria-live="polite">${message || checking}</p>`;
+}
+
+function premiumPanel() { return `<div id="premium-panel">${premiumContent()}</div>`; }
+function refreshPremiumPanel(message?: string) {
+  const panel = document.querySelector<HTMLElement>('#premium-panel');
+  if (!panel) return;
+  panel.innerHTML = premiumContent(message);
+  document.querySelector('#save-preset')?.addEventListener('click', savePreset);
+  wireNavigation(panel);
+}
+function savePreset() {
+  if (!hasValidLicense()) { refreshPremiumPanel('Check an active Lens Plus license before saving a preset.'); return; }
+  const name = (document.querySelector<HTMLInputElement>('#preset-name')?.value || '').trim();
+  const note = document.querySelector('#preset-note')!;
+  if (!name) { note.textContent = 'Name the preset, then save it.'; return; }
+  const presets = JSON.parse(localStorage.getItem('color-signal-lens:presets') || '[]') as { name: string; colour: string; mode: LensMode; mapping: string }[];
+  presets.push({ name, colour: rgbToHex(target), mode, mapping });
+  localStorage.setItem('color-signal-lens:presets', JSON.stringify(presets.slice(-12)));
+  note.textContent = `${name} is saved on this device.`;
+}
 
 function renderPrivacy() { layout(`<article class="legal paper-edge"><p class="eyebrow">PRIVACY</p><h1>Your screenshot stays on this device.</h1><p>Color Signal Lens reads pixels in the image you open. It does not upload screenshots, record your screen, or use analytics.</p><h2>Local storage</h2><p>The demo uses a separate local browser key. Reset demo deletes it. A paid license, if you add one, is stored only in your browser so the app can remember it.</p><h2>Screen permission</h2><p>The installed app asks for screen permission only after you press Capture screen region. You choose the region before it is added. You can use files or pasted screenshots instead.</p><p>Last updated: 28 August 2026.</p></article>`, 'Privacy — Color Signal Lens'); }
 function renderTerms() { layout(`<article class="legal paper-edge"><p class="eyebrow">TERMS</p><h1>Use the lens to read your own screen.</h1><p>Color Signal Lens is an accessibility aid for inspecting images you choose.</p><h2>Lens Plus</h2><p>Lens Plus costs $12 as a one-time purchase. Sociobot and Dodo are the merchant of record. A refunded purchase may lose access to saved presets.</p><h2>Limits</h2><p>You are responsible for the screenshots you open.</p><p>Last updated: 28 August 2026.</p></article>`, 'Terms — Color Signal Lens'); }
 function render404() { layout(`<article class="legal paper-edge"><p class="eyebrow">NOT FOUND</p><h1>This paper layer is missing.</h1><p>The page may have moved. Return to the lens and choose a screenshot.</p><a class="button primary" href="/" data-nav>Return home</a></article>`, 'Page not found — Color Signal Lens'); }
 
-function showRestore() { const area = document.querySelector('#license-area')!; area.innerHTML = `<label for="license-input">Paste your license</label><div class="restore"><input id="license-input" autocomplete="off"><button class="button secondary" id="save-license">Restore license</button></div><p id="license-note" aria-live="polite"></p>`; document.querySelector('#save-license')?.addEventListener('click', () => { const value = (document.querySelector<HTMLInputElement>('#license-input')?.value || '').trim(); if (!value) return; localStorage.setItem('sb_license:color-signal-lens', value); document.querySelector('#license-note')!.textContent = 'License saved. It will be checked when you are online.'; void verifyLicense(value, document.querySelector('#license-note')!); }); }
-function acceptLicense() { const params = new URLSearchParams(location.search); const value = params.get('license'); if (value) { localStorage.setItem('sb_license:color-signal-lens', value); params.delete('license'); history.replaceState({}, '', `${location.pathname}${params.size ? `?${params}` : ''}`); } const stored = localStorage.getItem('sb_license:color-signal-lens'); if (stored) void verifyLicense(stored); }
-async function verifyLicense(license: string, note?: Element) { const key = 'sb_license_check:color-signal-lens'; const cache = JSON.parse(localStorage.getItem(key) || 'null') as { checked: number; valid: boolean } | null; if (cache && Date.now() - cache.checked < 86_400_000) { if (!cache.valid && note) note.textContent = 'This license is no longer active.'; return; } try { const response = await fetch(`https://api.sociobot.in/api/v1/products/color-signal-lens/verify?license=${encodeURIComponent(license)}`); const result = await response.json() as { valid: boolean }; localStorage.setItem(key, JSON.stringify({ checked: Date.now(), valid: result.valid })); if (!result.valid) { localStorage.removeItem('sb_license:color-signal-lens'); if (note) note.textContent = 'This license is no longer active. You can buy Lens Plus again.'; } else if (note) note.textContent = 'License is active.'; } catch { if (note) note.textContent = 'License saved. It will be checked when you are online.'; } }
+function storeLicense(license: string) {
+  if (localStorage.getItem(licenseKey) !== license) localStorage.removeItem(licenseCheckKey);
+  localStorage.setItem(licenseKey, license);
+}
+function showRestore() {
+  const area = document.querySelector('#license-area')!;
+  area.innerHTML = `<label for="license-input">Paste your license</label><div class="restore"><input id="license-input" autocomplete="off"><button class="button secondary" id="save-license">Restore license</button></div><p id="license-note" aria-live="polite"></p>`;
+  document.querySelector('#save-license')?.addEventListener('click', () => {
+    const value = (document.querySelector<HTMLInputElement>('#license-input')?.value || '').trim();
+    if (!value) return;
+    storeLicense(value);
+    const note = document.querySelector('#license-note')!;
+    note.textContent = 'Checking the license.';
+    void verifyLicense(value, note);
+  });
+}
+async function acceptLicense(onResult?: (result: LicenseResult) => void) {
+  const params = new URLSearchParams(location.search);
+  const value = params.get('license');
+  if (value) {
+    storeLicense(value);
+    params.delete('license');
+    history.replaceState({}, '', `${location.pathname}${params.size ? `?${params}` : ''}`);
+  }
+  const stored = localStorage.getItem(licenseKey);
+  if (stored) onResult?.(await verifyLicense(stored));
+}
+async function verifyLicense(license: string, note?: Element): Promise<LicenseResult> {
+  const cached = cachedLicenseVerdict(license);
+  if (cached && Date.now() - cached.checked < 86_400_000) {
+    if (!cached.valid) {
+      localStorage.removeItem(licenseKey);
+      if (note) note.textContent = 'This license is no longer active. You can buy Lens Plus again.';
+      return 'invalid';
+    }
+    if (note) note.textContent = 'License is active.';
+    return 'valid';
+  }
+  try {
+    const response = await fetch(`https://api.sociobot.in/api/v1/products/color-signal-lens/verify?license=${encodeURIComponent(license)}`);
+    if (!response.ok) throw new Error('License check failed');
+    const result = await response.json() as { valid?: boolean };
+    if (localStorage.getItem(licenseKey) !== license) return 'unavailable';
+    const valid = result.valid === true;
+    localStorage.setItem(licenseCheckKey, JSON.stringify({ checked: Date.now(), valid, license } satisfies LicenseVerdict));
+    if (!valid) {
+      localStorage.removeItem(licenseKey);
+      if (note) note.textContent = 'This license is no longer active. You can buy Lens Plus again.';
+      return 'invalid';
+    }
+    if (note) note.textContent = 'License is active.';
+    return 'valid';
+  } catch {
+    if (note) note.textContent = cached?.valid ? 'License check is offline. The last active check is in use.' : 'The license could not be checked. Connect to the internet and try again.';
+    return cached?.valid ? 'valid' : 'unavailable';
+  }
+}
 type ReleaseAsset = { name: string; browser_download_url: string };
 type CachedRelease = { cached: number; assets: ReleaseAsset[] };
 
@@ -266,7 +374,7 @@ async function hydrateDownload() {
     state.textContent = 'The current download matches your computer.';
   } catch { /* Keep the calm fallback if the release list is unavailable. */ }
 }
-function wireNavigation() { document.querySelectorAll<HTMLAnchorElement>('a[data-nav]').forEach((a) => a.addEventListener('click', (event) => { const href = a.getAttribute('href')!; if (!href.startsWith('/')) return; event.preventDefault(); history.pushState({}, '', href); renderRoute(); })); }
+function wireNavigation(root: ParentNode = document) { root.querySelectorAll<HTMLAnchorElement>('a[data-nav]').forEach((a) => a.addEventListener('click', (event) => { const href = a.getAttribute('href')!; if (!href.startsWith('/')) return; event.preventDefault(); history.pushState({}, '', href); renderRoute(); })); }
 function renderRoute() { if (location.search.includes('demo=1')) { demo = true; renderDemo(); return; } if (!siteBuild && (location.pathname === '/' || location.pathname === '/lens')) { demo = false; renderLens(); return; } if (location.pathname === '/') renderLanding(); else if (location.pathname === '/lens') { demo = false; renderLens(); } else if (location.pathname === '/demo') renderDemo(); else if (location.pathname === '/privacy') renderPrivacy(); else if (location.pathname === '/terms') renderTerms(); else render404(); }
 window.addEventListener('popstate', renderRoute);
 renderRoute();
