@@ -30,5 +30,7 @@ npm run build
 ```
 
 The clean worker's literal `npm run tauri build` fails when `CI=1` is inherited
-by Tauri. A `CI=true` native build with the release workflow's Linux packages
-was initiated, but no completed native artifact is claimed in this report.
+by Tauri. With `CI=true` and the workflow's Linux packages, local `.deb` and
+`.rpm` artifacts were produced; `cargo test --manifest-path src-tauri/Cargo.toml`
+passed with 0 Rust tests. Neither artifact is published, so the release remains
+unacceptable.

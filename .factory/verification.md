@@ -41,9 +41,11 @@ Independent browser confirmation also showed demo reset preserves a seeded
   10,062 bytes / 3.13 KB gzip; hero WebP is 50,718 bytes.
 - The standard `npm run tauri build` fails in this clean worker because its
   `CI=1` is passed to Tauri 2.11.4 as an invalid boolean (`invalid value '1'
-  for '--ci'`). Retrying with `CI=true` and the Linux packages used by the
-  release workflow was started; native compilation was still in progress at
-  report-writing time, so no native artifact is claimed as verified.
+  for '--ci'`). With `CI=true` and the Linux packages used by the release
+  workflow, Tauri produced local `.deb` (4,637,980 bytes) and `.rpm`
+  (4,643,122 bytes) outputs. `cargo test --manifest-path src-tauri/Cargo.toml`
+  then passed (0 Rust tests); Cargo emitted a future-incompatibility warning
+  for `screenshots v0.8.10`.
 - Live deployment matches the candidate web build: the live home page serves
   `assets/index-BLeucTCv.js`, exactly the filename and 20,225-byte content size
   emitted by `npm run build:site` at this commit.
