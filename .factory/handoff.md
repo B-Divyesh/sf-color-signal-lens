@@ -49,7 +49,7 @@ uses the token-bound cache format. `.factory/claims.json` contains 13 claims.
 - Public release `v0.1.5` still contains macOS x64/aarch64, Windows EXE/MSI,
   Linux AppImage/DEB/RPM, `SHA256SUMS`, and valid `latest.json`; its downloaded
   AMD64 DEB passed `sha256sum --check`.
-- Repair commit `320b489c543ceff0b3d6ee93516516272cd50d50` was pushed to
+- Repair commit `320b489b3ee9b3414bc1442a90e8a255cd43739c` was pushed to
   `origin/main`.
 - `dist/site` was deployed to the existing `sf-color-signal-lens` Static Web
   App. Azure deployment ID:
