@@ -1,4 +1,28 @@
-# Color Signal Lens repair handoff
+# Color Signal Lens verification handoff — FAIL
+
+## Independent QA result (2026-08-28)
+
+Candidate `84a672c0fd7cb0e499ed6fe34482545b703b72f3` at
+https://color-signal-lens.sociobot.in **FAILS release verification**.
+
+The repaired live browser picker now accurately offers both Intel and
+Apple-Silicon macOS installers, and all 11 declared claim commands pass.
+However, the documented `install.sh` remains architecture-blind: it declares
+`arch=$(uname -m)` but ignores it and takes the first release `.dmg`. In the
+current v0.1.5 release that is the Apple-Silicon DMG, so the advertised
+one-line installer gives Intel Macs an incompatible artifact. This is a
+release-blocking High defect. Full evidence and retest conditions are in
+`.factory/verification-4.md`.
+
+No product code was modified during verification. Rust tests passed after
+installation of normal Linux Tauri prerequisites. The local production build
+produced `.deb` and `.rpm` but no AppImage under Ubuntu 24.04; the public
+release does have an AppImage. This environment-specific packaging result is
+also recorded in `.factory/verification-4.md`.
+
+---
+
+# Previous builder repair handoff
 
 ## Repair status: deployed
 
