@@ -46,7 +46,9 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: Color Signal Lens ${{ github.ref_name }}
           releaseBody: Private desktop build. Unsigned installers may require an OS confirmation.
-          releaseDraft: false
+          # A failed matrix must never expose a partial public desktop release.
+          # The manifest job publishes only after all three platforms pass.
+          releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
 
@@ -62,15 +64,22 @@ jobs:
           mkdir release-assets
           gh release download "$GITHUB_REF_NAME" --pattern '*' --dir release-assets
           cd release-assets
+          mac=$(find . -maxdepth 1 -type f -iname '*.dmg' -printf '%f\n' | head -n1)
+          windows=$(find . -maxdepth 1 -type f \( -iname '*.msi' -o -iname '*.exe' \) -printf '%f\n' | head -n1)
+          linux=$(find . -maxdepth 1 -type f \( -iname '*.AppImage' -o -iname '*.deb' \) -printf '%f\n' | head -n1)
+          [ -n "$mac" ] || { echo 'No macOS installer was attached.' >&2; exit 1; }
+          [ -n "$windows" ] || { echo 'No Windows installer was attached.' >&2; exit 1; }
+          [ -n "$linux" ] || { echo 'No Linux installer was attached.' >&2; exit 1; }
           find . -maxdepth 1 -type f ! -name SHA256SUMS ! -name latest.json -printf '%f\n' | sort | while IFS= read -r file; do sha256sum "$file"; done > SHA256SUMS
           jq -n \
             --arg version "$GITHUB_REF_NAME" \
             --arg release "https://github.com/$GITHUB_REPOSITORY/releases/tag/$GITHUB_REF_NAME" \
             --arg base "https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/" \
-            --arg mac "$(find . -maxdepth 1 -type f -iname '*.dmg' -printf '%f\n' | head -n1)" \
-            --arg windows "$(find . -maxdepth 1 -type f \( -iname '*.msi' -o -iname '*.exe' \) -printf '%f\n' | head -n1)" \
-            --arg linux "$(find . -maxdepth 1 -type f \( -iname '*.AppImage' -o -iname '*.deb' \) -printf '%f\n' | head -n1)" \
+            --arg mac "$mac" \
+            --arg windows "$windows" \
+            --arg linux "$linux" \
             '{version: $version, release: $release, downloads: {macos: ($base + $mac), windows: ($base + $windows), linux: ($base + $linux)}}' > latest.json
           gh release upload "$GITHUB_REF_NAME" SHA256SUMS latest.json --clobber
+          gh release edit "$GITHUB_REF_NAME" --draft=false
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

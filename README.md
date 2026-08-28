@@ -16,9 +16,7 @@ screenshot. Nothing in demo mode is saved with real settings.
 3. Choose Label, Pattern, or Remap. The source image remains underneath.
 
 Screen capture is requested only after the Capture button is pressed. Only the
-region you select is added to the lens. Opened images stay on the device. Color
-Signal Lens does not diagnose or correct colour vision, and it does not modify
-another app's data.
+region you select is added to the lens. Opened images stay on the device.
 
 ## Develop
 
@@ -36,7 +34,7 @@ The desktop app uses Tauri 2 and its configuration is in `src-tauri/`.
 
 ## Install and releases
 
-Release builds run on tags such as `v0.1.1` through
+Release builds run on tags such as `v0.1.4` through
 `.github/workflows/release.yml`. The workflow creates unsigned macOS, Windows,
 and Linux artifacts plus checksums. The landing site chooses a matching release
 asset through the GitHub API and shows a calm release-page fallback offline.

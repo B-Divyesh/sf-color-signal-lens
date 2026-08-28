@@ -24,7 +24,7 @@ test('a corrupt image keeps the last valid image and announces recovery', async 
   await expect.poll(() => page.locator('#lens-canvas').evaluate((canvas) => (canvas as HTMLCanvasElement).toDataURL())).toBe(before);
 });
 
-test('capture requires and retains a selected region without a native whole-screen command', async ({ page }) => {
+test('@claim:capture-consent capture requires and retains a selected region without a native whole-screen command', async ({ page }) => {
   await page.addInitScript(() => {
     const track = { stop: () => { (window as Window & { captureStopped?: boolean }).captureStopped = true; }, getSettings: () => ({ width: 1200, height: 800 }) };
     Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: { getDisplayMedia: async () => ({ getVideoTracks: () => [track] }) } });
@@ -51,6 +51,14 @@ test('landing release lookup handles an empty release list without a console err
   await page.goto('/');
   await expect(page.getByText('Downloads are being published.')).toBeVisible();
   expect(errors).toEqual([]);
+});
+
+test('the loaded demo remains usable offline', async ({ page, context }) => {
+  await page.goto('/demo');
+  await context.setOffline(true);
+  await page.getByLabel('Label the signal').check();
+  await expect(page.getByText('A text label marks the selected signal.')).toBeVisible();
+  await context.setOffline(false);
 });
 
 test('390px navigation, demo controls, and radio rows have 44px touch targets', async ({ page }) => {

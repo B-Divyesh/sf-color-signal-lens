@@ -1,6 +1,6 @@
 [package]
 name = "color-signal-lens"
-version = "0.1.3"
+version = "0.1.4"
 description = "A private reading lens for status colours"
 authors = ["Param Factory"]
 edition = "2021"

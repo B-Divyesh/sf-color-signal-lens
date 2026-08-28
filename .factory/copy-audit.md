@@ -16,8 +16,8 @@ the 22-word limit and banned marketing words.
 | Use a file, paste an image, or capture a screen only when you choose. | 15 | Pass |
 | Click the signal that is hard to read. | 9 | Pass |
 | Show a plain label, a pattern, or a blue-orange remap over that signal. | 14 | Pass |
-| It does not correct vision or change other apps. | 10 | Pass |
-| Screen content stays on your device unless you choose a file yourself. | 13 | Pass |
+| It adds cues to the image you choose. | 8 | Pass |
+| It adds a temporary layer while you inspect one image. | 10 | Pass |
 | Save custom lenses for $12 once. | 7 | Pass |
 | The free lens includes screenshot reading, labels, patterns, and remapping. | 10 | Pass |
 | Plus saves named presets. | 4 | Pass |

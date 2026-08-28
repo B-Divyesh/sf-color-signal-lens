@@ -8,14 +8,14 @@
   },
   {
     "id": "local-screenshots",
-    "claim": "The demo does not upload screenshots.",
+    "claim": "Screenshots are read on your device; the demo sends no screenshot or analytics request.",
     "where": "privacy page, workspace permission note",
     "test": "npm test -- --grep @claim:local-screenshots",
     "sandbox": "fresh browser context at /demo; intercept all requests during lens use"
   },
   {
     "id": "reading-cues",
-    "claim": "The lens adds labels, patterns, or blue-orange remapping.",
+    "claim": "The free lens reads screenshots with labels, patterns, or blue-orange remapping.",
     "where": "landing preview, workspace controls",
     "test": "npm test -- --grep @claim:reading-cues",
     "sandbox": "fresh browser context at /demo; switch each cue"
@@ -26,5 +26,47 @@
     "where": "demo banner",
     "test": "npm test -- --grep @claim:demo-reset",
     "sandbox": "fresh browser context at /demo; reset local demo namespace"
+  },
+  {
+    "id": "screenshot-input",
+    "claim": "Works from a screenshot opened from your device.",
+    "where": "landing facts, workspace",
+    "test": "npm test -- --grep @claim:screenshot-input",
+    "sandbox": "fresh browser context at /lens; open a bundled PNG fixture and inspect the source name"
+  },
+  {
+    "id": "capture-consent",
+    "claim": "Screen capture is requested only after Capture screen region is pressed, and only the selected region is added.",
+    "where": "landing how-it-works, workspace permission note, README, privacy page",
+    "test": "npm test -- --grep @claim:capture-consent",
+    "sandbox": "fresh browser context with a mocked display picker; select coordinates and assert the selected region is used"
+  },
+  {
+    "id": "named-presets",
+    "claim": "Lens Plus saves named presets on this device.",
+    "where": "landing Lens Plus section, workspace",
+    "test": "npm test -- --grep @claim:named-presets",
+    "sandbox": "fresh browser context with a valid cached license; save a preset and assert its local record"
+  },
+  {
+    "id": "lens-plus-price",
+    "claim": "Lens Plus costs $12 as a one-time purchase.",
+    "where": "landing facts, Lens Plus section, terms",
+    "test": "npm test -- --grep @claim:lens-plus-price",
+    "sandbox": "fresh browser context at /; assert the displayed price and one-time terms"
+  },
+  {
+    "id": "installer-checksums",
+    "claim": "Install scripts verify SHA-256 before handing off the downloaded installer.",
+    "where": "README install section",
+    "test": "npm run test:unit -- --test-name-pattern=@claim:installer-checksums",
+    "sandbox": "unit fixture checks both platform scripts reject a missing checksum and calculate SHA-256 before their success message"
+  },
+  {
+    "id": "desktop-release",
+    "claim": "Each public desktop release includes macOS, Windows, Linux, SHA256SUMS, and latest.json assets.",
+    "where": "README install section",
+    "test": "npm run test:unit -- --test-name-pattern=@claim:desktop-release",
+    "sandbox": "release-workflow regression test checks the required platform asset gate and draft-to-public ordering"
   }
 ]
