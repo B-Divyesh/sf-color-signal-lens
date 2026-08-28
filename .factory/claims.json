@@ -1,0 +1,30 @@
+[
+  {
+    "id": "sample-lens",
+    "claim": "Try it with sample data opens a diff lens with nothing saved.",
+    "where": "landing hero, demo banner",
+    "test": "npm test -- --grep @claim:sample-lens",
+    "sandbox": "fresh browser context at /demo"
+  },
+  {
+    "id": "local-screenshots",
+    "claim": "The demo does not upload screenshots.",
+    "where": "privacy page, workspace permission note",
+    "test": "npm test -- --grep @claim:local-screenshots",
+    "sandbox": "fresh browser context at /demo; intercept all requests during lens use"
+  },
+  {
+    "id": "reading-cues",
+    "claim": "The lens adds labels, patterns, or blue-orange remapping.",
+    "where": "landing preview, workspace controls",
+    "test": "npm test -- --grep @claim:reading-cues",
+    "sandbox": "fresh browser context at /demo; switch each cue"
+  },
+  {
+    "id": "demo-reset",
+    "claim": "Reset demo replaces demo data without touching real data.",
+    "where": "demo banner",
+    "test": "npm test -- --grep @claim:demo-reset",
+    "sandbox": "fresh browser context at /demo; reset local demo namespace"
+  }
+]
