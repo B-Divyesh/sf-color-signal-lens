@@ -1,24 +1,51 @@
-# Color Signal Lens verification handoff — FAIL
+# Color Signal Lens repair handoff — deployed
 
-## Independent QA result (2026-08-28)
+## Current repair status (2026-08-28)
 
-Candidate `84a672c0fd7cb0e499ed6fe34482545b703b72f3` at
-https://color-signal-lens.sociobot.in **FAILS release verification**.
+Repair commit `96255a168101de9513fe3b8345aa819246a71a45` resolves the
+release-blocking `install.sh` defect reported in `.factory/verification-4.md`
+for candidate `84a672c0fd7cb0e499ed6fe34482545b703b72f3`.
 
-The repaired live browser picker now accurately offers both Intel and
-Apple-Silicon macOS installers, and all 11 declared claim commands pass.
-However, the documented `install.sh` remains architecture-blind: it declares
-`arch=$(uname -m)` but ignores it and takes the first release `.dmg`. In the
-current v0.1.5 release that is the Apple-Silicon DMG, so the advertised
-one-line installer gives Intel Macs an incompatible artifact. This is a
-release-blocking High defect. Full evidence and retest conditions are in
-`.factory/verification-4.md`.
+Before the implementation change, the new fixture listed `_aarch64.dmg`
+first and mocked Intel `uname -m` as `x86_64`; the installer reproduced the
+defect by verifying `Color.Signal.Lens_0.1.6_aarch64.dmg`. The repaired script
+selects `_x64.dmg` for `x86_64` and `i386`, selects `_aarch64.dmg` for
+`arm64` and `aarch64`, and fails clearly for an unknown Mac CPU. The explicit
+browser Mac chip choices, Windows/Linux behavior, and checksum verification
+remain unchanged.
 
-No product code was modified during verification. Rust tests passed after
-installation of normal Linux Tauri prerequisites. The local production build
-produced `.deb` and `.rpm` but no AppImage under Ubuntu 24.04; the public
-release does have an AppImage. This environment-specific packaging result is
-also recorded in `.factory/verification-4.md`.
+Added the declared `macos-shell-installer-architecture` claim. Its exact
+command, run successfully after the repair, is:
+
+```sh
+npm run test:unit -- --test-name-pattern=@claim:macos-shell-installer-architecture
+```
+
+It supplies valid SHA-256 sums, observes all four supported `uname -m` aliases
+with the Apple-Silicon artifact first, and checks the unknown-CPU error. All
+12 commands in `.factory/claims.json` were run verbatim and passed. `CI=1 npm
+test` passed 6 unit tests and 19 Playwright tests; `npm run check`, `npm run
+build`, and `cargo test --manifest-path src-tauri/Cargo.toml` also passed.
+The targeted desktop/390px Playwright accessibility/regression suite passed
+11 tests covering serious/critical Axe checks, keyboard, reduced motion,
+offline-after-load, privacy/network, touch targets, and release fallback.
+
+`npm run build` produced `dist/app` and `dist/site`; the site bundle is
+24.36 KB JavaScript (8.59 KB gzip) and 11.72 KB CSS (3.47 KB gzip). After the
+standard Tauri Linux prerequisites were installed, `CI=1 npm run tauri build -- --bundles deb,rpm`
+produced the unsigned Linux packages. The full local
+AppImage attempt still hits Ubuntu 24.04's recorded `linuxdeploy` issue; the
+public v0.1.5 release was checked to contain its AppImage plus both macOS
+DMGs, Windows installers, SHA256SUMS, and latest.json. The downloaded public
+AMD64 DEB verifies against SHA256SUMS.
+
+`dist/site` was deployed to production; Azure returned
+`https://nice-pebble-0ccaf2710.7.azurestaticapps.net`. The custom URL
+https://color-signal-lens.sociobot.in now serves an `install.sh` byte-matching
+the repaired source. Live root verification passed: HTTP 200, no console
+errors, title/lang/one h1/main, no missing alt text, and no unlabeled buttons.
+`/demo`, `/privacy`, and `/terms` return HTTP 200 with HSTS, `nosniff`, strict
+referrer policy, and the expected restrictive CSP.
 
 ---
 
