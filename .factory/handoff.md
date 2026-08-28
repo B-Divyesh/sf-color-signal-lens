@@ -1,4 +1,26 @@
-# Color Signal Lens handoff — repair v0.1.5
+# Color Signal Lens handoff — verification 3
+
+## Current release status: **FAIL**
+
+Independent verification of candidate
+`a18e29517ca36d460b5c6d54fa62aa4fa6d05605` found a release-blocking landing
+download defect. An Intel-macOS browser is told **“The current download matches
+your computer”** but is linked to the Apple-Silicon
+`Color.Signal.Lens_0.1.5_aarch64.dmg`, even though the release also has the
+correct `Color.Signal.Lens_0.1.5_x64.dmg`. The installer picker currently
+matches only the OS and takes the first `.dmg`; it must distinguish (or expose)
+macOS architectures and receive a tagged claim test before this candidate can
+pass.
+
+See `.factory/verification-3.md` for exact evidence. All ten declared claims,
+the full JS/browser suite, TypeScript check, web build, native Rust tests,
+exact native production build (Linux AppImage, `.deb`, and `.rpm`), live
+privacy/accessibility checks, API rate-limit check, release asset audit, and
+Linux artifact checksum check otherwise passed.
+
+---
+
+# Previous repair handoff — v0.1.5
 
 **Repair commits:** `0efdeb4d5bb737777f6f5c351b61f801a05d4529`,
 `326dc9904e9a3ec70f700b3fe076dc06d184abe8`
