@@ -15,7 +15,8 @@ test('@claim:desktop-release Windows has a native icon and the workflow keeps in
   assert.match(workflow, /No Windows installer was attached/);
   assert.match(workflow, /No macOS installer was attached/);
   assert.match(workflow, /No Linux installer was attached/);
-  assert.match(workflow, /SHA256SUMS latest\.json --clobber/);
-  assert.match(workflow, /gh release edit "\$GITHUB_REF_NAME" --draft=false/);
-  assert.ok(workflow.indexOf('SHA256SUMS latest.json --clobber') < workflow.indexOf('gh release edit'), 'release must be public only after the manifest upload');
+  assert.match(workflow, /gh release download "\$GITHUB_REF_NAME" --repo "\$GITHUB_REPOSITORY"/);
+  assert.match(workflow, /gh release upload "\$GITHUB_REF_NAME" SHA256SUMS latest\.json --repo "\$GITHUB_REPOSITORY" --clobber/);
+  assert.match(workflow, /gh release edit "\$GITHUB_REF_NAME" --repo "\$GITHUB_REPOSITORY" --draft=false/);
+  assert.ok(workflow.indexOf('SHA256SUMS latest.json --repo') < workflow.indexOf('gh release edit'), 'release must be public only after the manifest upload');
 });

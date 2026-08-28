@@ -62,7 +62,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir release-assets
-          gh release download "$GITHUB_REF_NAME" --pattern '*' --dir release-assets
+          gh release download "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --pattern '*' --dir release-assets
           cd release-assets
           mac=$(find . -maxdepth 1 -type f -iname '*.dmg' -printf '%f\n' | head -n1)
           windows=$(find . -maxdepth 1 -type f \( -iname '*.msi' -o -iname '*.exe' \) -printf '%f\n' | head -n1)
@@ -79,7 +79,7 @@ jobs:
             --arg windows "$windows" \
             --arg linux "$linux" \
             '{version: $version, release: $release, downloads: {macos: ($base + $mac), windows: ($base + $windows), linux: ($base + $linux)}}' > latest.json
-          gh release upload "$GITHUB_REF_NAME" SHA256SUMS latest.json --clobber
-          gh release edit "$GITHUB_REF_NAME" --draft=false
+          gh release upload "$GITHUB_REF_NAME" SHA256SUMS latest.json --repo "$GITHUB_REPOSITORY" --clobber
+          gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --draft=false
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
