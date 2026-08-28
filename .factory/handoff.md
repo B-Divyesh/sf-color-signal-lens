@@ -1,6 +1,6 @@
 # Color Signal Lens repair handoff
 
-## Repair status: ready to deploy
+## Repair status: deployed
 
 This repair resolves the independent verifier's release-blocking macOS
 installer defect from `.factory/verification-3.md`.
@@ -50,7 +50,7 @@ Results:
   reduced-motion, console, and serious/critical Axe coverage.
 - Every command in `.factory/claims.json` passed verbatim (11 claims).
 - `npm run check`: pass.
-- `npm run build`: pass. The deployed site bundle is 24.36 KB JS (8.59 KB
+- `npm run build`: pass. The production site bundle is 24.36 KB JS (8.59 KB
   gzip) and 11.72 KB CSS (3.47 KB gzip).
 - `cargo test`: pass (0 Rust tests).
 - Native production build: pass after installing the standard Tauri Linux
@@ -70,11 +70,14 @@ Results:
 
 ## Deployment and known gaps
 
-Deploy `dist/site` with:
-
-```sh
-/opt/fleet/lib/deploy-static.sh color-signal-lens dist/site
-```
+Deployed `dist/site` to `sf-color-signal-lens` on 2026-08-28 with deployment
+ID `164b482a-e4c7-4e26-8f89-9143b6c8474c`.
+`https://color-signal-lens.sociobot.in/` returned HTTP 200 with the expected
+CSP, HSTS, strict referrer policy, and `nosniff`. The live desktop browser
+check had no console errors and reported title, `lang=en`, one h1, a main
+landmark, no missing image alt text, and no unlabeled buttons. Fresh live
+Intel- and Apple-Silicon-macOS browser contexts both exposed the accurate x64
+and aarch64 installer links from v0.1.5.
 
 The application remains a Tauri 2 desktop app with a static landing site.
 The desktop installers are unsigned; macOS users may need right-click → Open
