@@ -43,14 +43,28 @@ jobs:
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
-      - name: Publish checksum manifest
-        if: github.ref_type == 'tag'
+
+  release-manifest:
+    needs: release
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish checksums and platform manifest after every build is attached
         shell: bash
         run: |
+          set -euo pipefail
+          mkdir release-assets
           gh release download "$GITHUB_REF_NAME" --pattern '*' --dir release-assets
           cd release-assets
-          shasum -a 256 * > SHA256SUMS
-          printf '{"version":"%s","release":"https://github.com/%s/releases/tag/%s"}\n' "$GITHUB_REF_NAME" "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME" > latest.json
+          find . -maxdepth 1 -type f ! -name SHA256SUMS ! -name latest.json -printf '%f\n' | sort | while IFS= read -r file; do sha256sum "$file"; done > SHA256SUMS
+          jq -n \
+            --arg version "$GITHUB_REF_NAME" \
+            --arg release "https://github.com/$GITHUB_REPOSITORY/releases/tag/$GITHUB_REF_NAME" \
+            --arg base "https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/" \
+            --arg mac "$(find . -maxdepth 1 -type f -iname '*.dmg' -printf '%f\n' | head -n1)" \
+            --arg windows "$(find . -maxdepth 1 -type f \( -iname '*.msi' -o -iname '*.exe' \) -printf '%f\n' | head -n1)" \
+            --arg linux "$(find . -maxdepth 1 -type f \( -iname '*.AppImage' -o -iname '*.deb' \) -printf '%f\n' | head -n1)" \
+            '{version: $version, release: $release, downloads: {macos: ($base + $mac), windows: ($base + $windows), linux: ($base + $linux)}}' > latest.json
           gh release upload "$GITHUB_REF_NAME" SHA256SUMS latest.json --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

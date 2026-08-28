@@ -1,6 +1,6 @@
 {
   "name": "color-signal-lens",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,7 +11,7 @@
     "build:site": "vite build --mode site && cp public/robots.txt dist/site/robots.txt && cp public/sitemap.xml dist/site/sitemap.xml && cp public/staticwebapp.config.json dist/site/staticwebapp.config.json && cp public/404.html dist/site/404.html",
     "test": "npm run test:unit && playwright test",
     "test:unit": "tsx --test src/lens.test.ts",
-    "tauri": "tauri",
+    "tauri": "node scripts/tauri-cli.mjs",
     "check": "tsc --noEmit"
   },
   "devDependencies": {
