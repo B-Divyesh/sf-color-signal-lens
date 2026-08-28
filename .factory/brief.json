@@ -1,0 +1,7 @@
+{
+  "slug": "color-signal-lens",
+  "title": "Color Signal Lens",
+  "artifact_class": "desktop-app",
+  "summary": "Reveal status colors with labels, patterns, and blue-orange remapping.",
+  "smallest_useful_product": "A desktop color-picker/lens that samples a selected region and overlays configurable patterns, labels, or blue/orange remapping for detected status colors."
+}
