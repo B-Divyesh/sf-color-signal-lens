@@ -1,0 +1,56 @@
+name: Release desktop app
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            args: --target aarch64-apple-darwin
+          - os: macos-latest
+            args: --target x86_64-apple-darwin
+          - os: windows-latest
+            args: ''
+          - os: ubuntu-22.04
+            args: ''
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - uses: dtolnay/rust-toolchain@stable
+        with: { targets: aarch64-apple-darwin,x86_64-apple-darwin }
+      - name: Install Linux package tools
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: Color Signal Lens ${{ github.ref_name }}
+          releaseBody: Private desktop build. Unsigned installers may require an OS confirmation.
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.args }}
+      - name: Publish checksum manifest
+        if: github.ref_type == 'tag'
+        shell: bash
+        run: |
+          gh release download "$GITHUB_REF_NAME" --pattern '*' --dir release-assets
+          cd release-assets
+          shasum -a 256 * > SHA256SUMS
+          printf '{"version":"%s","release":"https://github.com/%s/releases/tag/%s"}\n' "$GITHUB_REF_NAME" "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME" > latest.json
+          gh release upload "$GITHUB_REF_NAME" SHA256SUMS latest.json --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

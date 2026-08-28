@@ -1,0 +1,26 @@
+{
+  "name": "color-signal-lens",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:desktop": "vite --mode desktop",
+    "build": "npm run build:app && npm run build:site",
+    "build:app": "vite build --mode desktop",
+    "build:site": "vite build --mode site && cp public/robots.txt dist/site/robots.txt && cp public/sitemap.xml dist/site/sitemap.xml && cp public/staticwebapp.config.json dist/site/staticwebapp.config.json && cp public/404.html dist/site/404.html",
+    "test": "npm run test:unit && playwright test",
+    "test:unit": "tsx --test src/lens.test.ts",
+    "tauri": "tauri",
+    "check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "1.58.2",
+    "@tauri-apps/cli": "^2.0.0",
+    "@types/node": "^26.4.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3"
+  }
+}
