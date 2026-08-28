@@ -33,7 +33,7 @@ function layout(content: string, route: string) {
     </header>
     <div id="route-announcement" class="sr-only" aria-live="polite"></div>
     <main id="main" tabindex="-1">${content}</main>
-    <footer><p>Color Signal Lens makes screenshot status signals easier to read.</p><p><a href="/privacy" data-nav>Privacy</a> · <a href="/terms" data-nav>Terms</a> · Built by Param Factory · v0.1.1</p></footer>`;
+    <footer><p>Color Signal Lens makes screenshot status signals easier to read.</p><p><a href="/privacy" data-nav>Privacy</a> · <a href="/terms" data-nav>Terms</a> · Built by Param Factory · v0.1.2</p></footer>`;
   wireNavigation();
   pageTitle(route);
 }
