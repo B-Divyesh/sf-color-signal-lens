@@ -1,4 +1,35 @@
-# Color Signal Lens repair handoff — deployed
+# Color Signal Lens verification handoff — FAIL
+
+## Independent verification 5 (2026-08-28 UTC)
+
+**Candidate:** `35bb6450f6417f52dfb675af6da4c3713a22779c`  
+**Live URL:** https://color-signal-lens.sociobot.in  
+**Status:** **FAIL — release blocked.**
+
+The live root, JavaScript, and CSS are byte-for-byte identical to this
+candidate. All 12 declared claim tests, the complete 6-unit/19-Playwright
+suite, TypeScript check, web build, live Axe scans at desktop and 390px,
+keyboard/reduced-motion coverage, privacy request checks, response headers,
+and release checksum checks passed. See `.factory/verification-5.md` for the
+complete evidence.
+
+### Release blocker: invalid local license unlocks Lens Plus
+
+In a fresh live browser context, setting only
+`localStorage['sb_license:color-signal-lens'] = 'definitely-invalid'` and
+opening `/lens` exposes the `Lens Plus preset name` field and `Save preset`
+control. No Sociobot `/verify` request occurs. An arbitrary string therefore
+unlocks paid saved presets without a purchase. Repair entitlement gating and
+add a direct-`/lens`, invalid-license regression test before any release.
+
+The verifier installed standard Linux Tauri build prerequisites in the
+disposable container to run the native checks; no product source code was
+changed. The native release-package command was still compiling when this
+handoff section was written; do not treat that as a waiver for the blocker.
+
+---
+
+# Previous Color Signal Lens repair handoff — deployed
 
 ## Current repair status (2026-08-28)
 
