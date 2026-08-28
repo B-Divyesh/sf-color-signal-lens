@@ -34,7 +34,7 @@ The desktop app uses Tauri 2 and its configuration is in `src-tauri/`.
 
 ## Install and releases
 
-Release builds run on tags such as `v0.1.5` through
+Release builds run on tags such as `v0.1.6` through
 `.github/workflows/release.yml`. The workflow creates unsigned macOS, Windows,
 and Linux artifacts plus checksums. The landing site uses the GitHub API for
 release links, offers both Mac chip choices, and shows a calm release-page
