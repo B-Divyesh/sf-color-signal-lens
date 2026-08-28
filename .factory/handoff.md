@@ -1,4 +1,4 @@
-# Color Signal Lens handoff — repair v0.1.2
+# Color Signal Lens handoff — repair v0.1.3
 
 **Base verified:** `5dc4c99e50e4e708373dd58ddffeaecc384d0b41`
 **Repair scope:** every release-blocking finding in verifier report
@@ -8,7 +8,7 @@
 
 1. Desktop release workflow now waits for every platform build before creating
    `SHA256SUMS` and `latest.json`, including per-platform download URLs. The
-   repair is released as tag `v0.1.2`.
+   repair is released as tag `v0.1.3`.
 2. Landing download discovery calls the GitHub releases collection endpoint,
    which returns `200 []` before a release exists, rather than requesting the
    404-producing `releases/latest` endpoint. The calm fallback remains.
@@ -61,7 +61,7 @@ Results on 2026-08-28:
 ## Deployment and operator notes
 
 The repaired `dist/site` was deployed to the existing static site at
-https://color-signal-lens.sociobot.in. Pushing `v0.1.2` runs
+https://color-signal-lens.sociobot.in. Pushing `v0.1.3` runs
 `.github/workflows/release.yml`, which builds
 unsigned macOS arm64/x86_64, Windows, and Linux release assets and publishes
 checksums and `latest.json`. The site then resolves its platform button from

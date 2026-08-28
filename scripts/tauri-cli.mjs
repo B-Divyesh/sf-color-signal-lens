@@ -4,7 +4,6 @@ import { spawn } from 'node:child_process';
 // providers set CI=1, which Tauri forwards as an invalid flag value.
 if (process.env.CI === '1') process.env.CI = 'true';
 
-const executable = process.platform === 'win32' ? 'node_modules/.bin/tauri.cmd' : 'node_modules/.bin/tauri';
-const child = spawn(executable, process.argv.slice(2), { stdio: 'inherit', shell: process.platform === 'win32' });
+const child = spawn(process.execPath, ['node_modules/@tauri-apps/cli/tauri.js', ...process.argv.slice(2)], { stdio: 'inherit' });
 child.on('exit', (code, signal) => process.exitCode = code ?? (signal ? 1 : 0));
 child.on('error', (error) => { console.error(error); process.exitCode = 1; });
