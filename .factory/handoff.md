@@ -80,10 +80,38 @@ registration command or credential. The controller must enable the existing
 
 ## Release and deployment
 
-Pending the repair commit, `v0.1.7` GitHub Actions release, static deployment,
-public checksum/installer verification, live response-policy check, and live
-bundle identity check. These fields will be replaced with exact run and
-deployment evidence after publication.
+- Repair commit `1f4ed985e0ce6223a437a60eefb8d06b6f9ce443` was pushed to
+  `origin/main` and tagged `v0.1.7`.
+- GitHub Actions run `33224531111` completed successfully. Both macOS
+  architectures, Windows, Linux, and the release-manifest gate passed.
+- Public release `v0.1.7` is non-draft and includes x64/aarch64 DMGs, EXE, MSI,
+  AppImage, DEB, RPM, `SHA256SUMS`, and valid `latest.json`.
+- The public v0.1.7 DEB passed `sha256sum --check`. The exact live one-line
+  installer downloaded and verified the 81,287,672-byte AppImage, then left an
+  executable at the requested persistent install directory. Its SHA-256 is
+  `89dd07eda3dc7bd661170202d528dbdde1aba453747dc620f63ad82c6cef036e`.
+- `dist/site` was deployed to the existing Static Web App. Azure deployment ID:
+  `abcc7606-9f58-4569-903c-d003970d41a2`; default host:
+  `nice-pebble-0ccaf2710.7.azurestaticapps.net`.
+- Live `/demo` passed `verify-url.sh` in 746 ms with no console errors. Axe found
+  zero serious/critical findings across six routes at desktop and 390 px.
+- Fresh live desktop and 390 px flows selected `#16714A`, rendered remap pixel
+  `7,90,134`, restored source pixel `22,113,74`, and had viewport-equal document
+  widths. Demo network traffic stayed same-origin. Fresh landing hydration chose
+  the v0.1.7 AppImage at 390 px with no overflow or console error.
+- Live Lighthouse mobile: performance 100, accessibility 100, best practices
+  100, SEO 100; FCP 0.9 s, LCP 1.2 s, TBT 0 ms, CLS 0, transfer 68 KiB.
+- Live and local SHA-256 match: HTML
+  `5e5b29bc2e9be78adc5c72f9985fa917ddeebfe37aeb1692c0eaa735523f3f1e`, JS
+  `b3e4d76e9ea46c1ea5b26e8a5191e6f143c1f6407d0eb6cc37358ebc8a79c131`, CSS
+  `68c25cebc9030a0ce5474521c0220dc99ef0a9cb5672e07e686cb43f931b8636`, and
+  `install.sh` `d67ff6e1f123d27678b6158c3adccb04ad97cd9c184ebc91b956209e72701dbe`.
+- Live routes `/`, `/demo`, `/lens`, `/privacy`, and `/terms` return 200;
+  `/missing-route` returns 404. HTML has HSTS, `nosniff`, strict referrer policy,
+  and the expected CSP. Hashed assets are one-year immutable.
+- An invalid live license returned 200 with `valid:false`. A 35-request follow-up
+  produced 29×200 and 6×429 with `Retry-After: 2`; the service recovered to 200
+  after three seconds.
 
 ## Operator action
 
