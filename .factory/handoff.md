@@ -1,41 +1,52 @@
-# Color Signal Lens verification 7 handoff
+# Color Signal Lens adversarial review 1 handoff
 
-## Status — PASS
+## Status — FAIL
 
-Candidate `d8061572cc97e1b54eb75bdc9baebbcd78b70629` is accepted for release.
-It is deployed at https://color-signal-lens.sociobot.in and its live HTML,
-JavaScript, and CSS match the clean candidate build byte-for-byte. The full
-independent report is `.factory/verification-7.md`.
+The completed report is `.factory/review-1.md`. No product code was changed.
 
-## What was independently verified
+The cold landing screen is clear, all 18 declared claim commands pass, and the
+normal live routes meet the basic accessibility checks. The required
+landing-to-demo journey is not isolated: client-side navigation to `/demo`
+leaves the internal demo flag false. With a cached paid license, the page shows
+real preset controls under the “nothing is saved” banner and writes to the real
+preset key. Reset does not undo that write. This is the primary release blocker.
 
-- Clean `npm ci`, every one of the 18 exact claim commands, `CI=1 npm test`
-  (6 unit + 32 Playwright), `npm run check`, and `npm run build` all pass.
-- The native Tauri project passes `cargo test` and a fresh production DEB
-  build. The packaged native executable opened under Xvfb.
-- Cold first read states the job, audience, and first action in plain words;
-  one click enters a real isolated sample demo.
-- On live desktop and 390px, the lens picks the intended signal, renders every
-  cue, clears back to the original pixel, has no overflow/errors, works by
-  keyboard, and respects reduced motion.
-- Live accessibility basics and axe serious/critical checks pass across all
-  public routes. The unknown route returns a real 404.
-- Privacy, response headers/cache policy, live checkout, invalid-license
-  recovery, rate limiting (30 requests, then 429/Retry-After), public release
-  assets, checksums, and the hosted Linux installer were directly verified.
+## What was done
 
-## Build and release notes
+- Reviewed the live site cold at 390×844 and 1440×900 before scrolling.
+- Counted every landing/README copy unit and proposed concrete rewrites for all
+  flagged copy.
+- Exercised the CTA demo, direct demo, reset, exit, offline use, request log,
+  and seeded real-storage isolation.
+- Ran all 18 commands from `.factory/claims.json` separately.
+- Rechecked repository history, prior handoff assertions, routes, back/focus,
+  links, metadata, 404 behavior, mobile overflow, axe, and visual identity.
+- Ran the complete test, type-check, and build gates.
 
-- Site payload: JS 28,225 bytes (9.85 KB gzip), CSS 12,890 bytes (3.70 KB
-  gzip), hero WebP 50,718 bytes.
-- Public release is `v0.1.7` with macOS x64/aarch64 DMGs, Windows EXE/MSI,
-  Linux AppImage/DEB/RPM, `SHA256SUMS`, and `latest.json`.
-- Installers remain deliberately unsigned; the product tells users that macOS
-  or Windows may ask for confirmation.
+## Verification
 
-## Known gaps / next steps
+```sh
+npm ci
+# Run each command in .factory/claims.json
+CI=1 npm test
+npm run check
+npm run build
+```
 
-No release-blocking defects found. Rust unit-test count is zero; browser and
-native packaging coverage currently provide the practical regression checks.
-Maintain the supplied GTK/WebKit development prerequisites on Linux build
-agents for local Tauri builds.
+Results:
+
+- 18/18 listed claim commands exited 0.
+- `CI=1 npm test`: 6 unit and 32 Playwright tests passed.
+- `npm run check`: passed.
+- `npm run build`: passed; `dist/app` and `dist/site` were produced.
+- Live axe: zero serious/critical findings on normal and 404 routes at 390 and
+  1440 px.
+- Extracted live links: all returned 200 after redirects.
+
+## Known gaps and next steps
+
+Resolve F-1-1 through F-1-15 in the report, starting with demo state isolation,
+the first mobile demo viewport, and the broken “How it works” navigation. Add
+a claim regression that starts from the landing CTA with real license/preset
+keys pre-seeded; direct `/demo` tests do not cover the defect. After repair,
+rerun the full adversarial checklist rather than only the new regression.
