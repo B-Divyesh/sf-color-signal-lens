@@ -1,0 +1,229 @@
+{
+  "origin": "https://color-signal-lens.sociobot.in",
+  "routes": [
+    {
+      "path": "/",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "status": 200,
+      "title": "Color Signal Lens — Make status colors distinct",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "overflow": false,
+      "serious": [],
+      "errors": [],
+      "relevantErrors": []
+    },
+    {
+      "path": "/demo",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "status": 200,
+      "title": "Demo — Color Signal Lens",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "overflow": false,
+      "serious": [],
+      "errors": [],
+      "relevantErrors": []
+    },
+    {
+      "path": "/lens",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "status": 200,
+      "title": "Color Signal Lens — Inspect screenshot colors",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "overflow": false,
+      "serious": [],
+      "errors": [],
+      "relevantErrors": []
+    },
+    {
+      "path": "/privacy",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "status": 200,
+      "title": "Privacy — Color Signal Lens",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "overflow": false,
+      "serious": [],
+      "errors": [],
+      "relevantErrors": []
+    },
+    {
+      "path": "/terms",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "status": 200,
+      "title": "Terms — Color Signal Lens",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "overflow": false,
+      "serious": [],
+      "errors": [],
+      "relevantErrors": []
+    },
+    {
+      "path": "/missing-review-route",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "status": 404,
+      "title": "Page not found — Color Signal Lens",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "overflow": false,
+      "serious": [],
+      "errors": [
+        "Failed to load resource: the server responded with a status of 404 ()"
+      ],
+      "relevantErrors": []
+    },
+    {
+      "path": "/",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "status": 200,
+      "title": "Color Signal Lens — Make status colors distinct",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "overflow": false,
+      "serious": [],
+      "errors": [],
+      "relevantErrors": []
+    },
+    {
+      "path": "/demo",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "status": 200,
+      "title": "Demo — Color Signal Lens",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "overflow": false,
+      "serious": [],
+      "errors": [],
+      "relevantErrors": []
+    },
+    {
+      "path": "/lens",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "status": 200,
+      "title": "Color Signal Lens — Inspect screenshot colors",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "overflow": false,
+      "serious": [],
+      "errors": [],
+      "relevantErrors": []
+    },
+    {
+      "path": "/privacy",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "status": 200,
+      "title": "Privacy — Color Signal Lens",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "overflow": false,
+      "serious": [],
+      "errors": [],
+      "relevantErrors": []
+    },
+    {
+      "path": "/terms",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "status": 200,
+      "title": "Terms — Color Signal Lens",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "overflow": false,
+      "serious": [],
+      "errors": [],
+      "relevantErrors": []
+    },
+    {
+      "path": "/missing-review-route",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "status": 404,
+      "title": "Page not found — Color Signal Lens",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "overflow": false,
+      "serious": [],
+      "errors": [
+        "Failed to load resource: the server responded with a status of 404 ()"
+      ],
+      "relevantErrors": []
+    }
+  ],
+  "demoIsolation": {
+    "before": {},
+    "afterEntry": {},
+    "afterReset": {},
+    "afterExit": {},
+    "url": "https://color-signal-lens.sociobot.in/lens"
+  },
+  "releaseFallback": {
+    "text": "Choose a download from the Releases page.",
+    "href": "https://github.com/B-Divyesh/sf-color-signal-lens/releases"
+  },
+  "hashNavigation": {
+    "active": "How Color Signal Lens works",
+    "announcement": "How Color Signal Lens works",
+    "top": 36.046875
+  }
+}
