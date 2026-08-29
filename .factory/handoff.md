@@ -1,33 +1,27 @@
-# Color Signal Lens adversarial review 1 handoff
+# Color Signal Lens polish 1 handoff
 
-## Status — FAIL
+## Delivered
 
-The completed report is `.factory/review-1.md`. No product code was changed.
+Repair commit: `c941b08a9f1fa4cbf0d88435d9bd79d8d8dc1205` (pushed to `main`).
 
-The cold landing screen is clear, all 18 declared claim commands pass, and the
-normal live routes meet the basic accessibility checks. The required
-landing-to-demo journey is not isolated: client-side navigation to `/demo`
-leaves the internal demo flag false. With a cached paid license, the page shows
-real preset controls under the “nothing is saved” banner and writes to the real
-preset key. Reset does not undo that write. This is the primary release blocker.
+- Fixed isolated demo routing and storage: landing CTA, `/demo`, and `?demo=1`
+  now enter the same demo state before any storage or entitlement access.
+- Reworked the 390px demo to show a transformed sample and active cue before
+  import controls; added reset/start-for-real behavior.
+- Rewrote reviewed copy, standardized terminology, added actual app walkthrough
+  frames, metadata updates, complete sitemap, and a full host-served 404 shell.
+- Added and expanded claim coverage, including landing-CTA isolation, paste,
+  keyboard color input, privacy, limits, and merchant disclosure.
 
-## What was done
-
-- Reviewed the live site cold at 390×844 and 1440×900 before scrolling.
-- Counted every landing/README copy unit and proposed concrete rewrites for all
-  flagged copy.
-- Exercised the CTA demo, direct demo, reset, exit, offline use, request log,
-  and seeded real-storage isolation.
-- Ran all 18 commands from `.factory/claims.json` separately.
-- Rechecked repository history, prior handoff assertions, routes, back/focus,
-  links, metadata, 404 behavior, mobile overflow, axe, and visual identity.
-- Ran the complete test, type-check, and build gates.
+`polish-1.md` maps F-1-1 through F-1-15 to implementation and evidence.
 
 ## Verification
 
+From a fresh local clone at `/tmp/color-signal-lens-clean`:
+
 ```sh
 npm ci
-# Run each command in .factory/claims.json
+# every command listed in .factory/claims.json, separately
 CI=1 npm test
 npm run check
 npm run build
@@ -35,18 +29,25 @@ npm run build
 
 Results:
 
-- 18/18 listed claim commands exited 0.
-- `CI=1 npm test`: 6 unit and 32 Playwright tests passed.
+- Every declared claim command passed independently from the clean clone.
+- `CI=1 npm test`: 6 unit tests and 39 Playwright tests passed.
 - `npm run check`: passed.
-- `npm run build`: passed; `dist/app` and `dist/site` were produced.
-- Live axe: zero serious/critical findings on normal and 404 routes at 390 and
-  1440 px.
-- Extracted live links: all returned 200 after redirects.
+- `npm run build`: passed; emitted `dist/app` and `dist/site`.
+- `cargo test --manifest-path src-tauri/Cargo.toml`: passed (0 Rust tests).
+- `CI=1 npm run tauri build -- --bundles deb`: passed; produced
+  `src-tauri/target/release/bundle/deb/Color Signal Lens_0.1.7_amd64.deb`
+  (5,939,328 bytes).
+- Static app bundle: 30.60 KB JS (10.31 KB gzip) and 13.61 KB CSS
+  (3.84 KB gzip).
 
-## Known gaps and next steps
+## Deployment
 
-Resolve F-1-1 through F-1-15 in the report, starting with demo state isolation,
-the first mobile demo viewport, and the broken “How it works” navigation. Add
-a claim regression that starts from the landing CTA with real license/preset
-keys pre-seeded; direct `/demo` tests do not cover the defect. After repair,
-rerun the full adversarial checklist rather than only the new regression.
+The repair commit was pushed to `origin/main`, the only deployment mechanism
+configured in this repository. At handoff time the public URL still returned
+the preceding bundle (`index-vjqVa6Gb.js`), so a live cold re-check cannot
+truthfully be recorded yet. No repository deployment token, static-host CLI
+configuration, or deployment workflow is present to trigger it directly.
+
+Once the factory deployment updates, cold-check `/`, `/demo`, `/?demo=1`,
+`/lens`, `/privacy`, `/terms`, `/#how`, and a missing route; the exact local
+coverage and expected behavior are listed in `.factory/polish-1.md`.
