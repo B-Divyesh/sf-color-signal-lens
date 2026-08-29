@@ -1,28 +1,32 @@
-# Color Signal Lens polish 1 handoff
+# Color Signal Lens adversarial review 2 handoff
 
-## Delivered
+## Result
 
-Repair series: `c941b08a9f1fa4cbf0d88435d9bd79d8d8dc1205` through
-`02f49be` (pushed to `main`).
+Verdict: **FAIL**.
 
-- Fixed isolated demo routing and storage: landing CTA, `/demo`, and `?demo=1`
-  now enter the same demo state before any storage or entitlement access.
-- Reworked the 390px demo to show a transformed sample and active cue before
-  import controls; added reset/start-for-real behavior.
-- Rewrote reviewed copy, standardized terminology, added actual app walkthrough
-  frames, metadata updates, complete sitemap, and a full host-served 404 shell.
-- Added and expanded claim coverage, including landing-CTA isolation, paste,
-  keyboard color input, privacy, limits, and merchant disclosure.
+The complete report is in `.factory/review-2.md`. No product code was changed.
+The review reopens F-1-6, F-1-7, and F-1-9 as blocking findings and records four
+new findings (F-2-1 through F-2-4).
 
-`polish-1.md` maps F-1-1 through F-1-15 to implementation and evidence.
+## What was checked
+
+- Cold live first read at 390×844 and 1440×900.
+- Pixel 7 and iPhone 13 download behavior.
+- One-click demo, reset, exit, real-key isolation, request logging, and loaded
+  offline behavior.
+- Every earlier review/polish finding against live behavior and current code.
+- Landing and README copy, including conditional download/license states.
+- Claims inventory and every listed command from a fresh clone.
+- Titles, metadata, routes, 404, history, links, accessibility, bundle size,
+  and visual identity.
 
 ## Verification
 
-From a fresh local clone at `/tmp/color-signal-lens-clean`:
+From fresh clone `/tmp/color-signal-lens-review2.bLoPzV`:
 
 ```sh
 npm ci
-# every command listed in .factory/claims.json, separately
+# Each command in .factory/claims.json was run independently: 23/23 passed.
 CI=1 npm test
 npm run check
 npm run build
@@ -30,25 +34,15 @@ npm run build
 
 Results:
 
-- Every declared claim command passed independently from the clean clone.
-- `CI=1 npm test`: 6 unit tests and 39 Playwright tests passed.
-- `npm run check`: passed.
-- `npm run build`: passed; emitted `dist/app` and `dist/site`.
-- `cargo test --manifest-path src-tauri/Cargo.toml`: passed (0 Rust tests).
-- `CI=1 npm run tauri build -- --bundles deb`: passed; produced
-  `src-tauri/target/release/bundle/deb/Color Signal Lens_0.1.7_amd64.deb`
-  (5,939,328 bytes).
-- Static app bundle: 30.60 KB JS (10.31 KB gzip) and 13.61 KB CSS
-  (3.84 KB gzip).
+- Full suite: 6 unit tests and 39 Playwright tests passed.
+- Type check passed.
+- Build passed and emitted `dist/app` and `dist/site`.
+- Live axe scans: zero serious/critical violations across `/`, `/demo`,
+  `/lens`, `/privacy`, and `/terms` at 390 and 1440 widths.
+- Live link crawl reached 200 final responses for all site links.
 
-## Deployment
+## Remaining work
 
-The repair commit was pushed to `origin/main`, the only deployment mechanism
-configured in this repository. At handoff time the public URL still returned
-the preceding bundle (`index-vjqVa6Gb.js`), so a live cold re-check cannot
-truthfully be recorded yet. No repository deployment workflow or Static Web App
-resource named `color-signal-lens` is configured for a direct worker deploy.
-
-Once the factory deployment updates, cold-check `/`, `/demo`, `/?demo=1`,
-`/lens`, `/privacy`, `/terms`, `/#how`, and a missing route; the exact local
-coverage and expected behavior are listed in `.factory/polish-1.md`.
+See the report for exact evidence and rewrites. The blocking work is to prevent
+phone-to-desktop download mismatch, replace tautological paid-claim tests with
+checkout contract assertions, and finish terminology normalization.
