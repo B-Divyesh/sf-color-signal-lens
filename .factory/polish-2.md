@@ -28,5 +28,7 @@ Candidate repaired: `ed0e21d` (based on `f81025a` and reviews `95ce59`, `c062156
 
 - Full local suite: `npm test` — 6 unit/install-release tests and 39 browser tests passed.
 - Type/build: `npm run check` and `npm run build` passed. Site JS is 31.08 KB raw / 10.45 KB gzip and CSS is 13.61 KB raw / 3.84 KB gzip.
-- Clean-clone claim gate: every command in `.factory/claims.json` is running independently from `/tmp/color-signal-lens-clean-MzxeOh` after `npm ci`; final result and deployed URL evidence are recorded in the handoff.
+- Clean-clone claim gate: all 23 commands in `.factory/claims.json` passed independently from `/tmp/color-signal-lens-clean-MzxeOh` after `npm ci`.
 - Accessibility: the full browser suite includes desktop and 390px axe serious/critical scans, keyboard/focus tests, touch-target tests, reduced-motion coverage, routing, and 404 checks.
+- Screenshots: `.factory/evidence/polish-2-home-390.png`, `.factory/evidence/polish-2-demo-390.png`, and `.factory/evidence/polish-2-home-1440.png` show the repaired local first screen, one-click demo, and desktop landing state. `.factory/evidence/polish-2-live-home-iphone.png` and `.factory/evidence/polish-2-live-demo-390.png` record the deployed mobile landing and demo.
+- Live URL re-check: deployment served `index-NuQYYCs_.js`; `/`, `/demo`, `/lens`, `/privacy`, and `/terms` returned 200 with their expected runtime title, one h1, main landmark, and `lang=en`; `/missing-review-route` returned 404. An iPhone user agent saw “Downloads require macOS, Windows, or Linux.” and “Open desktop downloads”. Console errors: none. Live axe: 0 serious/critical violations across six routes at 390px and 1440px.

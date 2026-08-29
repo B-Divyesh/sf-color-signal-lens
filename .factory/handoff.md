@@ -1,48 +1,50 @@
-# Color Signal Lens adversarial review 2 handoff
+# Color Signal Lens polish 2 handoff
 
 ## Result
 
-Verdict: **FAIL**.
+Released repair: `060a7eceda5f066bbac42e102a20a9eccfaec4ed` on `main`, with product tag `v0.1.8`. The cumulative review map is `.factory/polish-2.md`.
 
-The complete report is in `.factory/review-2.md`. No product code was changed.
-The review reopens F-1-6, F-1-7, and F-1-9 as blocking findings and records four
-new findings (F-2-1 through F-2-4).
+All findings from review 1 and review 2 are resolved. The landing now keeps desktop downloads away from phones, uses one product vocabulary, includes the required offline fact, and has a plain clickable demo link. The demo claim now checks its transformed pixel and non-demo storage. The price claim uses the recorded checkout contract fixture; the unprovable merchant-of-record sentence was removed.
 
-## What was checked
+## Deployment and release
 
-- Cold live first read at 390×844 and 1440×900.
-- Pixel 7 and iPhone 13 download behavior.
-- One-click demo, reset, exit, real-key isolation, request logging, and loaded
-  offline behavior.
-- Every earlier review/polish finding against live behavior and current code.
-- Landing and README copy, including conditional download/license states.
-- Claims inventory and every listed command from a fresh clone.
-- Titles, metadata, routes, 404, history, links, accessibility, bundle size,
-  and visual identity.
+- Static production deployment completed from `dist/site` to <https://color-signal-lens.sociobot.in>. The live page serves `assets/index-NuQYYCs_.js` from this repair.
+- GitHub Actions release run completed successfully for tag `v0.1.8`: <https://github.com/B-Divyesh/sf-color-signal-lens/actions/runs/33231068275>.
+- The public release includes two macOS DMGs, Windows EXE/MSI, Linux AppImage, DEB/RPM, `SHA256SUMS`, and `latest.json`.
+- Installers are unsigned by design. No signing secrets are configured; an operator would need to add Apple and Windows signing credentials only if signed installers become a release requirement.
 
 ## Verification
 
-From fresh clone `/tmp/color-signal-lens-review2.bLoPzV`:
+From a clean clone at `/tmp/color-signal-lens-clean-MzxeOh`:
 
 ```sh
 npm ci
-# Each command in .factory/claims.json was run independently: 23/23 passed.
-CI=1 npm test
+# Every one of the 23 commands in .factory/claims.json, independently
+npm test
 npm run check
 npm run build
+cargo test --manifest-path src-tauri/Cargo.toml
 ```
 
 Results:
 
-- Full suite: 6 unit tests and 39 Playwright tests passed.
-- Type check passed.
-- Build passed and emitted `dist/app` and `dist/site`.
-- Live axe scans: zero serious/critical violations across `/`, `/demo`,
-  `/lens`, `/privacy`, and `/terms` at 390 and 1440 widths.
-- Live link crawl reached 200 final responses for all site links.
+- All 23 listed claim commands passed independently. The full suite passed: 6 unit/install-release checks and 39 Playwright tests.
+- `npm run check` passed. `npm run build` produced `dist/app` and `dist/site`. Site JS is 31.08 KB raw / 10.45 KB gzip; CSS is 13.61 KB raw / 3.84 KB gzip.
+- `cargo test --manifest-path src-tauri/Cargo.toml` passed after installing the standard Linux Tauri development libraries; it has no Rust tests yet.
+- Local screenshots: `.factory/evidence/polish-2-home-390.png`, `.factory/evidence/polish-2-demo-390.png`, and `.factory/evidence/polish-2-home-1440.png`.
+- Cold live re-check passed. `/`, `/demo`, `/lens`, `/privacy`, and `/terms` each returned 200 with expected title, one h1, main landmark, and `lang=en`. `/missing-review-route` returned 404. An iPhone user agent received “Downloads require macOS, Windows, or Linux.” and “Open desktop downloads”. Demo showed the sample banner, active cue, canvas, and no preset control. No browser console errors occurred.
+- Live axe scans found zero serious or critical violations across `/`, `/demo`, `/lens`, `/privacy`, `/terms`, and the 404 route at 390px and 1440px. Lighthouse (mobile) scored 100 performance and 100 accessibility.
 
-## Remaining work
+## Run locally
 
-See the report for exact evidence and rewrites. The blocking work is to prevent
-phone-to-desktop download mismatch, replace tautological paid-claim tests with
-checkout contract assertions, and finish terminology normalization.
+```sh
+npm ci
+npm run dev
+npm test
+npm run build
+cargo test --manifest-path src-tauri/Cargo.toml
+```
+
+## Known gaps
+
+None for this work order.
