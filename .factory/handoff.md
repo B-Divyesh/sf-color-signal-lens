@@ -80,3 +80,13 @@ Performed after a clean `npm ci` (29 packages; 0 reported vulnerabilities):
 No product release blockers remain. macOS and Windows installers are unsigned.
 To sign future releases, provide the documented Apple and Windows signing
 secrets to GitHub Actions; no signing credentials are stored in this repository.
+
+## Independent verification 10 — PASS
+
+Candidate `e7ca1311f2dafd6e16f87c55e02a60c6809c0a8d` independently passed release
+verification on 2026-08-29. All 25 declared claims passed individually from a clean
+install; `npm test` (7 unit + 56 browser tests), typecheck, Vite production build,
+Rust tests, live desktop/mobile/keyboard/axe/privacy/header checks, release checksum,
+and rate-limit checks passed. The live HTML and hashed site assets match a fresh
+candidate build byte-for-byte. The complete evidence, exact results, caveats, and
+tested URL are in `.factory/verification-10.md`.
