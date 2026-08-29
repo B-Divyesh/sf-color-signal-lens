@@ -7,8 +7,10 @@ type Source = { url: string; name: string; kind: 'sample' | 'file' | 'capture' }
 type LicenseVerdict = { checked: number; valid: boolean; license: string };
 type LicenseResult = 'valid' | 'invalid' | 'unavailable';
 type Preset = { id: string; name: string; colour: string; mode: LensMode; mapping: 'blue' | 'orange' };
+type NativeTauri = { core?: { invoke?: <T>(command: string, args: Record<string, string>) => Promise<T> } };
 const app = document.querySelector<HTMLDivElement>('#app')!;
 const siteBuild = __SITE_BUILD__;
+const nativeTauri = (window as Window & { __TAURI__?: NativeTauri }).__TAURI__;
 const licenseKey = 'sb_license:color-signal-lens';
 const licenseCheckKey = 'sb_license_check:color-signal-lens';
 let source: Source | null = null;
@@ -52,14 +54,15 @@ function pageTitle(title: string, path = location.pathname) {
 }
 
 function layout(content: string, route: string, path = location.pathname) {
+  const howHref = siteBuild ? '/#how' : '/lens#how';
   app.innerHTML = `
     <a class="skip" href="#main">Skip to main content</a>
     <header class="topbar"><a class="wordmark" href="/" data-nav>Color<br>Signal<br>Lens</a>
-      <nav aria-label="Main navigation"><a href="/demo" data-nav>Demo</a><a href="/#how" data-nav>How it works</a><a href="/privacy" data-nav>Privacy</a></nav>
+      <nav aria-label="Main navigation"><a href="/demo" data-nav>Demo</a><a href="${howHref}" data-nav>How it works</a><a href="/privacy" data-nav>Privacy</a></nav>
     </header>
     <div id="route-announcement" class="sr-only" aria-live="polite"></div>
     <main id="main" tabindex="-1">${content}</main>
-    <footer><p>Color Signal Lens makes screenshot status colors easier to read.</p><p><a href="/privacy" data-nav>Privacy</a> · <a href="/terms" data-nav>Terms</a> · Built by Param Factory · v0.1.9</p></footer>`;
+    <footer><p>Color Signal Lens makes screenshot status colors easier to read.</p><p><a href="/privacy" data-nav>Privacy</a> · <a href="/terms" data-nav>Terms</a> · Built by Param Factory · v0.1.10</p></footer>`;
   wireNavigation();
   document.querySelector<HTMLAnchorElement>('.skip')?.addEventListener('click', (event) => {
     event.preventDefault();
@@ -97,7 +100,7 @@ function renderDemo() {
 function workspace(isDemo = false) {
   const sourceActions = `<div class="source-actions">${isDemo ? '' : '<button class="button primary" id="load-sample">Load sample screenshot</button>'}<label class="button secondary file-picker" for="file-input">Open screenshot<input id="file-input" type="file" accept="image/png,image/jpeg,image/webp"></label><button class="button secondary" id="capture-screen">Capture screen region</button><p id="source-status" role="status" aria-live="polite">${esc(source?.name || 'No screenshot loaded.')}</p></div><p class="permission-note">Capture asks for screen permission only when you press it. Select a region before it is added. The screenshot stays on this device.</p>`;
   return `<section class="lens-shell ${isDemo ? 'demo-workspace' : ''}"><div class="lens-heading"><p class="eyebrow">${isDemo ? 'SAMPLE CHECKOUT SCREENSHOT' : 'SCREENSHOT READER'}</p><h1>${isDemo ? 'See the sample status colors.' : 'Inspect a screenshot status color.'}</h1><p id="demo-active-cue">${isDemo ? `Active cue: ${mode === 'patterns' ? 'Pattern for the removed status color.' : meaningCopy()}` : 'Click a status color in the image. Then choose how the overlay marks it.'}</p></div>
-  ${isDemo ? '' : sourceActions}<div class="work-grid"><section class="canvas-paper" aria-label="Screenshot overlay"><div class="canvas-wrap"><canvas id="lens-canvas" width="1200" height="720" aria-label="Screenshot. Click a color to select it." tabindex="0"></canvas><div id="canvas-empty" class="canvas-empty" ${source ? 'hidden' : ''}><p>No screenshot is open.</p><button id="empty-sample">Load sample screenshot</button></div></div><p class="canvas-help">Keyboard: use the color field below, then press Apply selected color.</p></section>
+  ${isDemo ? '' : sourceActions}${isDemo ? '' : '<section id="how" class="desktop-how" aria-labelledby="desktop-how-title"><h2 id="desktop-how-title">How Color Signal Lens works</h2><ol><li>Open or paste a screenshot.</li><li>Choose the status color that is hard to read.</li><li>Add a label, pattern, or blue-orange colors.</li></ol></section>'}<div class="work-grid"><section class="canvas-paper" aria-label="Screenshot overlay"><div class="canvas-wrap"><canvas id="lens-canvas" width="1200" height="720" aria-label="Screenshot. Click a color to select it." tabindex="0"></canvas><div id="canvas-empty" class="canvas-empty" ${source ? 'hidden' : ''}><p>No screenshot is open.</p><button id="empty-sample">Load sample screenshot</button></div></div><p class="canvas-help">Keyboard: use the color field below, then press Apply selected color.</p></section>
   <aside class="controls paper-edge" aria-label="Overlay controls"><h2>Overlay controls</h2><label for="color-input">Selected color</label><div class="colour-input"><input id="color-input" type="color" value="${rgbToHex(target)}"><output id="color-value">${rgbToHex(target).toUpperCase()}</output></div><button class="button secondary full" id="apply-colour">Apply selected color</button>
   <fieldset><legend>Reading cue</legend><label><input type="radio" name="mode" value="labels" ${mode === 'labels' ? 'checked' : ''}> Add a label</label><label><input type="radio" name="mode" value="patterns" ${mode === 'patterns' ? 'checked' : ''}> Add a pattern</label><label><input type="radio" name="mode" value="remap" ${mode === 'remap' ? 'checked' : ''}> Use blue-orange colors</label></fieldset>
   <fieldset id="mapping-options" ${mode === 'remap' ? '' : 'hidden'}><legend>Remap to</legend><label><input type="radio" name="mapping" value="blue" ${mapping === 'blue' ? 'checked' : ''}> Blue</label><label><input type="radio" name="mapping" value="orange" ${mapping === 'orange' ? 'checked' : ''}> Orange</label></fieldset>
@@ -446,9 +449,14 @@ async function verifyLicense(license: string, note?: Element): Promise<LicenseRe
     return 'valid';
   }
   try {
-    const response = await fetch(`https://api.sociobot.in/api/v1/products/color-signal-lens/verify?license=${encodeURIComponent(license)}`);
-    if (!response.ok) throw new Error('License check failed');
-    const result = await response.json() as { valid?: boolean };
+    const nativeVerify = nativeTauri?.core?.invoke;
+    const result = nativeVerify
+      ? await nativeVerify<{ valid?: boolean }>('verify_license', { license })
+      : await (async () => {
+        const response = await fetch(`https://api.sociobot.in/api/v1/products/color-signal-lens/verify?license=${encodeURIComponent(license)}`);
+        if (!response.ok) throw new Error('License check failed');
+        return response.json() as Promise<{ valid?: boolean }>;
+      })();
     if (localStorage.getItem(licenseKey) !== license) return 'unavailable';
     const valid = result.valid === true;
     localStorage.setItem(licenseCheckKey, JSON.stringify({ checked: Date.now(), valid, license } satisfies LicenseVerdict));

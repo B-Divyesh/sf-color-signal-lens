@@ -52,8 +52,8 @@ Audit date: 2026-08-29. This covers every visitor-facing copy unit from the land
 | It does not filter your whole display. | 7 | Pass |
 | Read privacy details | 3 | Pass |
 | Save named presets for $12 once. | 6 | Pass; `lens-plus-price` |
-| The free app includes screenshot reading, labels, patterns, and blue-orange colors. | 11 | Pass |
-| Lens Plus saves named presets. | 5 | Pass |
+| The free app includes screenshot reading, labels, patterns, and blue-orange colors. Lens Plus saves named presets. | 16 | Pass |
+| Sociobot/Dodo is the merchant of record. Refunds are handled by Sociobot/Dodo. A refund revokes the license automatically. | 17 | Pass; purchase and refund terms |
 | Buy Lens Plus | 3 | Pass |
 | Restore license | 2 | Pass |
 | Desktop app | 2 | Pass |
@@ -80,7 +80,7 @@ Audit date: 2026-08-29. This covers every visitor-facing copy unit from the land
 | Privacy | 1 | Pass |
 | Terms | 1 | Pass |
 | Built by Param Factory | 4 | Pass |
-| v0.1.8 | 1 | Pass |
+| v0.1.10 | 1 | Pass |
 
 ## Demo and workspace
 
@@ -95,6 +95,10 @@ Audit date: 2026-08-29. This covers every visitor-facing copy unit from the land
 | Screenshot reader | 2 | Pass |
 | Inspect a screenshot status color. | 5 | Pass |
 | Click a status color in the image. Then choose how the overlay marks it. | 15 | Pass |
+| How Color Signal Lens works | 5 | Pass; desktop help destination |
+| Open or paste a screenshot. | 5 | Pass |
+| Choose the status color that is hard to read. | 9 | Pass |
+| Add a label, pattern, or blue-orange colors. | 8 | Pass |
 | Load sample screenshot | 3 | Pass |
 | Open screenshot | 2 | Pass |
 | Capture screen region | 3 | Pass |
@@ -151,6 +155,7 @@ Audit date: 2026-08-29. This covers every visitor-facing copy unit from the land
 | Use the overlay to read your own screen. | 8 | Pass |
 | Color Signal Lens helps you inspect screenshots that you choose. | 10 | Pass |
 | Lens Plus costs $12 as a one-time purchase through the registered Sociobot checkout. | 13 | Pass; `lens-plus-price` |
+| Sociobot/Dodo is the merchant of record. Refunds are handled by Sociobot/Dodo. A refund revokes the license automatically. | 17 | Pass; terms page |
 | You are responsible for the screenshots you open. | 9 | Pass |
 | Try the sample at https://color-signal-lens.sociobot.in/demo. | 5 | Pass |
 | It opens a checkout diff with added and removed totals. | 10 | Pass |
@@ -165,6 +170,7 @@ Audit date: 2026-08-29. This covers every visitor-facing copy unit from the land
 | Lens Plus costs $12 as a one-time purchase and saves named presets on this device. | 15 | Pass |
 | The purchase action uses the Sociobot checkout path. | 8 | Pass |
 | Restore a purchase by pasting its license on the landing page. | 11 | Pass |
+| Sociobot/Dodo is the merchant of record. Refunds are handled by Sociobot/Dodo, and a refund revokes the license automatically. | 17 | Pass; README Lens Plus section |
 | The free screenshot reader works offline after the installed desktop app has loaded. | 12 | Pass; `offline-reader` |
 | The browser sample is for trying the app before installation. | 10 | Pass |
 | The app has no analytics and loads no third-party runtime scripts. | 11 | Pass; `local-screenshots` |

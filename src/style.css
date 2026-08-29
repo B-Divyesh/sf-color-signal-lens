@@ -36,4 +36,5 @@ html{scroll-behavior:auto}
 
 /* Keep the right-hand form controls inside the cut-paper edge's hit area. */
 .controls{padding-right:36px}
-.restore input{min-width:0}
+.restore input{min-width:44px}
+.desktop-how{margin:28px 0;background:var(--paper-soft);border:2px solid var(--ink);padding:18px 20px;box-shadow:4px 4px 0 var(--ink)}.desktop-how h2{font-size:1.7rem}.desktop-how ol{margin:10px 0 0;padding-left:24px;display:grid;gap:6px}.desktop-how li{padding-left:4px}
