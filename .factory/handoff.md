@@ -2,7 +2,8 @@
 
 ## Delivered
 
-Repair commit: `c941b08a9f1fa4cbf0d88435d9bd79d8d8dc1205` (pushed to `main`).
+Repair series: `c941b08a9f1fa4cbf0d88435d9bd79d8d8dc1205` through
+`02f49be` (pushed to `main`).
 
 - Fixed isolated demo routing and storage: landing CTA, `/demo`, and `?demo=1`
   now enter the same demo state before any storage or entitlement access.
