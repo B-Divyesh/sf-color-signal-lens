@@ -1,128 +1,25 @@
 [
-  {
-    "id": "sample-lens",
-    "claim": "Try it with sample data opens a diff lens with nothing saved.",
-    "where": "landing hero, demo banner",
-    "test": "npm test -- --grep @claim:sample-lens",
-    "sandbox": "fresh browser context at /demo"
-  },
-  {
-    "id": "local-screenshots",
-    "claim": "Screenshots are read on your device; the demo sends no screenshot or analytics request.",
-    "where": "privacy page, workspace permission note",
-    "test": "npm test -- --grep @claim:local-screenshots",
-    "sandbox": "fresh browser context at /demo; intercept all requests during lens use"
-  },
-  {
-    "id": "reading-cues",
-    "claim": "The free lens reads screenshots with labels, patterns, or blue-orange remapping.",
-    "where": "landing preview, workspace controls",
-    "test": "npm test -- --grep @claim:reading-cues",
-    "sandbox": "fresh browser context at /demo; switch each cue"
-  },
-  {
-    "id": "demo-reset",
-    "claim": "Reset demo replaces demo data without touching real data.",
-    "where": "demo banner",
-    "test": "npm test -- --grep @claim:demo-reset",
-    "sandbox": "fresh browser context at /demo; reset local demo namespace"
-  },
-  {
-    "id": "screenshot-input",
-    "claim": "Works from a screenshot opened from your device.",
-    "where": "landing facts, workspace",
-    "test": "npm test -- --grep @claim:screenshot-input",
-    "sandbox": "fresh browser context at /lens; open a bundled PNG fixture and inspect the source name"
-  },
-  {
-    "id": "capture-consent",
-    "claim": "Screen capture is requested only after Capture screen region is pressed, and only the selected region is added.",
-    "where": "landing how-it-works, workspace permission note, README, privacy page",
-    "test": "npm test -- --grep @claim:capture-consent",
-    "sandbox": "fresh browser context with a mocked display picker; select coordinates and assert the selected region is used"
-  },
-  {
-    "id": "named-presets",
-    "claim": "Lens Plus saves, lists, applies, renames, and deletes named presets on this device.",
-    "where": "landing Lens Plus section, workspace",
-    "test": "npm test -- --grep @claim:named-presets",
-    "sandbox": "fresh browser context with a valid cached license; save, reload, apply, rename, delete, and reload again"
-  },
-  {
-    "id": "license-entitlement",
-    "claim": "Lens Plus controls appear only after an active license has been verified.",
-    "where": "Lens Plus purchase section and workspace",
-    "test": "npm test -- --grep @claim:license-entitlement",
-    "sandbox": "fresh browser context at /lens with only an invalid token; assert verification, locked controls, and token removal"
-  },
-  {
-    "id": "lens-plus-price",
-    "claim": "Lens Plus costs $12 as a one-time purchase.",
-    "where": "landing facts, Lens Plus section, terms",
-    "test": "npm test -- --grep @claim:lens-plus-price",
-    "sandbox": "fresh browser context at /; assert the displayed price and one-time terms"
-  },
-  {
-    "id": "installer-checksums",
-    "claim": "The Linux install script verifies SHA-256 and leaves an executable Color Signal Lens AppImage on PATH.",
-    "where": "README install section",
-    "test": "npm run test:unit -- --test-name-pattern=@claim:installer-checksums",
-    "sandbox": "shell fixture rejects a missing checksum, verifies a fixture AppImage, and asserts the executable survives temporary cleanup"
-  },
-  {
-    "id": "desktop-release",
-    "claim": "Each public desktop release includes macOS, Windows, Linux, SHA256SUMS, and latest.json assets.",
-    "where": "README install section",
-    "test": "npm run test:unit -- --test-name-pattern=@claim:desktop-release",
-    "sandbox": "release-workflow regression test checks the required platform asset gate and draft-to-public ordering"
-  },
-  {
-    "id": "macos-installer-architecture",
-    "claim": "The macOS download offers the x64 installer for Intel Macs and the aarch64 installer for Apple-Silicon Macs.",
-    "where": "landing install section",
-    "test": "npm test -- --grep @claim:macos-installer-architecture",
-    "sandbox": "fresh browser contexts with Intel and Apple-Silicon Mac user agents; mocked release response with both DMGs"
-  },
-  {
-    "id": "macos-shell-installer-architecture",
-    "claim": "The macOS install script selects the x64 DMG for Intel Macs and the aarch64 DMG for Apple-Silicon Macs.",
-    "where": "README install section, install.sh",
-    "test": "npm run test:unit -- --test-name-pattern=@claim:macos-shell-installer-architecture",
-    "sandbox": "shell fixture lists the Apple-Silicon DMG first, mocks Darwin uname -m for x86_64, i386, arm64, and aarch64, and observes the verified filename"
-  },
-  {
-    "id": "clear-lens",
-    "claim": "Clear lens removes the overlay and restores the original screenshot.",
-    "where": "workspace Clear lens action, README",
-    "test": "npm test -- --grep @claim:clear-lens",
-    "sandbox": "fresh demo; remap the known green pixel, clear the lens, and compare its original RGB value"
-  },
-  {
-    "id": "license-daily-cache",
-    "claim": "A current verified license is checked no more than once per day.",
-    "where": "README Lens Plus section",
-    "test": "npm test -- --grep @claim:license-daily-cache",
-    "sandbox": "fresh context with a current token-bound valid verdict; assert paid controls load with no verification request"
-  },
-  {
-    "id": "license-restore",
-    "claim": "A purchase can be restored by pasting its license on the landing page.",
-    "where": "landing Lens Plus section, README",
-    "test": "npm test -- --grep @claim:license-restore",
-    "sandbox": "fresh context; paste a fixture license, mock the Sociobot valid response, and assert local storage"
-  },
-  {
-    "id": "release-fallback",
-    "claim": "The landing page keeps a direct release-page fallback when GitHub metadata is unavailable.",
-    "where": "README install section, landing install section",
-    "test": "npm test -- --grep @claim:release-fallback",
-    "sandbox": "fresh context with GitHub API blocked; assert calm status and usable direct release link"
-  },
-  {
-    "id": "sociobot-checkout-path",
-    "claim": "Lens Plus purchases use the registered Sociobot checkout path.",
-    "where": "landing Lens Plus purchase action",
-    "test": "npm test -- --grep @claim:sociobot-checkout-path",
-    "sandbox": "fresh landing page; assert the purchase link targets the exact controller registration path"
-  }
+  {"id":"sample-lens","claim":"Try it with sample data opens a sample screenshot with an overlay and nothing saved.","where":"landing hero, demo banner","test":"npm test -- --grep @claim:sample-lens","sandbox":"fresh context starts at /, clicks the landing action, and checks the visible demo"},
+  {"id":"demo-isolation","claim":"Demo actions and Reset demo never change real settings.","where":"demo banner","test":"npm test -- --grep @claim:demo-isolation","sandbox":"seed real license and presets; enter through landing; exercise sample, reset, and exit; compare real keys byte-for-byte"},
+  {"id":"local-screenshots","claim":"Screenshot data stays in the app; it is not uploaded and the app has no analytics or third-party runtime scripts.","where":"privacy page, README, workspace note","test":"npm test -- --grep @claim:local-screenshots","sandbox":"fresh contexts visit public routes, open a file, paste an image, and capture a fixture region while recording requests and scripts"},
+  {"id":"reading-cues","claim":"The free reader marks screenshots with labels, patterns, or blue-orange colors.","where":"landing preview, workspace controls","test":"npm test -- --grep @claim:reading-cues","sandbox":"fresh demo switches every cue at desktop and 390px"},
+  {"id":"demo-reset","claim":"Reset demo restores sample demo data without touching real data.","where":"demo banner","test":"npm test -- --grep @claim:demo-reset","sandbox":"fresh demo resets its demo namespace and compares seeded real keys"},
+  {"id":"screenshot-input","claim":"Open a screenshot from your device.","where":"workspace","test":"npm test -- --grep @claim:screenshot-input","sandbox":"fresh workspace opens a bundled PNG fixture"},
+  {"id":"paste-input","claim":"Paste an image into the workspace.","where":"README, workspace","test":"npm test -- --grep @claim:paste-input","sandbox":"fresh workspace dispatches an image clipboard fixture and checks its source name"},
+  {"id":"keyboard-color-input","claim":"Set a status color with the keyboard color field.","where":"README, workspace","test":"npm test -- --grep @claim:keyboard-color-input","sandbox":"fresh demo types a color value and applies it"},
+  {"id":"capture-consent","claim":"Screen capture starts only after Capture screen region is pressed, and only the selected region is added.","where":"workspace, README, privacy","test":"npm test -- --grep @claim:capture-consent","sandbox":"mocked display picker selects coordinates and asserts the selected region"},
+  {"id":"clear-overlay","claim":"Clear overlay restores the original screenshot.","where":"workspace, README","test":"npm test -- --grep @claim:clear-overlay","sandbox":"fresh demo remaps a known pixel, clears the overlay, and compares the original RGB value"},
+  {"id":"privacy-limits","claim":"It does not change the screenshot or filter your whole display.","where":"landing privacy and limits","test":"npm test -- --grep @claim:privacy-limits","sandbox":"fresh demo compares original source after cues and asserts no display-capture request before user action"},
+  {"id":"named-presets","claim":"Lens Plus saves, lists, applies, renames, and deletes named presets on this device.","where":"landing Lens Plus section, workspace","test":"npm test -- --grep @claim:named-presets","sandbox":"valid cached fixture license performs each preset action"},
+  {"id":"license-entitlement","claim":"Lens Plus controls appear only after an active license is verified.","where":"Lens Plus purchase section and workspace","test":"npm test -- --grep @claim:license-entitlement","sandbox":"invalid token verifies, removes the token, and leaves controls locked"},
+  {"id":"lens-plus-price","claim":"Lens Plus costs $12 as a one-time purchase.","where":"landing facts, Lens Plus section, terms","test":"npm test -- --grep @claim:lens-plus-price","sandbox":"fresh context asserts the displayed price and one-time terms"},
+  {"id":"merchant-disclosure","claim":"Sociobot and Dodo are the merchant of record for Lens Plus.","where":"terms","test":"npm test -- --grep @claim:merchant-disclosure","sandbox":"fresh terms page reads the merchant disclosure"},
+  {"id":"license-restore","claim":"Restore a purchase by pasting its license on the landing page.","where":"landing Lens Plus section, README","test":"npm test -- --grep @claim:license-restore","sandbox":"fixture license response stores and verifies a pasted token"},
+  {"id":"sociobot-checkout-path","claim":"Lens Plus purchases use the registered Sociobot checkout path.","where":"landing Lens Plus purchase action, README","test":"npm test -- --grep @claim:sociobot-checkout-path","sandbox":"fresh landing page asserts the registered checkout href"},
+  {"id":"license-daily-cache","claim":"A current verified license is checked no more than once per day.","where":"README Lens Plus section","test":"npm test -- --grep @claim:license-daily-cache","sandbox":"current fixture verdict loads without a verification request"},
+  {"id":"desktop-release","claim":"Each public desktop release includes macOS, Windows, Linux, SHA256SUMS, and latest.json assets.","where":"README install section","test":"npm run test:unit -- --test-name-pattern=@claim:desktop-release","sandbox":"workflow regression checks platform asset gates and draft-to-public ordering"},
+  {"id":"installer-checksums","claim":"The Linux install script verifies SHA-256 and leaves an executable Color Signal Lens AppImage on PATH.","where":"README install section","test":"npm run test:unit -- --test-name-pattern=@claim:installer-checksums","sandbox":"shell fixture verifies an AppImage and checks the installed executable"},
+  {"id":"macos-installer-architecture","claim":"The macOS download offers x64 for Intel Macs and aarch64 for Apple-Silicon Macs.","where":"landing install section","test":"npm test -- --grep @claim:macos-installer-architecture","sandbox":"Intel and Apple-Silicon user agents receive both labelled DMGs"},
+  {"id":"macos-shell-installer-architecture","claim":"The macOS install script selects the matching x64 or aarch64 DMG.","where":"install.sh","test":"npm run test:unit -- --test-name-pattern=@claim:macos-shell-installer-architecture","sandbox":"mocked Darwin uname values observe verified filenames"},
+  {"id":"release-fallback","claim":"If GitHub metadata cannot be reached, the landing page links to the Releases page.","where":"README, landing install section","test":"npm test -- --grep @claim:release-fallback","sandbox":"GitHub API is blocked and the direct release link remains usable"}
 ]

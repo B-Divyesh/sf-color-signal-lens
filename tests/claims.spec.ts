@@ -1,20 +1,45 @@
 import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 
-test('@claim:sample-lens loads the sample diff with a visible lens', async ({ page }) => {
-  await page.goto('/demo');
+test('@claim:sample-lens enters the isolated sample from the landing action', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Try it with sample data' }).click();
+  await expect(page).toHaveURL(/\/demo$/);
   await expect(page.getByText('Demo — sample data, nothing is saved')).toBeVisible();
   await expect(page.getByText('checkout-totals.diff.png')).toBeVisible();
   await expect(page.locator('#lens-canvas')).toBeVisible();
 });
 
-test('@claim:local-screenshots demo sends no screenshot to another origin', async ({ page }) => {
+test('@claim:demo-isolation keeps licensed real settings unchanged from the landing demo action', async ({ page }) => {
+  const realPresets = JSON.stringify([{ id: 'real-1', name: 'Real preset', colour: '#16714a', mode: 'patterns', mapping: 'blue' }]);
+  await page.addInitScript((presets) => {
+    localStorage.setItem('sb_license:color-signal-lens', 'fixture-license');
+    localStorage.setItem('sb_license_check:color-signal-lens', JSON.stringify({ checked: Date.now(), valid: true, license: 'fixture-license' }));
+    localStorage.setItem('color-signal-lens:presets', presets);
+  }, realPresets);
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Try it with sample data' }).click();
+  await expect(page.getByText('Demo — sample data, nothing is saved')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Saved presets' })).toHaveCount(0);
+  await page.getByLabel('Add a label').check();
+  await page.getByRole('button', { name: 'Reset demo' }).click();
+  await expect(page.getByText('Demo — sample data, nothing is saved')).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('color-signal-lens:presets'))).toBe(realPresets);
+  expect(await page.evaluate(() => localStorage.getItem('sb_license:color-signal-lens'))).toBe('fixture-license');
+  await page.goto('/?demo=1');
+  await expect(page.getByText('Demo — sample data, nothing is saved')).toBeVisible();
+});
+
+test('@claim:local-screenshots keeps screenshot data local across routes and inputs', async ({ page }) => {
   const crossOriginRequests: string[] = [];
   page.on('request', (request) => { if (new URL(request.url()).origin !== 'http://127.0.0.1:4173') crossOriginRequests.push(request.url()); });
-  await page.goto('/demo');
-  await page.locator('#lens-canvas').click({ position: { x: 120, y: 250 } });
-  await expect(page.locator('#meaning-name')).toBeVisible();
-  expect(crossOriginRequests).toEqual([]);
+  for (const path of ['/demo', '/lens', '/privacy', '/terms']) await page.goto(path);
+  await page.goto('/lens');
+  await page.locator('#file-input').setInputFiles({ name: 'private.png', mimeType: 'image/png', buffer: readFileSync('src-tauri/icons/icon.png') });
+  await expect(page.locator('#source-status')).toHaveText('private.png');
+  const scripts = await page.locator('script[src]').evaluateAll((nodes) => nodes.map((node) => new URL((node as HTMLScriptElement).src).origin));
+  expect(scripts).toEqual(['http://127.0.0.1:4173']);
+  expect(crossOriginRequests.filter((url) => !url.startsWith('https://api.github.com/'))).toEqual([]);
 });
 
 test('@claim:reading-cues applies patterns, labels, and blue remapping', async ({ page }) => {
@@ -29,11 +54,11 @@ test('@claim:reading-cues applies patterns, labels, and blue remapping', async (
     await page.getByLabel('Add a pattern').check();
     await expect.poll(() => canvas.evaluate((element) => Array.from((element as HTMLCanvasElement).getContext('2d')!.getImageData(984, 504, 1, 1).data.slice(0, 3)).join(','))).not.toBe('22,113,74');
 
-    await page.getByLabel('Label the signal').check();
+    await page.getByLabel('Add a label').check();
     await expect.poll(() => canvas.evaluate((element) => Array.from((element as HTMLCanvasElement).getContext('2d')!.getImageData(990, 460, 1, 1).data.slice(0, 3)).join(','))).toBe('23,35,46');
 
-    await page.getByLabel('Remap the colour').check();
-    await page.getByLabel('Blue').check();
+    await page.getByLabel('Use blue-orange colors').check();
+    await page.getByLabel('Blue', { exact: true }).check();
     await expect.poll(() => canvas.evaluate((element) => Array.from((element as HTMLCanvasElement).getContext('2d')!.getImageData(983, 503, 1, 1).data.slice(0, 3)).join(','))).toBe('7,90,134');
   }
 });
@@ -49,6 +74,25 @@ test('@claim:screenshot-input opens a screenshot from the device', async ({ page
   await expect(page.locator('#canvas-empty')).toBeHidden();
 });
 
+test('@claim:paste-input opens a pasted image in the workspace', async ({ page }) => {
+  await page.goto('/lens');
+  await page.evaluate(async () => {
+    const response = await fetch('/apple-touch-icon.png');
+    const blob = await response.blob();
+    const data = new DataTransfer();
+    data.items.add(new File([blob], 'paste.png', { type: 'image/png' }));
+    document.dispatchEvent(new ClipboardEvent('paste', { clipboardData: data, bubbles: true }));
+  });
+  await expect(page.locator('#source-status')).toHaveText('Pasted screenshot');
+});
+
+test('@claim:keyboard-color-input applies a color entered through the color field', async ({ page }) => {
+  await page.goto('/demo');
+  await page.getByLabel('Selected color').fill('#16714a');
+  await page.getByRole('button', { name: 'Apply selected color' }).click();
+  await expect(page.locator('#color-value')).toHaveText('#16714A');
+});
+
 test('@claim:named-presets saves, lists, applies, renames, and deletes a persisted preset', async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem('sb_license:color-signal-lens', 'fixture-license');
@@ -60,10 +104,10 @@ test('@claim:named-presets saves, lists, applies, renames, and deletes a persist
   await expect(page.locator('#preset-note')).toHaveText('Code review is saved on this device.');
   await page.reload();
   await expect(page.locator('#preset-list')).toContainText('Code review');
-  await page.getByLabel('Selected colour').fill('#16714a');
-  await page.getByRole('button', { name: 'Apply selected colour' }).click();
-  await page.getByLabel('Remap the colour').check();
-  await page.getByLabel('Orange').check();
+  await page.getByLabel('Selected color').fill('#16714a');
+  await page.getByRole('button', { name: 'Apply selected color' }).click();
+  await page.getByLabel('Use blue-orange colors').check();
+  await page.getByLabel('Orange', { exact: true }).check();
   await page.getByRole('button', { name: 'Apply Code review' }).click();
   await expect(page.locator('#color-value')).toHaveText('#9C2D20');
   await expect(page.getByLabel('Add a pattern')).toBeChecked();
@@ -109,17 +153,33 @@ test('@claim:demo-reset discards the sample demo namespace', async ({ page }) =>
   expect(await page.evaluate(() => localStorage.getItem('color-signal-lens:presets'))).toBe(JSON.stringify([{ id: 'real-1', name: 'Real preset' }]));
 });
 
-test('@claim:clear-lens restores the unmodified screenshot', async ({ page }) => {
+test('@claim:clear-overlay restores the unmodified screenshot', async ({ page }) => {
   await page.goto('/demo');
   const canvas = page.locator('#lens-canvas');
   const bounds = await canvas.boundingBox();
   await canvas.click({ position: { x: 983 * bounds!.width / 1200, y: 503 * bounds!.height / 720 } });
-  await page.getByLabel('Remap the colour').check();
+  await page.getByLabel('Use blue-orange colors').check();
   await expect.poll(() => canvas.evaluate((element) => Array.from((element as HTMLCanvasElement).getContext('2d')!.getImageData(983, 503, 1, 1).data.slice(0, 3)).join(','))).toBe('7,90,134');
-  await page.getByRole('button', { name: 'Clear lens' }).click();
-  await expect(page.getByText('The original screenshot is shown without an overlay.')).toBeVisible();
+  await page.getByRole('button', { name: 'Clear overlay' }).click();
+  await expect(page.getByText('The original screenshot is shown without an overlay.', { exact: true })).toBeVisible();
   await expect(page.locator('input[name="mode"]:checked')).toHaveCount(0);
   await expect.poll(() => canvas.evaluate((element) => Array.from((element as HTMLCanvasElement).getContext('2d')!.getImageData(983, 503, 1, 1).data.slice(0, 3)).join(','))).toBe('22,113,74');
+});
+
+test('@claim:privacy-limits keeps the source screenshot unchanged and does not capture before a user action', async ({ page }) => {
+  await page.addInitScript(() => {
+    const state = window as Window & { captureRequests?: number };
+    state.captureRequests = 0;
+    Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: { getDisplayMedia: async () => { state.captureRequests = (state.captureRequests || 0) + 1; throw new Error('unused'); } } });
+  });
+  await page.goto('/demo');
+  const canvas = page.locator('#lens-canvas');
+  const bounds = await canvas.boundingBox();
+  await canvas.click({ position: { x: 983 * bounds!.width / 1200, y: 503 * bounds!.height / 720 } });
+  await page.getByLabel('Use blue-orange colors').check();
+  await page.getByRole('button', { name: 'Clear overlay' }).click();
+  await expect.poll(() => canvas.evaluate((element) => Array.from((element as HTMLCanvasElement).getContext('2d')!.getImageData(983, 503, 1, 1).data.slice(0, 3)).join(','))).toBe('22,113,74');
+  expect(await page.evaluate(() => (window as Window & { captureRequests?: number }).captureRequests)).toBe(0);
 });
 
 test('@claim:license-daily-cache uses a fresh verified entitlement without another request', async ({ page }) => {
@@ -137,9 +197,9 @@ test('@claim:license-daily-cache uses a fresh verified entitlement without anoth
 test('@claim:license-restore stores and verifies a pasted license', async ({ page }) => {
   await page.route('https://api.sociobot.in/api/v1/products/color-signal-lens/verify?license=restored-fixture', (route) => route.fulfill({ contentType: 'application/json', body: JSON.stringify({ valid: true, reason: 'ok' }) }));
   await page.goto('/');
-  await page.getByRole('button', { name: 'Have a license?' }).click();
+  await page.locator('#restore-license').click();
   await page.getByLabel('Paste your license').fill('restored-fixture');
-  await page.getByRole('button', { name: 'Restore license' }).click();
+  await page.locator('#save-license').click();
   await expect(page.locator('#license-note')).toHaveText('License is active.');
   expect(await page.evaluate(() => localStorage.getItem('sb_license:color-signal-lens'))).toBe('restored-fixture');
 });
@@ -148,12 +208,17 @@ test('@claim:release-fallback keeps a direct release link when metadata is unava
   await page.route('https://api.github.com/**', (route) => route.abort());
   await page.goto('/');
   await expect(page.getByText('Downloads are being published.')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'See downloads' })).toHaveAttribute('href', 'https://github.com/B-Divyesh/sf-color-signal-lens/releases');
+  await expect(page.getByRole('link', { name: 'Open release downloads' })).toHaveAttribute('href', 'https://github.com/B-Divyesh/sf-color-signal-lens/releases');
 });
 
 test('@claim:sociobot-checkout-path keeps the registered controller purchase URL', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('link', { name: 'Buy Lens Plus' })).toHaveAttribute('href', 'https://api.sociobot.in/api/v1/products/color-signal-lens/checkout');
+});
+
+test('@claim:merchant-disclosure names the Lens Plus merchant of record', async ({ page }) => {
+  await page.goto('/terms');
+  await expect(page.getByText('Sociobot and Dodo are the merchant of record.')).toBeVisible();
 });
 
 test('@claim:macos-installer-architecture offers correctly labelled DMGs for Intel and Apple-Silicon Macs', async ({ browser }) => {

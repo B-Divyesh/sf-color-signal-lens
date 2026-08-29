@@ -17,15 +17,32 @@ let target: Rgb = parseHex('#9c2d20');
 let mapping: 'blue' | 'orange' = 'blue';
 let imageReady = false;
 let selectedPoint: { x: number; y: number } | null = null;
-let demo = location.pathname === '/demo' || location.search.includes('demo=1');
+let demo = location.pathname === '/demo' || new URLSearchParams(location.search).get('demo') === '1';
 let focusAfterRender = false;
 
 const esc = (text: string) => text.replace(/[&<>"]/g, (v) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[v]!));
 const lensName = () => detectStatusName(target);
 const asset = (path: string) => siteBuild ? `./${path.replace(/^\//, '')}` : path;
 
-function pageTitle(title: string) {
+const siteUrl = 'https://color-signal-lens.sociobot.in';
+const pageMetadata: Record<string, { description: string }> = {
+  '/': { description: 'Make screenshot status colors easier to tell apart with labels, patterns, and blue-orange colors.' },
+  '/demo': { description: 'Try Color Signal Lens with a sample checkout screenshot. Demo data stays separate from your settings.' },
+  '/lens': { description: 'Open a screenshot and mark one status color with a label, pattern, or blue-orange colors.' },
+  '/privacy': { description: 'Read how Color Signal Lens handles screenshots, local storage, and screen permission.' },
+  '/terms': { description: 'Read Color Signal Lens terms, product limits, and Lens Plus purchase details.' },
+  '/404': { description: 'This Color Signal Lens page was not found. Return home to open a screenshot.' },
+};
+function pageTitle(title: string, path = location.pathname) {
   document.title = title;
+  const meta = pageMetadata[path] || pageMetadata['/404'];
+  const canonical = `${siteUrl}${path === '/404' ? '/404.html' : path}`;
+  document.querySelector<HTMLMetaElement>('meta[name="description"]')!.content = meta.description;
+  document.querySelector<HTMLLinkElement>('link[rel="canonical"]')!.href = canonical;
+  document.querySelector<HTMLMetaElement>('meta[property="og:title"]')!.content = title;
+  document.querySelector<HTMLMetaElement>('meta[property="og:description"]')!.content = meta.description;
+  document.querySelector<HTMLMetaElement>('meta[name="twitter:title"]')!.content = title;
+  document.querySelector<HTMLMetaElement>('meta[name="twitter:description"]')!.content = meta.description;
   const heading = document.querySelector<HTMLElement>('h1');
   heading?.setAttribute('tabindex', '-1');
   if (focusAfterRender) heading?.focus();
@@ -33,7 +50,7 @@ function pageTitle(title: string) {
   document.querySelector('#route-announcement')!.textContent = title;
 }
 
-function layout(content: string, route: string) {
+function layout(content: string, route: string, path = location.pathname) {
   app.innerHTML = `
     <a class="skip" href="#main">Skip to main content</a>
     <header class="topbar"><a class="wordmark" href="/" data-nav>Color<br>Signal<br>Lens</a>
@@ -43,48 +60,48 @@ function layout(content: string, route: string) {
     <main id="main" tabindex="-1">${content}</main>
     <footer><p>Color Signal Lens makes screenshot status signals easier to read.</p><p><a href="/privacy" data-nav>Privacy</a> · <a href="/terms" data-nav>Terms</a> · Built by Param Factory · v0.1.7</p></footer>`;
   wireNavigation();
-  pageTitle(route);
+  pageTitle(route, path);
 }
 
 function renderLanding() {
   layout(`
   <section class="hero paper-edge"><div class="hero-copy"><p class="eyebrow">PRIVATE DESKTOP UTILITY</p><h1>Make status colors distinct.</h1><p class="lede">For people who cannot rely on red and green during code reviews, charts, or status screens.</p>
-  <div class="hero-actions"><a class="button primary" href="/demo" data-nav>Try it with sample data</a><span>See a diff lens open with nothing saved.</span></div>
+  <div class="hero-actions"><a class="button primary" href="/demo" data-nav>Try it with sample data</a><span>See a sample screenshot with an overlay. Nothing is saved.</span></div>
   <ul class="facts"><li>Works from a screenshot</li><li>Runs on your device</li><li>Lens Plus: $12 once</li></ul></div>
   <figure class="hero-art"><img src="${asset('/paper-cut-lens.webp')}" width="1200" height="800" fetchpriority="high" decoding="async" alt="A paper-cut software panel viewed through a large circular lens with blue and orange status marks."></figure></section>
-  <section class="live-preview" aria-labelledby="preview-title"><div><p class="eyebrow">A SMALL, LOCAL LAYER</p><h2 id="preview-title">Pick one signal. Make it readable.</h2><p>Open a screenshot, click a colour, then add labels, patterns, or a blue-orange remap.</p><a class="text-link" href="/demo" data-nav>Open the sample diff →</a></div><div class="preview-swatch"><span class="dot orange"></span><span class="stripe"></span><b>Removed</b><span class="dot blue"></span><span class="dots"></span><b>Added</b></div></section>
-  <section id="how" class="how"><p class="eyebrow">HOW IT WORKS</p><h2>Read the signal, not a global filter.</h2><ol><li><span>01</span><h3>Open a screenshot</h3><p>Use a file, paste an image, or capture a screen only when you choose.</p></li><li><span>02</span><h3>Choose a colour</h3><p>Click the signal that is hard to read. The original image stays in place.</p></li><li><span>03</span><h3>Add another cue</h3><p>Show a plain label, a pattern, or a blue-orange remap over that signal.</p></li></ol></section>
-  <section class="limits paper-edge"><div><p class="eyebrow">WHAT IT DOES NOT DO</p><h2>It adds cues to the image you choose.</h2><p>It adds a temporary layer while you inspect one image.</p></div><a class="button secondary" href="/privacy" data-nav>Read privacy details</a></section>
-  <section class="plus"><p class="eyebrow">LENS PLUS</p><h2>Save custom lenses for $12 once.</h2><p>The free lens includes screenshot reading, labels, patterns, and remapping. Plus saves named presets.</p><a class="button primary" href="https://api.sociobot.in/api/v1/products/color-signal-lens/checkout">Buy Lens Plus</a><button class="link-button" id="restore-license">Have a license?</button><div id="license-area"></div></section>
-  <section class="install"><p class="eyebrow">DESKTOP APP</p><h2>Install the lens on your computer.</h2><p id="download-state">Downloads are being published. <a href="https://github.com/B-Divyesh/sf-color-signal-lens/releases">Open the release page</a>.</p><a id="download-button" class="button secondary" href="https://github.com/B-Divyesh/sf-color-signal-lens/releases">See downloads</a><p class="download-note">Installers are unsigned. Your computer may ask you to confirm the app.</p></section>`, 'Color Signal Lens — Make status colors distinct');
+  <section class="live-preview" aria-labelledby="preview-title"><div><p class="eyebrow">SCREENSHOT PREVIEW</p><h2 id="preview-title">Preview the screenshot changes.</h2><p>Open a screenshot, choose a status color, then add a label, pattern, or blue-orange colors.</p><a class="text-link" href="/demo" data-nav>Open the sample screenshot →</a></div><div class="preview-swatch"><span class="dot orange"></span><span class="stripe"></span><b>Removed</b><span class="dot blue"></span><span class="dots"></span><b>Added</b></div></section>
+  <section id="how" class="how"><p class="eyebrow">HOW IT WORKS</p><h2>How Color Signal Lens works</h2><ol><li><span>01</span><img src="${asset('/walkthrough-open.png')}" width="640" height="400" loading="lazy" decoding="async" alt="Color Signal Lens with a sample checkout screenshot open."><h3>Open a screenshot</h3><p>Open a file, paste an image, or capture a screen region when you choose.</p></li><li><span>02</span><img src="${asset('/walkthrough-select.png')}" width="640" height="400" loading="lazy" decoding="async" alt="A green status color selected in the sample checkout screenshot."><h3>Choose a status color</h3><p>Click the color that is hard to tell apart.</p></li><li><span>03</span><img src="${asset('/walkthrough-remap.png')}" width="640" height="400" loading="lazy" decoding="async" alt="The selected green status color shown in blue with a pattern cue."><h3>Choose a reading cue</h3><p>Add a label, a pattern, or blue-orange colors over that status color.</p></li></ol></section>
+  <section class="limits paper-edge"><div><p class="eyebrow">PRIVACY AND LIMITS</p><h2>It changes neither the screenshot nor your display.</h2><p>It processes only the image you open. It does not filter your whole display.</p></div><a class="button secondary" href="/privacy" data-nav>Read privacy details</a></section>
+  <section class="plus"><p class="eyebrow">LENS PLUS</p><h2>Save custom lenses for $12 once.</h2><p>The free lens includes screenshot reading, labels, patterns, and blue-orange colors. Plus saves named presets.</p><a class="button primary" href="https://api.sociobot.in/api/v1/products/color-signal-lens/checkout">Buy Lens Plus</a><button class="link-button" id="restore-license">Restore license</button><div id="license-area"></div></section>
+  <section class="install"><p class="eyebrow">DESKTOP APP</p><h2>Install Color Signal Lens.</h2><p id="download-state">Downloads are being published. <a href="https://github.com/B-Divyesh/sf-color-signal-lens/releases">Open the release downloads</a>.</p><a id="download-button" class="button secondary" href="https://github.com/B-Divyesh/sf-color-signal-lens/releases">Open release downloads</a></section>`, 'Color Signal Lens — Make status colors distinct');
   document.querySelector('#restore-license')?.addEventListener('click', showRestore);
   void acceptLicense();
   hydrateDownload();
 }
 
 function renderDemo() {
+  demo = true;
   if (!source) source = { url: svgDataUrl, name: 'checkout-totals.diff.png', kind: 'sample' };
   localStorage.setItem('demo:color-signal-lens:started', '1');
-  layout(`<aside class="demo-banner" role="status"><b>Demo — sample data, nothing is saved</b><span><button id="reset-demo">Reset demo</button><button id="start-real">Start for real</button></span></aside>${workspace()}`, 'Demo — Color Signal Lens');
+  layout(`<aside class="demo-banner" role="status"><b>Demo — sample data, nothing is saved</b><span><button id="reset-demo">Reset demo</button><button id="start-real">Start for real</button></span></aside>${workspace(true)}`, 'Demo — Color Signal Lens');
   wireWorkspace();
 }
 
-function workspace() {
-  return `<section class="lens-shell"><div class="lens-heading"><p class="eyebrow">READING LAYER</p><h1>Inspect a screenshot signal.</h1><p>Click a colour in the image. Then choose how the lens marks it.</p></div>
-  <div class="source-actions"><button class="button primary" id="load-sample">Load sample diff</button><label class="button secondary file-picker" for="file-input">Open screenshot<input id="file-input" type="file" accept="image/png,image/jpeg,image/webp"></label><button class="button secondary" id="capture-screen">Capture screen region</button><p id="source-status" role="status" aria-live="polite">${esc(source?.name || 'No screenshot loaded.')}</p></div>
-  <p class="permission-note">Capture asks for screen permission only when you press it. Select a region before it is added. The image stays on this device.</p>
-  <div class="work-grid"><section class="canvas-paper" aria-label="Screenshot lens"><div class="canvas-wrap"><canvas id="lens-canvas" width="1200" height="720" aria-label="Screenshot. Click a colour to select it." tabindex="0"></canvas><div id="canvas-empty" class="canvas-empty" ${source ? 'hidden' : ''}><p>No screenshot is open.</p><button id="empty-sample">Load sample diff</button></div></div><p class="canvas-help">Keyboard: use the colour field below, then press Apply selected colour.</p></section>
-  <aside class="controls paper-edge" aria-label="Lens controls"><h2>Lens controls</h2><label for="color-input">Selected colour</label><div class="colour-input"><input id="color-input" type="color" value="${rgbToHex(target)}"><output id="color-value">${rgbToHex(target).toUpperCase()}</output></div><button class="button secondary full" id="apply-colour">Apply selected colour</button>
-  <fieldset><legend>Reading cue</legend><label><input type="radio" name="mode" value="labels" ${mode === 'labels' ? 'checked' : ''}> Label the signal</label><label><input type="radio" name="mode" value="patterns" ${mode === 'patterns' ? 'checked' : ''}> Add a pattern</label><label><input type="radio" name="mode" value="remap" ${mode === 'remap' ? 'checked' : ''}> Remap the colour</label></fieldset>
+function workspace(isDemo = false) {
+  const sourceActions = `<div class="source-actions">${isDemo ? '' : '<button class="button primary" id="load-sample">Load sample screenshot</button>'}<label class="button secondary file-picker" for="file-input">Open screenshot<input id="file-input" type="file" accept="image/png,image/jpeg,image/webp"></label><button class="button secondary" id="capture-screen">Capture screen region</button><p id="source-status" role="status" aria-live="polite">${esc(source?.name || 'No screenshot loaded.')}</p></div><p class="permission-note">Capture asks for screen permission only when you press it. Select a region before it is added. The screenshot stays on this device.</p>`;
+  return `<section class="lens-shell ${isDemo ? 'demo-workspace' : ''}"><div class="lens-heading"><p class="eyebrow">${isDemo ? 'SAMPLE CHECKOUT SCREENSHOT' : 'SCREENSHOT READER'}</p><h1>${isDemo ? 'See the sample status colors.' : 'Inspect a screenshot status color.'}</h1><p id="demo-active-cue">${isDemo ? `Active cue: ${mode === 'patterns' ? 'Pattern for the removed status color.' : meaningCopy()}` : 'Click a status color in the image. Then choose how the overlay marks it.'}</p></div>
+  ${isDemo ? '' : sourceActions}<div class="work-grid"><section class="canvas-paper" aria-label="Screenshot overlay"><div class="canvas-wrap"><canvas id="lens-canvas" width="1200" height="720" aria-label="Screenshot. Click a color to select it." tabindex="0"></canvas><div id="canvas-empty" class="canvas-empty" ${source ? 'hidden' : ''}><p>No screenshot is open.</p><button id="empty-sample">Load sample screenshot</button></div></div><p class="canvas-help">Keyboard: use the color field below, then press Apply selected color.</p></section>
+  <aside class="controls paper-edge" aria-label="Overlay controls"><h2>Overlay controls</h2><label for="color-input">Selected color</label><div class="colour-input"><input id="color-input" type="color" value="${rgbToHex(target)}"><output id="color-value">${rgbToHex(target).toUpperCase()}</output></div><button class="button secondary full" id="apply-colour">Apply selected color</button>
+  <fieldset><legend>Reading cue</legend><label><input type="radio" name="mode" value="labels" ${mode === 'labels' ? 'checked' : ''}> Add a label</label><label><input type="radio" name="mode" value="patterns" ${mode === 'patterns' ? 'checked' : ''}> Add a pattern</label><label><input type="radio" name="mode" value="remap" ${mode === 'remap' ? 'checked' : ''}> Use blue-orange colors</label></fieldset>
   <fieldset id="mapping-options" ${mode === 'remap' ? '' : 'hidden'}><legend>Remap to</legend><label><input type="radio" name="mapping" value="blue" ${mapping === 'blue' ? 'checked' : ''}> Blue</label><label><input type="radio" name="mapping" value="orange" ${mapping === 'orange' ? 'checked' : ''}> Orange</label></fieldset>
-  <div class="meaning"><span class="cue-icon ${mode}"></span><div><b id="meaning-name">${mode === 'none' ? 'No reading cue' : lensName()}</b><p id="meaning-copy">${meaningCopy()}</p></div></div>${premiumPanel()}<button id="clear-lens" class="link-button">Clear lens</button></aside></div></section>`;
+  <div class="meaning"><span class="cue-icon ${mode}"></span><div><b id="meaning-name">${mode === 'none' ? 'No reading cue' : lensName()}</b><p id="meaning-copy">${meaningCopy()}</p></div></div>${premiumPanel()}<button id="clear-lens" class="link-button">Clear overlay</button></aside></div>${isDemo ? sourceActions : ''}</section>`;
 }
 
 function meaningCopy() {
   if (mode === 'none') return 'The original screenshot is shown without an overlay.';
-  if (mode === 'labels') return 'A text label marks the selected signal.';
-  if (mode === 'patterns') return 'A pattern sits over the selected signal.';
-  return 'The selected signal is remapped.';
+  if (mode === 'labels') return 'A text label marks the selected status color.';
+  if (mode === 'patterns') return 'A pattern marks the selected status color.';
+  return 'The selected status color uses blue-orange colors.';
 }
 
 function draw() {
@@ -143,7 +160,7 @@ function wireWorkspace() {
   document.querySelectorAll<HTMLInputElement>('input[name="mapping"]').forEach((input) => input.addEventListener('change', () => { mapping = input.value as 'blue' | 'orange'; refreshLens(); }));
   document.querySelector('#clear-lens')?.addEventListener('click', () => { mode = 'none'; selectedPoint = null; refreshLens(); });
   wirePresetActions();
-  document.querySelector('#reset-demo')?.addEventListener('click', () => { localStorage.removeItem('demo:color-signal-lens:started'); source = { url: svgDataUrl, name: 'checkout-totals.diff.png', kind: 'sample' }; target = parseHex('#9c2d20'); mode = 'patterns'; renderDemo(); });
+  document.querySelector('#reset-demo')?.addEventListener('click', () => { localStorage.removeItem('demo:color-signal-lens:started'); localStorage.removeItem('demo:color-signal-lens:presets'); source = { url: svgDataUrl, name: 'checkout-totals.diff.png', kind: 'sample' }; target = parseHex('#9c2d20'); mode = 'patterns'; renderDemo(); });
   document.querySelector('#start-real')?.addEventListener('click', () => { localStorage.removeItem('demo:color-signal-lens:started'); source = null; selectedPoint = null; demo = false; focusAfterRender = true; history.pushState({}, '', '/lens'); renderLens(); });
   document.addEventListener('paste', pasteImage, { once: true });
 }
@@ -170,6 +187,8 @@ function refreshLens() {
   if (name) name.textContent = mode === 'none' ? 'No reading cue' : lensName();
   const copy = document.querySelector('#meaning-copy');
   if (copy) copy.textContent = meaningCopy();
+  const demoCue = document.querySelector('#demo-active-cue');
+  if (demoCue && demo) demoCue.textContent = `Active cue: ${mode === 'patterns' ? 'Pattern for the selected status color.' : meaningCopy()}`;
   draw();
 }
 function rerenderWorkspace() { demo ? renderDemo() : renderLens(); }
@@ -242,7 +261,8 @@ async function captureScreen() {
   } catch { setSourceStatus('Screen capture did not start. Check screen-sharing permission, then try again or open a screenshot.'); }
 }
 function renderLens() {
-  layout(workspace(), 'Color Signal Lens — Inspect a screenshot signal');
+  demo = false;
+  layout(workspace(), 'Color Signal Lens — Inspect screenshot colors');
   wireWorkspace();
   void acceptLicense((result) => {
     const message = result === 'invalid'
@@ -266,13 +286,15 @@ function cachedLicenseVerdict(license: string) {
 }
 
 function hasValidLicense() {
+  if (demo) return false;
   const license = localStorage.getItem(licenseKey);
   return Boolean(license && cachedLicenseVerdict(license)?.valid);
 }
 
 function readPresets(): Preset[] {
   try {
-    const value = JSON.parse(localStorage.getItem('color-signal-lens:presets') || '[]') as Partial<Preset>[];
+    const key = demo ? 'demo:color-signal-lens:presets' : 'color-signal-lens:presets';
+    const value = JSON.parse(localStorage.getItem(key) || '[]') as Partial<Preset>[];
     if (!Array.isArray(value)) return [];
     return value.flatMap((preset, index) => {
       if (typeof preset.name !== 'string' || typeof preset.colour !== 'string' || !['none', 'labels', 'patterns', 'remap'].includes(String(preset.mode))) return [];
@@ -280,13 +302,13 @@ function readPresets(): Preset[] {
       return [{ id: typeof preset.id === 'string' ? preset.id : `saved-${index}`, name: preset.name.slice(0, 32), colour: preset.colour, mode: preset.mode as LensMode, mapping: savedMapping }];
     }).slice(-12);
   } catch {
-    localStorage.removeItem('color-signal-lens:presets');
+    localStorage.removeItem(demo ? 'demo:color-signal-lens:presets' : 'color-signal-lens:presets');
     return [];
   }
 }
 
 function writePresets(presets: Preset[]) {
-  localStorage.setItem('color-signal-lens:presets', JSON.stringify(presets.slice(-12)));
+  localStorage.setItem(demo ? 'demo:color-signal-lens:presets' : 'color-signal-lens:presets', JSON.stringify(presets.slice(-12)));
 }
 
 function presetList() {
@@ -360,9 +382,9 @@ function deletePreset(id: string) {
   refreshPremiumPanel(`${removed.name} is deleted.`);
 }
 
-function renderPrivacy() { layout(`<article class="legal paper-edge"><p class="eyebrow">PRIVACY</p><h1>Your screenshot stays on this device.</h1><p>Color Signal Lens reads pixels in the image you open. It does not upload screenshots, record your screen, or use analytics.</p><h2>Local storage</h2><p>The demo uses a separate local browser key. Reset demo deletes it. A paid license, if you add one, is stored only in your browser so the app can remember it.</p><h2>Screen permission</h2><p>The installed app asks for screen permission only after you press Capture screen region. You choose the region before it is added. You can use files or pasted screenshots instead.</p><p>Last updated: 28 August 2026.</p></article>`, 'Privacy — Color Signal Lens'); }
-function renderTerms() { layout(`<article class="legal paper-edge"><p class="eyebrow">TERMS</p><h1>Use the lens to read your own screen.</h1><p>Color Signal Lens is an accessibility aid for inspecting images you choose.</p><h2>Lens Plus</h2><p>Lens Plus costs $12 as a one-time purchase. Sociobot and Dodo are the merchant of record. A refunded purchase may lose access to saved presets.</p><h2>Limits</h2><p>You are responsible for the screenshots you open.</p><p>Last updated: 28 August 2026.</p></article>`, 'Terms — Color Signal Lens'); }
-function render404() { layout(`<article class="legal paper-edge"><p class="eyebrow">NOT FOUND</p><h1>This paper layer is missing.</h1><p>The page may have moved. Return to the lens and choose a screenshot.</p><a class="button primary" href="/" data-nav>Return home</a></article>`, 'Page not found — Color Signal Lens'); }
+function renderPrivacy() { layout(`<article class="legal paper-edge"><p class="eyebrow">PRIVACY</p><h1>Your screenshot stays on this device.</h1><p>Color Signal Lens processes the screenshot you open in the app. It does not upload screenshot data or use analytics.</p><h2>Local storage</h2><p>The demo uses separate browser keys beginning with demo:. Reset demo deletes those keys. A paid license is stored in your browser only when you add it.</p><h2>Screen permission</h2><p>The app asks for screen permission only after you press Capture screen region. You choose the region before it is added. You can use files or pasted screenshots instead.</p><p>Last updated: 29 August 2026.</p></article>`, 'Privacy — Color Signal Lens'); }
+function renderTerms() { layout(`<article class="legal paper-edge"><p class="eyebrow">TERMS</p><h1>Use the overlay to read your own screen.</h1><p>Color Signal Lens helps you inspect screenshots that you choose.</p><h2>Lens Plus</h2><p>Lens Plus costs $12 as a one-time purchase. Sociobot and Dodo are the merchant of record.</p><h2>Limits</h2><p>You are responsible for the screenshots you open.</p><p>Last updated: 29 August 2026.</p></article>`, 'Terms — Color Signal Lens'); }
+function render404() { layout(`<article class="legal paper-edge"><p class="eyebrow">NOT FOUND</p><h1>Page not found</h1><p>Return to Color Signal Lens to open a screenshot.</p><a class="button primary" href="/" data-nav>Return home</a></article>`, 'Page not found — Color Signal Lens', '/404'); }
 
 function storeLicense(license: string) {
   if (localStorage.getItem(licenseKey) !== license) localStorage.removeItem(licenseCheckKey);
@@ -381,6 +403,7 @@ function showRestore() {
   });
 }
 async function acceptLicense(onResult?: (result: LicenseResult) => void) {
+  if (demo) return;
   const params = new URLSearchParams(location.search);
   const value = params.get('license');
   if (value) {
@@ -467,10 +490,15 @@ async function hydrateDownload() {
     if (!download) return;
     button.href = download.browser_download_url;
     button.textContent = `Download ${download.name}`;
-    state.textContent = 'The current download matches your computer.';
-  } catch { /* Keep the calm fallback if the release list is unavailable. */ }
+    state.textContent = 'Download the installer for this computer.';
+  } catch { /* Keep the release-page fallback if metadata is unavailable. */ }
 }
-function wireNavigation(root: ParentNode = document) { root.querySelectorAll<HTMLAnchorElement>('a[data-nav]').forEach((a) => a.addEventListener('click', (event) => { const href = a.getAttribute('href')!; if (!href.startsWith('/')) return; event.preventDefault(); focusAfterRender = true; history.pushState({}, '', href); renderRoute(); })); }
-function renderRoute() { if (location.search.includes('demo=1')) { demo = true; renderDemo(); return; } if (!siteBuild && (location.pathname === '/' || location.pathname === '/lens')) { demo = false; renderLens(); return; } if (location.pathname === '/') renderLanding(); else if (location.pathname === '/lens') { demo = false; renderLens(); } else if (location.pathname === '/demo') renderDemo(); else if (location.pathname === '/privacy') renderPrivacy(); else if (location.pathname === '/terms') renderTerms(); else render404(); }
+function wireNavigation(root: ParentNode = document) { root.querySelectorAll<HTMLAnchorElement>('a[data-nav]').forEach((a) => a.addEventListener('click', (event) => { const href = a.getAttribute('href')!; if (!href.startsWith('/')) return; const target = new URL(href, location.origin); if (target.pathname === location.pathname && target.hash) return; event.preventDefault(); focusAfterRender = !target.hash; history.pushState({}, '', href); renderRoute(); if (target.hash) requestAnimationFrame(() => { const section = document.querySelector<HTMLElement>(target.hash); section?.scrollIntoView(); section?.setAttribute('tabindex', '-1'); section?.focus(); }); })); }
+function renderRoute() {
+  const params = new URLSearchParams(location.search);
+  if (location.pathname === '/demo' || params.get('demo') === '1') { demo = true; renderDemo(); return; }
+  if (!siteBuild && (location.pathname === '/' || location.pathname === '/lens')) { demo = false; renderLens(); return; }
+  if (location.pathname === '/') renderLanding(); else if (location.pathname === '/lens') renderLens(); else if (location.pathname === '/privacy') renderPrivacy(); else if (location.pathname === '/terms') renderTerms(); else render404();
+}
 window.addEventListener('popstate', () => { focusAfterRender = true; renderRoute(); });
 renderRoute();

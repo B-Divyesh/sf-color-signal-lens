@@ -3,8 +3,8 @@ import { readFileSync } from 'node:fs';
 
 test('real workspace deep link loads after a cold navigation', async ({ page }) => {
   await page.goto('/lens');
-  await expect(page.getByRole('heading', { name: 'Inspect a screenshot signal.' })).toBeVisible();
-  await expect(page.getByText('This paper layer is missing.')).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Inspect a screenshot status color.' })).toBeVisible();
+  await expect(page.getByText('Page not found')).toHaveCount(0);
 });
 
 test('a valid verdict cached for another token cannot unlock Lens Plus', async ({ page }) => {
@@ -40,7 +40,7 @@ test('Start for real discards the demo image and opens the reloadable workspace'
   await expect(page).toHaveURL(/\/lens$/);
   await expect(page.getByText('No screenshot is open.')).toBeVisible();
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Inspect a screenshot signal.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Inspect a screenshot status color.' })).toBeVisible();
 });
 
 test('a corrupt image keeps the last valid image and announces recovery', async ({ page }) => {
@@ -101,8 +101,8 @@ test('landing release lookup handles an empty release list without a console err
 test('the loaded demo remains usable offline', async ({ page, context }) => {
   await page.goto('/demo');
   await context.setOffline(true);
-  await page.getByLabel('Label the signal').check();
-  await expect(page.getByText('A text label marks the selected signal.')).toBeVisible();
+  await page.getByLabel('Add a label').check();
+  await expect(page.getByText('A text label marks the selected status color.', { exact: true })).toBeVisible();
   await context.setOffline(false);
 });
 
@@ -127,6 +127,29 @@ test('390px hydrated download and workspace stay within the viewport', async ({ 
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   await page.goto('/demo');
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+});
+
+test('390px demo shows the sample result and active cue before scrolling', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Try it with sample data' }).click();
+  const canvas = await page.locator('#lens-canvas').boundingBox();
+  const cue = await page.locator('#demo-active-cue').boundingBox();
+  expect(canvas).not.toBeNull();
+  expect(cue).not.toBeNull();
+  expect(canvas!.y).toBeLessThan(844);
+  expect(cue!.y + cue!.height).toBeLessThanOrEqual(844);
+  await expect(page.getByRole('button', { name: 'Load sample screenshot' })).toHaveCount(0);
+});
+
+test('How it works reaches its section through mouse, keyboard, back, and a direct hash link', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'How it works' }).click();
+  await expect.poll(() => page.evaluate(() => document.querySelector('#how')!.getBoundingClientRect().top)).toBeLessThan(80);
+  await page.goBack();
+  await expect(page).toHaveURL(/\/$/);
+  await page.goto('/#how');
+  await expect.poll(() => page.evaluate(() => document.querySelector('#how')!.getBoundingClientRect().top)).toBeLessThan(80);
 });
 
 test('capture failures explain the fallback without exposing platform errors', async ({ page }) => {

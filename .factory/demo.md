@@ -1,11 +1,14 @@
 # Demo sandbox
 
-Open `/demo` or `/?demo=1` to start the isolated demo. It loads
-`checkout-totals.diff.png`, a realistic red/green code-diff screenshot created
-inside the app. Choose a colour in the screenshot and switch between label,
-pattern, and blue/orange remap.
-Clear lens removes every cue and restores the unchanged sample screenshot.
+Open `/demo` or `/?demo=1`, or choose **Try it with sample data** on the first
+screen. The demo opens `checkout-totals.diff.png`, a sample checkout diff with
+added and removed totals. Its initial screen shows the patterned sample and the
+active cue before import controls.
 
-The demo writes only `demo:color-signal-lens:started` in browser localStorage.
-`Reset demo` removes and recreates that key. The demo never reads a real
-namespace and sends no screenshot request to another origin.
+The persistent banner says **Demo — sample data, nothing is saved**. **Reset
+demo** restores the sample and removes every `demo:color-signal-lens:*` key.
+**Start for real** discards the sample and opens `/lens`.
+
+Demo storage uses only the `demo:color-signal-lens:*` namespace. It never reads
+or writes real license or preset keys. The sample is bundled with the app, so
+the loaded demo remains usable offline.

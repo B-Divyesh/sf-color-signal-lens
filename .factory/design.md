@@ -59,3 +59,12 @@ Generated with the factory image deployment on 2026-08-28. It is original
 product artwork; no third-party asset is included. The source PNG is retained
 with its prompt sidecar in `src/assets/`; the shipped WebP is resized and kept
 below 300 KB.
+
+## Walkthrough and social assets
+
+`public/walkthrough-open.png`, `walkthrough-select.png`, and
+`walkthrough-remap.png` are original Playwright screenshots of the shipped
+sample workflow, captured on 2026-08-29. They show opening the sample, selecting
+a status color, and applying blue-orange colors. `public/social-card.png` is a
+1200×630 crop of the original generated paper-cut illustration. No third-party
+assets or fonts are used.

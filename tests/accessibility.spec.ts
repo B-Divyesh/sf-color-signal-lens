@@ -29,9 +29,7 @@ test('keyboard users can skip to the workspace and move from canvas to colour in
 
 test('keyboard users can focus the screenshot picker and route headings', async ({ page }) => {
   await page.goto('/demo');
-  await page.getByRole('button', { name: 'Load sample diff' }).focus();
-  await page.keyboard.press('Tab');
-  await expect(page.locator('#file-input')).toBeFocused();
+  await page.getByRole('button', { name: 'Open screenshot' }).focus();
   await page.keyboard.press('Tab');
   await expect(page.getByRole('button', { name: 'Capture screen region' })).toBeFocused();
 
@@ -51,8 +49,8 @@ test('focus indicators and compact controls meet contrast and 44px target requir
     expect(box!.width).toBeGreaterThanOrEqual(44);
     expect(box!.height).toBeGreaterThanOrEqual(44);
   }
-  await page.getByRole('button', { name: 'Load sample diff' }).focus();
-  const focusStyle = await page.getByRole('button', { name: 'Load sample diff' }).evaluate((element) => {
+  await page.getByRole('button', { name: 'Open screenshot' }).focus();
+  const focusStyle = await page.getByRole('button', { name: 'Open screenshot' }).evaluate((element) => {
     const style = getComputedStyle(element);
     return { outline: style.outlineColor, width: style.outlineWidth, shadow: style.boxShadow };
   });
