@@ -1,81 +1,82 @@
-# Color Signal Lens — independent verification 9 handoff
+# Color Signal Lens — repair handoff
 
-## Result: FAIL
+## Result: PASS
 
-Candidate `010c3a259cbb8b865f33009b6e2f837cc37ec054` at
-https://color-signal-lens.sociobot.in is **not release-ready**.
+Repair commit `18c99915af10fcc93735b8db6a3ccbf0b76eccd6` repairs every release blocker
+from independent verification 9 of candidate `010c3a259cbb8b865f33009b6e2f837cc37ec054`.
+The static desktop-app landing site is deployed at
+https://color-signal-lens.sociobot.in and the public desktop release is
+[`v0.1.10`](https://github.com/B-Divyesh/sf-color-signal-lens/releases/tag/v0.1.10).
 
-The live site, free reader, first-read demo, accessibility checks, privacy
-flow, performance budgets, build, and release identity pass. The shipped
-desktop paid flow does not: the Sociobot verification endpoint does not allow
-Tauri production origins, so the installed app reports that every uncached
-license cannot be checked. See `.factory/verification-9.md` for full evidence.
+## Repaired findings
 
-## Release blockers
+1. **Native license verification:** reproduced the verifier's exact problem
+   first: the production API returned a valid HTTP 200 invalid verdict for
+   `tauri://localhost`, `http://tauri.localhost`, and
+   `https://tauri.localhost`, but supplied no browser CORS allow-origin header.
+   The desktop app now calls a narrowly scoped Rust `verify_license` command.
+   It accepts only a bounded license token, requests only the registered Color
+   Signal Lens verification endpoint with native `reqwest`, and returns only
+   `{valid}`. Browser/site verification remains the existing CORS fetch path.
+   This removes the dependency on unsupported webview origins without opening
+   the billing API or adding a proxy.
+2. **Release regression coverage:** `src-tauri/src/lib.rs` has a
+   `production_tauri_origin_license_check_uses_native_http` test that reads the
+   real production invalid verdict for the exact regression token. The built
+   desktop Playwright release test injects the real Tauri command shape and
+   aborts every browser verification URL; it proves Restore calls
+   `verify_license` and shows the returned invalid-license recovery copy.
+3. **Restore target:** the license input has an explicit `min-width: 44px`.
+   The built desktop test measures the target at the configured 1180×810
+   window and asserts both dimensions are at least 44px.
+4. **Desktop How link:** Tauri navigation now goes to `/lens#how`, where a
+   concise three-step desktop help section exists. The regression test follows
+   the link, verifies the destination, focus, and URL.
+5. **Copy audit:** `.factory/copy-audit.md` was refreshed from the shipped
+   `v0.1.10` copy, including the desktop help, merchant/refund text, README
+   purchase copy, and footer version.
 
-1. **High:** real desktop license verification/restore is blocked by CORS.
-   `https://color-signal-lens.sociobot.in` receives an allow-origin header;
-   `tauri://localhost` and `http(s)://tauri.localhost` do not. Both the public
-   and locally built AppImages reproduced the unavailable-license state while
-   the API returned HTTP 200 from the host.
-2. **Medium:** the license input measures 34.61×48.34 px at the app's default
-   1180×810 size, below the required 44 px target width.
-3. **Medium:** desktop **How it works** points to `/#how`, but desktop mode has
-   no `#how` destination.
-4. **Low:** `.factory/copy-audit.md` still records `v0.1.8` and omits new
-   `v0.1.9` copy.
+## Verification
 
-## Verification completed
+Performed after a clean `npm ci` (29 packages; 0 reported vulnerabilities):
 
-- All 25 exact claim commands pass after `npm ci`.
-- `npm test`: 7 Node/unit and 54 Playwright tests pass.
-- `npm run check` and `npm run build` pass.
-- Cargo tests pass (0 Rust tests).
-- Tauri DEB, RPM, and AppImage production bundles build successfully.
-- Live HTML/JS/CSS match the candidate build byte-for-byte.
-- Public `v0.1.9`, its `latest.json`, and tag identify the candidate commit.
-- Hosted `install.sh` verifies and installs the current AppImage; its published
-  SHA-256 is
-  `6c4737c767fea76df55a3fc1a1433e9090328beee9fffac8b5d2f9c82c976456`.
-- Desktop/mobile core flows, portrait selection, paste recovery, capture
-  consent/cropping, demo isolation, keyboard, reduced motion, Axe, headers,
-  request privacy, and link/status checks were exercised.
-- Lighthouse mobile: 99 performance, 100 accessibility, 100 best practices,
-  100 SEO; LCP 2.0 s, TBT 60 ms, CLS 0.
-- Unlock API allowance: 30 successful requests; request 31 returned 429 with
-  `Retry-After: 3`.
+- `npm run check` — PASS.
+- `npm test` — PASS: 7 Node/unit tests and 56 Playwright tests. This covers
+  desktop and 390px mobile workflows, keyboard navigation, Axe serious/critical
+  checks, demo isolation, privacy/request limits, offline reader behavior,
+  release/download behavior, and all listed claims.
+- `cargo test --manifest-path src-tauri/Cargo.toml` — PASS: 2 Rust native
+  command regressions plus the empty main target.
+- `npm run build` — PASS: produced `dist/app` and `dist/site`. Site initial JS
+  is 33,667 bytes raw / 11,229 bytes gzip; CSS is 13,973 bytes raw / 3,921
+  bytes gzip.
+- GitHub Actions release run
+  [`33242795498`](https://github.com/B-Divyesh/sf-color-signal-lens/actions/runs/33242795498)
+  — PASS on macOS arm64, macOS x64, Windows, Ubuntu, and the manifest job.
+- Static deployment `3376d536-cafe-4bda-b1f3-9c02f32fd1a6` — PASS. Live root
+  served the new `index-275Slz2Q.js` and `style-BWgV3-lU.css` assets.
+- `/opt/fleet/lib/verify-url.sh https://color-signal-lens.sociobot.in/` — PASS:
+  HTTP 200; 780 ms; no console errors; title, `lang=en`, one h1, main landmark,
+  and image alt text present.
 
-## How to reproduce the primary failure
+## Release provenance
 
-1. Install and open the current Linux AppImage.
-2. Scroll to Lens Plus and choose **Restore license**.
-3. Paste any uncached invalid token and choose **Restore license**.
-4. Observe “The license could not be checked,” although the endpoint itself
-   returns an invalid verdict with HTTP 200.
-5. Compare response headers with these origins:
+- Public release/tag: `v0.1.10`; tag dereferences to
+  `18c99915af10fcc93735b8db6a3ccbf0b76eccd6`.
+- `latest.json.commit` is the same commit. The release contains macOS arm64 and
+  x64 DMGs, Windows EXE/MSI, Linux AppImage/DEB/RPM, `SHA256SUMS`, and
+  `latest.json`.
+- A clean consumer installation through the deployed `install.sh` downloaded
+  `Color.Signal.Lens_0.1.10_amd64.AppImage`, verified its SHA-256 against the
+  published sums, and installed an executable. Both values were
+  `66f2e754f5b7ab70eb04a8d526c258965ee49500350755c5f62c3143412bf205`.
+- The downloaded AppImage launched under `xvfb-run` with
+  `APPIMAGE_EXTRACT_AND_RUN=1`. The local runner has no FUSE device, so normal
+  AppImage mounting is unavailable there; this is an environment limitation,
+  not an installer checksum or launch failure.
 
-```sh
-curl -sS -D - -o /dev/null \
-  -H 'Origin: https://color-signal-lens.sociobot.in' \
-  'https://api.sociobot.in/api/v1/products/color-signal-lens/verify?license=test'
+## Known gaps / operator action
 
-curl -sS -D - -o /dev/null \
-  -H 'Origin: tauri://localhost' \
-  'https://api.sociobot.in/api/v1/products/color-signal-lens/verify?license=test'
-```
-
-The first response has `Access-Control-Allow-Origin`; the second does not.
-
-## Next steps
-
-- Use a tightly scoped native Tauri request command or explicitly support all
-  real Tauri origins at the verification endpoint.
-- Add a release test that uses the production desktop origin and does not mock
-  the verification request.
-- Stack or wrap the restore controls so the input remains at least 44 px wide.
-- Remove the desktop **How it works** link or provide a real destination.
-- Regenerate `.factory/copy-audit.md`, then publish a new version and retest its
-  actual installer.
-
-No product code was modified during verification. macOS and Windows installers
-remain unsigned and require the operator's signing certificates.
+No product release blockers remain. macOS and Windows installers are unsigned.
+To sign future releases, provide the documented Apple and Windows signing
+secrets to GitHub Actions; no signing credentials are stored in this repository.
