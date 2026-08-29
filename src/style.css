@@ -30,3 +30,10 @@ html,body{overflow-x:hidden}
 .how li img{display:block;width:100%;height:auto;aspect-ratio:8/5;object-fit:cover;margin:14px 0;border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink)}
 .demo-workspace{padding-top:18px}.demo-workspace .lens-heading h1{font-size:clamp(2rem,7vw,3.2rem);max-width:18ch}.demo-workspace .lens-heading p:not(.eyebrow){margin-top:8px;font-size:15px;font-weight:700}.demo-workspace .work-grid{margin-top:18px}.demo-workspace .source-actions{border-top:2px solid var(--ink);padding-top:22px}.demo-workspace .canvas-wrap{min-height:0}
 @media (max-width:760px){.demo-workspace .canvas-paper{padding:10px}.demo-workspace canvas{max-height:235px}.demo-workspace .canvas-help{display:none}.demo-workspace .controls{margin-top:0}}
+
+/* Keep controls immediately usable after the page brings them into view. */
+html{scroll-behavior:auto}
+
+/* Keep the right-hand form controls inside the cut-paper edge's hit area. */
+.controls{padding-right:36px}
+.restore input{min-width:0}

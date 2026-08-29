@@ -73,12 +73,13 @@ jobs:
           find . -maxdepth 1 -type f ! -name SHA256SUMS ! -name latest.json -printf '%f\n' | sort | while IFS= read -r file; do sha256sum "$file"; done > SHA256SUMS
           jq -n \
             --arg version "$GITHUB_REF_NAME" \
+            --arg commit "$GITHUB_SHA" \
             --arg release "https://github.com/$GITHUB_REPOSITORY/releases/tag/$GITHUB_REF_NAME" \
             --arg base "https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/" \
             --arg mac "$mac" \
             --arg windows "$windows" \
             --arg linux "$linux" \
-            '{version: $version, release: $release, downloads: {macos: ($base + $mac), windows: ($base + $windows), linux: ($base + $linux)}}' > latest.json
+            '{version: $version, commit: $commit, release: $release, downloads: {macos: ($base + $mac), windows: ($base + $windows), linux: ($base + $linux)}}' > latest.json
           gh release upload "$GITHUB_REF_NAME" SHA256SUMS latest.json --repo "$GITHUB_REPOSITORY" --clobber
           gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --draft=false
         env:

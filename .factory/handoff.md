@@ -1,59 +1,74 @@
-# Color Signal Lens — independent verification 8 handoff
+# Color Signal Lens — repair handoff
 
 ## Result
 
-**FAIL — do not release candidate
-`d315dfcfbb5beaa0713324684f124b46593c13e3`.**
+Repaired verification-8 release blockers on version `0.1.9`.
 
-Verified on 2026-08-29 against
-https://color-signal-lens.sociobot.in from a clean candidate worktree. The live
-static site matches the candidate and passes its claims, accessibility,
-privacy, build, and performance checks. The desktop-app acceptance contract
-does not pass.
+## Fixed
 
-## Release blockers
+1. Portrait-image clicks now translate through the exact `object-fit: contain`
+   image rectangle. Letterbox space is ignored instead of being treated as
+   bitmap pixels.
+2. Paste handling is permanent for the active workspace. Unsupported clipboard
+   data does not consume the listener, and pasting in a text field is left to
+   that field.
+3. The built desktop reader now has its own Buy Lens Plus and Restore license
+   controls. Restore verifies and stores the pasted token in the desktop webview.
+   The narrow desktop restore row no longer extends beyond its cut-paper hit area.
+4. Lens Plus and Terms state that Sociobot/Dodo is merchant of record, refunds
+   are handled by Sociobot/Dodo, and a refund revokes the license automatically.
+5. `latest.json` will record `GITHUB_SHA`, so every public desktop release
+   explicitly identifies the exact tagged source commit that built it.
 
-1. **Critical — desktop release mismatch.** Public release `v0.1.8` targets
-   `060a7eceda5f066bbac42e102a20a9eccfaec4ed`, ten commits behind the candidate.
-   The changed files include `index.html` and `src/main.ts`. The downloadable
-   desktop binaries are not the candidate reviewed here.
-2. **High — wrong color picked on tall images.** With a 100×400 red/green test
-   PNG, clicking the visible red strip selected green at both 1440×900 and
-   390×844. Click mapping ignores the horizontal letterbox created by
-   `object-fit: contain`.
-3. **High — paid feature cannot be bought/restored in desktop.** The desktop
-   `/` route always opens the reader. Its Lens Plus link loops to the same
-   route; the Buy and Restore controls are only on the website landing page.
-4. **Medium — paste recovery fails.** A non-image paste consumes the one-shot
-   listener, so a later valid image paste does nothing until reload.
-5. **Medium — paid legal copy is incomplete.** The product does not state the
-   Sociobot/Dodo merchant-of-record and refund-handling terms required by the
-   paid-unlock contract.
+## Regression coverage
 
-Full reproduction details and measurements are in
-`.factory/verification-8.md`.
+- `@claim:portrait-color-pick` pastes the verifier's 100×400 red-strip/green
+  image and clicks the visible red strip at 1440×900 and 390×844.
+- `@claim:paste-input` pastes text first, then an image, and verifies recovery.
+- `@claim:desktop-paid-flow` builds `dist/app`, serves that artifact, checks the
+  registered checkout URL, and restores a verified fixture license.
+- Unit coverage proves the numerical contained-image conversion. The existing
+  Lens Plus price claim now asserts merchant and refund terms. The desktop
+  release claim asserts the manifest commit field.
 
-## Verification completed
+## Verification
 
-- After `npm ci`, all 23 exact tests listed in `.factory/claims.json` passed
-  independently. A pre-install invocation could not start because `tsx` was
-  not installed yet.
-- `CI=1 npm test`, `npm run check`, `npm run build`, and Cargo tests passed.
-- Local Tauri AppImage, DEB, and RPM builds passed; both the local candidate
-  and installed public AppImage opened under Xvfb.
-- Live `/`, `/demo`, `/lens`, `/privacy`, `/terms`, and 404 were checked at
-  desktop and 390px. Axe reported zero serious/critical findings; keyboard,
-  focus, zoom, reduced motion, responsive layout, and errors were exercised.
-- Live static HTML/JS/CSS hashes exactly match the candidate build.
-- Privacy request logs, CSP/security headers, cache policy, checkout, release
-  assets/checksum installation, and API throttling were checked. The Sociobot
-  verify API allowed 30 requests; request 31 returned 429 with `Retry-After`.
-- Mobile Lighthouse: performance 100, accessibility 100, best practices 100,
-  SEO 100; LCP 1.5 s, TBT 80 ms, CLS 0.
+Run from a clean checkout:
 
-## Next steps
+```sh
+npm ci
+npm test
+npm run check
+npm run build
+cargo test --manifest-path src-tauri/Cargo.toml
+npm run tauri -- build --bundles deb,rpm,appimage
+```
 
-Repair the five findings above, add regression coverage for tall-image picking,
-paste-after-invalid recovery, and desktop purchase reachability, then publish
-new all-platform artifacts from the exact repaired commit and rerun independent
-verification. No product code was changed during this verification.
+Completed locally on 2026-08-29 UTC:
+
+- `npm ci`: 29 packages, 0 vulnerabilities.
+- `npm test`: 7 unit tests and 54 Playwright tests passed, including keyboard,
+  Axe serious/critical checks, desktop and 390px flows, offline reader,
+  privacy request assertions, and all claim tags.
+- `npm run check`, `npm run build`, and Cargo tests passed.
+- Tauri Linux packages built and launched under Xvfb (the expected timeout
+  confirms the desktop process stayed open):
+  - AppImage SHA-256 `db9cd57a6ba85f20f175f4a984985a180479c6cd3f1e238257b9b58b8755c320`
+  - DEB SHA-256 `482c82ee707bcf6eb3b1606080574a8bc76ebf7bb20bb9ed4e346af67ba16616`
+  - RPM SHA-256 `382b85818002aef8202272ab0c141d54bf79808095c6b911298e7507bbd79b44`
+
+## Release and deployment
+
+The repaired commit is tagged `v0.1.9`. The GitHub Actions release workflow
+builds macOS arm64/x64, Windows, and Linux from that tag, keeps the release a
+draft until every required installer exists, uploads SHA256SUMS and latest.json
+(including the tag commit), then publishes it. The static deployment root is
+`dist/site`; deployment is triggered from `main` by the factory static work
+order.
+
+## Known gaps / operator action
+
+The generated macOS and Windows installers are unsigned. Signing would require
+the owner to provide `APPLE_CERTIFICATE` and `WINDOWS_CERT_PFX` as GitHub
+secrets. No analytics, raw AI keys, payment-provider code, or screenshots are
+added by this repair.

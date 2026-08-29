@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { detectStatusName, isNear, parseHex, remapPixel, rgbToHex } from './lens.ts';
+import { containedBitmapPoint, detectStatusName, isNear, parseHex, remapPixel, rgbToHex } from './lens.ts';
 
 test('recognises close pixels', () => {
   assert.equal(isNear(parseHex('#9c2d20'), parseHex('#a02e22')), true);
@@ -13,4 +13,14 @@ test('remaps a selected colour', () => {
 
 test('provides a redundant signal name', () => {
   assert.equal(detectStatusName(parseHex('#16714a')), 'Added / ready');
+});
+
+test('maps a click through object-fit contain letterboxing', () => {
+  const point = containedBitmapPoint(
+    { clientX: 408.0828125, clientY: 279 },
+    { left: 0, top: 0, width: 927.765625, height: 558 },
+    { width: 100, height: 400 },
+  );
+  assert.deepEqual(point, { x: 9, y: 200 });
+  assert.equal(containedBitmapPoint({ clientX: 30, clientY: 279 }, { left: 0, top: 0, width: 927.765625, height: 558 }, { width: 100, height: 400 }), null);
 });

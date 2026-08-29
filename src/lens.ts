@@ -2,6 +2,34 @@ export type LensMode = 'none' | 'labels' | 'patterns' | 'remap';
 
 export type Rgb = { r: number; g: number; b: number };
 
+type Rectangle = { left: number; top: number; width: number; height: number };
+type Bitmap = { width: number; height: number };
+
+/**
+ * Translates a pointer in an `object-fit: contain` box to its source bitmap.
+ * The canvas element can be wider or taller than the rendered image, leaving
+ * letterbox space that must not be treated as image pixels.
+ */
+export const containedBitmapPoint = (
+  point: { clientX: number; clientY: number },
+  box: Rectangle,
+  bitmap: Bitmap,
+): { x: number; y: number } | null => {
+  if (box.width <= 0 || box.height <= 0 || bitmap.width <= 0 || bitmap.height <= 0) return null;
+  const scale = Math.min(box.width / bitmap.width, box.height / bitmap.height);
+  const renderedWidth = bitmap.width * scale;
+  const renderedHeight = bitmap.height * scale;
+  const left = box.left + (box.width - renderedWidth) / 2;
+  const top = box.top + (box.height - renderedHeight) / 2;
+  const x = point.clientX - left;
+  const y = point.clientY - top;
+  if (x < 0 || y < 0 || x >= renderedWidth || y >= renderedHeight) return null;
+  return {
+    x: Math.min(bitmap.width - 1, Math.floor(x / scale)),
+    y: Math.min(bitmap.height - 1, Math.floor(y / scale)),
+  };
+};
+
 export const parseHex = (hex: string): Rgb => {
   const value = hex.replace('#', '');
   return { r: Number.parseInt(value.slice(0, 2), 16), g: Number.parseInt(value.slice(2, 4), 16), b: Number.parseInt(value.slice(4, 6), 16) };

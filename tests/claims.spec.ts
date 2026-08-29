@@ -141,6 +141,12 @@ test('@claim:screenshot-input opens a screenshot from the device', async ({ page
 
 test('@claim:paste-input opens a pasted image in the workspace', async ({ page }) => {
   await page.goto('/lens');
+  await page.evaluate(() => {
+    const data = new DataTransfer();
+    data.setData('text/plain', 'not an image');
+    document.dispatchEvent(new ClipboardEvent('paste', { clipboardData: data, bubbles: true }));
+  });
+  await expect(page.locator('#source-status')).toHaveText('No screenshot loaded.');
   await page.evaluate(async () => {
     const response = await fetch('/apple-touch-icon.png');
     const blob = await response.blob();
@@ -149,6 +155,32 @@ test('@claim:paste-input opens a pasted image in the workspace', async ({ page }
     document.dispatchEvent(new ClipboardEvent('paste', { clipboardData: data, bubbles: true }));
   });
   await expect(page.locator('#source-status')).toHaveText('Pasted screenshot');
+});
+
+test('@claim:portrait-color-pick selects the visible portrait-image pixel at desktop and 390px', async ({ page }) => {
+  for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/lens');
+    await page.evaluate(async () => {
+      const fixture = document.createElement('canvas');
+      fixture.width = 100; fixture.height = 400;
+      const context = fixture.getContext('2d')!;
+      context.fillStyle = '#9c2d20'; context.fillRect(0, 0, 20, 400);
+      context.fillStyle = '#16714a'; context.fillRect(20, 0, 80, 400);
+      const blob = await new Promise<Blob>((resolve) => fixture.toBlob((value) => resolve(value!), 'image/png'));
+      const data = new DataTransfer();
+      data.items.add(new File([blob], 'portrait-status.png', { type: 'image/png' }));
+      document.dispatchEvent(new ClipboardEvent('paste', { clipboardData: data, bubbles: true }));
+    });
+    await expect(page.locator('#source-status')).toHaveText('Pasted screenshot');
+    const canvas = page.locator('#lens-canvas');
+    await expect.poll(() => canvas.evaluate((element) => ({ width: (element as HTMLCanvasElement).width, height: (element as HTMLCanvasElement).height }))).toEqual({ width: 100, height: 400 });
+    const bounds = await canvas.boundingBox();
+    const scale = Math.min(bounds!.width / 100, bounds!.height / 400);
+    const visibleWidth = 100 * scale;
+    await canvas.click({ position: { x: (bounds!.width - visibleWidth) / 2 + visibleWidth * 0.1, y: bounds!.height / 2 } });
+    await expect(page.locator('#color-value')).toHaveText('#9C2D20');
+  }
 });
 
 test('@claim:keyboard-color-input applies a color entered through the color field', async ({ page }) => {
@@ -206,8 +238,10 @@ test('@claim:lens-plus-price matches the recorded Sociobot checkout contract', a
   expect(contract).toMatchObject({ product_slug: 'color-signal-lens', product_name: 'Color Signal Lens Plus', amount_cents: 1200, currency: 'USD', billing_mode: 'one_time' });
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Save named presets for $12 once.' })).toBeVisible();
+  await expect(page.getByText('Sociobot/Dodo is the merchant of record. Refunds are handled by Sociobot/Dodo. A refund revokes the license automatically.')).toBeVisible();
   await page.getByRole('link', { name: 'Terms' }).click();
   await expect(page.getByText('Lens Plus costs $12 as a one-time purchase through the registered Sociobot checkout.')).toBeVisible();
+  await expect(page.getByText('Sociobot/Dodo is the merchant of record. Refunds are handled by Sociobot/Dodo. A refund revokes the license automatically.')).toBeVisible();
 });
 
 test('@claim:demo-reset discards the sample demo namespace', async ({ page }) => {

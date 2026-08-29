@@ -52,8 +52,9 @@ landing page links to the Releases page.
 
 The free app includes all reading controls. Lens Plus costs $12 as a one-time
 purchase and saves named presets on this device. The purchase action uses the
-Sociobot checkout path. Restore a purchase by pasting its license on the
-landing page.
+Sociobot checkout path. Buy and restore a license inside the desktop app or
+on the landing page. Sociobot/Dodo is the merchant of record. Refunds are
+handled by Sociobot/Dodo, and a refund revokes the license automatically.
 
 The free screenshot reader works offline after the installed desktop app has
 loaded. The browser sample is for trying the app before installation.
