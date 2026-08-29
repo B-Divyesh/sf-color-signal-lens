@@ -6,7 +6,7 @@ Audit date: 2026-08-29. This covers every visitor-facing copy unit from the land
 
 | Copy | Words | Result |
 | --- | ---: | --- |
-| Make screenshot status colors distinct with labels, patterns, and blue-orange colors. | 11 | Pass; catalog starts with a verb and is under 120 characters |
+| Distinguish screenshot status colors with labels, patterns, or blue-orange colors. | 10 | Pass; catalog starts with a verb and is under 120 characters |
 | Make screenshot status colors easier to tell apart with labels, patterns, and blue-orange colors. | 14 | Pass; home description and social metadata |
 | Color Signal Lens — Make status colors distinct | 8 | Pass; home title |
 | Demo — Color Signal Lens | 5 | Pass; demo title |
@@ -82,7 +82,7 @@ Audit date: 2026-08-29. This covers every visitor-facing copy unit from the land
 | Privacy | 1 | Pass |
 | Terms | 1 | Pass |
 | Built by Param Factory | 4 | Pass |
-| v0.1.11 | 1 | Pass |
+| v0.1.12 | 1 | Pass |
 
 ## Demo and workspace
 

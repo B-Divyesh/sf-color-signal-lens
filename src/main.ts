@@ -13,6 +13,7 @@ const siteBuild = __SITE_BUILD__;
 const nativeTauri = (window as Window & { __TAURI__?: NativeTauri }).__TAURI__;
 const licenseKey = 'sb_license:color-signal-lens';
 const licenseCheckKey = 'sb_license_check:color-signal-lens';
+const demoStoragePrefix = 'demo:color-signal-lens:';
 let source: Source | null = null;
 let mode: LensMode = 'patterns';
 let target: Rgb = parseHex('#9c2d20');
@@ -62,7 +63,7 @@ function layout(content: string, route: string, path = location.pathname) {
     </header>
     <div id="route-announcement" class="sr-only" aria-live="polite"></div>
     <main id="main" tabindex="-1">${content}</main>
-    <footer><p>Color Signal Lens makes screenshot status colors easier to read.</p><p><a href="/privacy" data-nav>Privacy</a> · <a href="/terms" data-nav>Terms</a> · Built by Param Factory · v0.1.11</p></footer>`;
+    <footer><p>Color Signal Lens makes screenshot status colors easier to read.</p><p><a href="/privacy" data-nav>Privacy</a> · <a href="/terms" data-nav>Terms</a> · Built by Param Factory · v0.1.12</p></footer>`;
   wireNavigation();
   document.querySelector<HTMLAnchorElement>('.skip')?.addEventListener('click', (event) => {
     event.preventDefault();
@@ -92,9 +93,15 @@ function renderLanding() {
 function renderDemo() {
   demo = true;
   if (!source) source = { url: svgDataUrl, name: 'checkout-totals.diff.png', kind: 'sample' };
-  localStorage.setItem('demo:color-signal-lens:started', '1');
   layout(`<aside class="demo-banner" role="status"><b>Demo — sample data, nothing is saved</b><span><button id="reset-demo">Reset demo</button><button id="start-real">Start for real</button></span></aside>${workspace(true)}`, 'Demo — Color Signal Lens', '/demo');
   wireWorkspace();
+}
+
+function clearDemoStorage() {
+  for (let index = localStorage.length - 1; index >= 0; index -= 1) {
+    const key = localStorage.key(index);
+    if (key?.startsWith(demoStoragePrefix)) localStorage.removeItem(key);
+  }
 }
 
 function workspace(isDemo = false) {
@@ -170,8 +177,8 @@ function wireWorkspace() {
   document.querySelector('#clear-lens')?.addEventListener('click', () => { mode = 'none'; selectedPoint = null; refreshLens(); });
   wirePresetActions();
   wireLicenseActions();
-  document.querySelector('#reset-demo')?.addEventListener('click', () => { localStorage.removeItem('demo:color-signal-lens:started'); localStorage.removeItem('demo:color-signal-lens:presets'); source = { url: svgDataUrl, name: 'checkout-totals.diff.png', kind: 'sample' }; target = parseHex('#9c2d20'); mode = 'patterns'; renderDemo(); });
-  document.querySelector('#start-real')?.addEventListener('click', () => { localStorage.removeItem('demo:color-signal-lens:started'); source = null; selectedPoint = null; demo = false; focusAfterRender = true; history.pushState({}, '', '/lens'); renderLens(); });
+  document.querySelector('#reset-demo')?.addEventListener('click', () => { clearDemoStorage(); source = { url: svgDataUrl, name: 'checkout-totals.diff.png', kind: 'sample' }; selectedPoint = null; target = parseHex('#9c2d20'); mode = 'patterns'; mapping = 'blue'; renderDemo(); });
+  document.querySelector('#start-real')?.addEventListener('click', () => { clearDemoStorage(); source = null; selectedPoint = null; demo = false; focusAfterRender = true; history.pushState({}, '', '/lens'); renderLens(); });
   ensurePasteListener();
 }
 

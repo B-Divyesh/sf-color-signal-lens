@@ -295,13 +295,21 @@ test('@claim:refund-revocation locks presets after a refunded purchase', async (
 });
 
 test('@claim:demo-reset discards the sample demo namespace', async ({ page }) => {
-  await page.addInitScript(() => localStorage.setItem('color-signal-lens:presets', JSON.stringify([{ id: 'real-1', name: 'Real preset' }])));
+  const realPresets = JSON.stringify([{ id: 'real-1', name: 'Real preset' }]);
+  await page.addInitScript((presets) => {
+    localStorage.setItem('color-signal-lens:presets', presets);
+    localStorage.setItem('demo:color-signal-lens:started', 'changed');
+    localStorage.setItem('demo:color-signal-lens:presets', '[{"name":"Demo preset"}]');
+    localStorage.setItem('demo:color-signal-lens:future-setting', 'changed');
+  }, realPresets);
   await page.goto('/demo');
-  await page.evaluate(() => localStorage.setItem('demo:color-signal-lens:started', 'changed'));
+  await page.getByLabel('Use blue-orange colors').check();
+  await page.getByLabel('Orange', { exact: true }).check();
   await page.getByRole('button', { name: 'Reset demo' }).click();
   await expect(page.getByText('checkout-totals.diff.png')).toBeVisible();
-  expect(await page.evaluate(() => localStorage.getItem('demo:color-signal-lens:started'))).toBe('1');
-  expect(await page.evaluate(() => localStorage.getItem('color-signal-lens:presets'))).toBe(JSON.stringify([{ id: 'real-1', name: 'Real preset' }]));
+  await expect(page.getByLabel('Add a pattern')).toBeChecked();
+  expect(await page.evaluate(() => Object.keys(localStorage).filter((key) => key.startsWith('demo:color-signal-lens:')))).toEqual([]);
+  expect(await page.evaluate(() => localStorage.getItem('color-signal-lens:presets'))).toBe(realPresets);
 });
 
 test('@claim:clear-overlay restores the unmodified screenshot', async ({ page }) => {
