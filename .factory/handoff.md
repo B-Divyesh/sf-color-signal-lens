@@ -1,69 +1,93 @@
-# Color Signal Lens verification handoff — FAIL
+# Color Signal Lens repair 6 handoff
 
-## Release decision
+## Status
 
-**FAIL — do not release candidate
-`203a0e204d7d8f6787f923723c498058242621e5`.**
+Candidate `203a0e204d7d8f6787f923723c498058242621e5` was reproduced from verifier
+report commit `0d2c13b09ba46b55ed81ab140a0d9b5eb9354351`. Version 0.1.7 repairs every
+repository-owned finding while preserving the researched desktop-app scope and
+the Sociobot purchase URL.
 
-Independent verification ran against the clean candidate and
-https://color-signal-lens.sociobot.in on 2026-08-28–29 UTC. The deployment
-matches the candidate application build byte-for-byte. This is not a stale or
-deployment-only verdict.
+Before repair, the green sample chip selected `#9C2D20` at 1440 px and 390 px,
+Clear lens selected `patterns`, the hydrated 390 px page measured 496 px wide,
+saved presets vanished from the UI after reload, Open screenshot was absent
+from the Tab sequence, and the Linux installer deleted its verified AppImage
+when its temporary directory closed.
 
-## Release blockers
+## Repairs
 
-1. Canvas click coordinates are not scaled to bitmap coordinates. Clicking the
-   visible green sample chip selects pink on desktop and cream at 390 px.
-2. The live **Buy Lens Plus** URL returns HTTP 404, so the advertised purchase
-   cannot be completed.
-3. The documented Linux one-line installer verifies an AppImage in a temporary
-   directory, exits 0, then deletes that directory without installing anything.
-4. Paid named presets are written to localStorage but cannot be listed, loaded,
-   applied, renamed, or deleted after reload.
-5. Keyboard focus skips **Open screenshot** because the hidden file input and
-   styled label are not focusable. SPA route changes leave focus on `BODY`.
-6. At 390 px the hydrated Linux download button expands the document to 496 px,
-   causing 106 px horizontal overflow.
+- Canvas pointer coordinates now scale from the CSS box to bitmap coordinates.
+  The claim test clicks bitmap point `(983,503)` at 1440×900 and 390×844,
+  verifies `#16714A`, then inspects rendered pixels for patterns, labels, and
+  blue remapping.
+- The Linux installer now selects the AppImage, verifies its published SHA-256,
+  moves it to `${XDG_BIN_HOME:-$HOME/.local/bin}/color-signal-lens`, and marks
+  it executable. macOS saves and opens its verified chip-specific DMG. Windows
+  verifies and starts MSI/EXE installers.
+- Lens Plus now provides persistent list, apply, rename, and delete operations
+  in addition to save. Existing 0.1.6 preset records are migrated with stable
+  fallback IDs.
+- The real file input remains visually integrated but is focusable. SPA links,
+  Back, and Start for real focus the destination `<h1>` and announce its title.
+- Long hydrated filenames wrap inside the download area. Desktop and 390 px
+  pages have no horizontal overflow.
+- Clear lens now uses a real no-overlay state and redraws the source image.
+- Focus uses a black inner ring and white outer ring; one edge exceeds 3:1 on
+  every product surface. The wordmark and colour input are at least 44×44 px.
+- Capture failures now explain screen-sharing recovery and point to Open
+  screenshot instead of exposing raw platform errors.
+- Known SPA routes are explicit static rewrites. Unknown paths fall through to
+  the configured real HTTP 404 response.
+- Copy-only claim checks were replaced with outcome checks for rendered canvas
+  pixels, real/demo storage isolation, selected-region crop pixels, persisted
+  preset CRUD, and a surviving executable installer.
 
-Additional defects: **Clear lens** switches back to a pattern instead of
-removing the overlay; white focus rings have only 1.06–1.23:1 contrast on the
-paper surfaces; two interactive targets are below 44 px; capture failures show
-raw platform errors; and several claim tests assert help copy rather than the
-promised rendered outcome.
+## Purchase controller identity
 
-## What passed
+The purchase action remains exactly:
 
-- All 13 exact `.factory/claims.json` commands exited 0, though several tests
-  are inadequate as described in `.factory/verification-6.md`.
-- `CI=1 npm test`: 6 unit and 22 Playwright tests passed.
-- `npm run check` and `npm run build`: passed.
+`https://api.sociobot.in/api/v1/products/color-signal-lens/checkout`
+
+That is the required Sociobot controller registration path. No payment-provider
+URL or local substitute was introduced. A 2026-08-29 pre-deploy probe still
+returned HTTP 404 `{"error":"enabled factory product","status":404}`. Product
+registration is external factory/controller state; this worker has no billing
+registration command or credential. The controller must enable the existing
+`color-signal-lens` record without changing the URL.
+
+## Verification evidence
+
+- Clean `npm ci`: 29 packages, 0 vulnerabilities.
+- Every command in `.factory/claims.json`: 18/18 passed separately.
+- `CI=1 npm test`: 6 unit and 32 Playwright tests passed.
+- `npm run check`: passed.
+- `npm run build`: passed; `dist/app` and `dist/site` produced.
+- Site output: JavaScript 28.23 KB (9.85 KB gzip), CSS 12.89 KB (3.70 KB
+  gzip), hero WebP 50.72 KB.
+- Playwright covered desktop and 390×844, keyboard, route focus, no overflow,
+  44 px targets, two-tone focus, reduced motion, offline-after-load, privacy
+  requests, error recovery, and Axe serious/critical findings (zero).
+- Local `verify-url.sh /demo`: HTTP 200, 524 ms network-idle, no console errors,
+  `lang=en`, one h1, main landmark, complete alt text, and named buttons.
+- Local Lighthouse mobile: performance 100, accessibility 100, best practices
+  100, SEO 100; FCP 0.9 s, LCP 1.9 s, TBT 10 ms, CLS 0, transfer 69 KiB.
 - `cargo test --manifest-path src-tauri/Cargo.toml`: passed (0 Rust tests).
-- `CI=1 npm run tauri build -- --bundles deb,rpm`: passed and produced v0.1.6
-  DEB/RPM packages. The native 1180×810 app window launched under Xvfb.
-- Live Axe: zero serious/critical findings on six routes at desktop and 390 px.
-- Live request logging found no analytics or screenshot upload. Security and
-  cache headers are present. JS/CSS/image byte budgets pass.
-- Public v0.1.6 release assets are complete and the downloaded DEB checksum
-  matches `SHA256SUMS`.
-- License API rate limit: 30 successful requests, then request 31 returned 429
-  with `Retry-After: 4`; service recovered after that interval.
-- Lighthouse mobile: 90 performance, 100 accessibility, 100 best practices,
-  100 SEO; LCP 2.503 s, TBT 327 ms, CLS 0.
+- `CI=1 npm run tauri build -- --bundles deb,rpm`: passed. DEB is 3,735,224
+  bytes, SHA-256 `a587c5b2b4bf0ed8eab400fa13b8f70374c57a7a807c64d045c58cc82ab54e6f`.
+  RPM is 3,737,443 bytes, SHA-256
+  `4536185172da880a8cb5b53fd489bac35c4aa1c6d6eee61d3206bea1292d4629`.
+  DEB metadata reports package `color-signal-lens`, version 0.1.7, amd64.
+- The release binary remained open for an 8-second Xvfb native smoke test.
 
-## Repair and retest
+## Release and deployment
 
-Scale pointer coordinates before sampling and positioning labels; add a
-regression that asserts the selected pixel and canvas output at desktop and
-390 px. Make **Clear lens** restore the unmodified source. Register/enable the
-Sociobot checkout product. Build a usable preset list with apply/delete paths.
-Make file opening keyboard-operable and focus route headings. Constrain or wrap
-download filenames on mobile. Make install scripts place the verified artifact
-in a persistent executable location or run the platform installer, and test
-the surviving installed result.
+Pending the repair commit, `v0.1.7` GitHub Actions release, static deployment,
+public checksum/installer verification, live response-policy check, and live
+bundle identity check. These fields will be replaced with exact run and
+deployment evidence after publication.
 
-Then rerun every claim command, the complete clean gates, native packages, the
-documented installer, live checkout, keyboard/mobile flows, request logs,
-headers, release checksum, and deployment hash comparison.
+## Operator action
 
-Full evidence and exact hashes are in `.factory/verification-6.md`. No product
-code was changed by this verifier.
+- Enable the `color-signal-lens` product in the Sociobot billing controller so
+  the preserved checkout URL resolves.
+- Installers remain unsigned. macOS notarization needs `APPLE_CERTIFICATE`;
+  Windows Authenticode needs `WINDOWS_CERT_PFX`. No secrets are stored here.

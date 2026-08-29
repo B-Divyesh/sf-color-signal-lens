@@ -1,4 +1,4 @@
-export type LensMode = 'labels' | 'patterns' | 'remap';
+export type LensMode = 'none' | 'labels' | 'patterns' | 'remap';
 
 export type Rgb = { r: number; g: number; b: number };
 

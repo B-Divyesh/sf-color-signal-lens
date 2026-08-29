@@ -12,7 +12,7 @@ case "$os" in
       *) echo "Unsupported macOS CPU: $arch. Download the matching installer from the release page." >&2; exit 1 ;;
     esac
     ;;
-  linux) match='\.appimage$|\.deb$' ;;
+  linux) match='\.appimage$' ;;
   *) echo "Use install.ps1 on Windows." >&2; exit 1 ;;
 esac
 
@@ -25,6 +25,25 @@ trap 'rm -rf "$work"' EXIT
 name=$(basename "$asset")
 curl -fL "$asset" -o "$work/$name"
 curl -fL "$checksum" -o "$work/SHA256SUMS"
-(cd "$work" && grep " $name$" SHA256SUMS | sha256sum -c -)
-echo "Verified $name. Installing it is your next step: $work/$name"
+expected=$(grep " $name$" "$work/SHA256SUMS" | awk '{print $1}')
+[ -n "$expected" ] || { echo "No checksum was published for $name." >&2; exit 1; }
+if command -v sha256sum >/dev/null 2>&1; then actual=$(sha256sum "$work/$name" | awk '{print $1}'); else actual=$(shasum -a 256 "$work/$name" | awk '{print $1}'); fi
+[ "$actual" = "$expected" ] || { echo "Checksum did not match. The download was not installed." >&2; exit 1; }
+echo "Verified $name."
+if [ "$os" = 'linux' ]; then
+  install_dir=${COLOR_SIGNAL_LENS_INSTALL_DIR:-${XDG_BIN_HOME:-$HOME/.local/bin}}
+  mkdir -p "$install_dir"
+  installed="$install_dir/color-signal-lens"
+  mv "$work/$name" "$installed"
+  chmod 755 "$installed"
+  echo "Installed Color Signal Lens at $installed"
+  case ":$PATH:" in *":$install_dir:"*) ;; *) echo "Add $install_dir to PATH to run color-signal-lens from a terminal." ;; esac
+else
+  install_dir=${COLOR_SIGNAL_LENS_INSTALL_DIR:-$HOME/Downloads}
+  mkdir -p "$install_dir"
+  installed="$install_dir/$name"
+  mv "$work/$name" "$installed"
+  echo "Saved the verified installer at $installed"
+  if [ "${COLOR_SIGNAL_LENS_NO_LAUNCH:-0}" != '1' ]; then open "$installed"; fi
+fi
 echo "The app is unsigned; your operating system may ask you to confirm it."

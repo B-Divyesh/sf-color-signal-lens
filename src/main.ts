@@ -6,6 +6,7 @@ declare const __SITE_BUILD__: boolean;
 type Source = { url: string; name: string; kind: 'sample' | 'file' | 'capture' };
 type LicenseVerdict = { checked: number; valid: boolean; license: string };
 type LicenseResult = 'valid' | 'invalid' | 'unavailable';
+type Preset = { id: string; name: string; colour: string; mode: LensMode; mapping: 'blue' | 'orange' };
 const app = document.querySelector<HTMLDivElement>('#app')!;
 const siteBuild = __SITE_BUILD__;
 const licenseKey = 'sb_license:color-signal-lens';
@@ -17,6 +18,7 @@ let mapping: 'blue' | 'orange' = 'blue';
 let imageReady = false;
 let selectedPoint: { x: number; y: number } | null = null;
 let demo = location.pathname === '/demo' || location.search.includes('demo=1');
+let focusAfterRender = false;
 
 const esc = (text: string) => text.replace(/[&<>"]/g, (v) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[v]!));
 const lensName = () => detectStatusName(target);
@@ -25,7 +27,9 @@ const asset = (path: string) => siteBuild ? `./${path.replace(/^\//, '')}` : pat
 function pageTitle(title: string) {
   document.title = title;
   const heading = document.querySelector<HTMLElement>('h1');
-  heading?.focus();
+  heading?.setAttribute('tabindex', '-1');
+  if (focusAfterRender) heading?.focus();
+  focusAfterRender = false;
   document.querySelector('#route-announcement')!.textContent = title;
 }
 
@@ -37,7 +41,7 @@ function layout(content: string, route: string) {
     </header>
     <div id="route-announcement" class="sr-only" aria-live="polite"></div>
     <main id="main" tabindex="-1">${content}</main>
-    <footer><p>Color Signal Lens makes screenshot status signals easier to read.</p><p><a href="/privacy" data-nav>Privacy</a> · <a href="/terms" data-nav>Terms</a> · Built by Param Factory · v0.1.6</p></footer>`;
+    <footer><p>Color Signal Lens makes screenshot status signals easier to read.</p><p><a href="/privacy" data-nav>Privacy</a> · <a href="/terms" data-nav>Terms</a> · Built by Param Factory · v0.1.7</p></footer>`;
   wireNavigation();
   pageTitle(route);
 }
@@ -67,13 +71,20 @@ function renderDemo() {
 
 function workspace() {
   return `<section class="lens-shell"><div class="lens-heading"><p class="eyebrow">READING LAYER</p><h1>Inspect a screenshot signal.</h1><p>Click a colour in the image. Then choose how the lens marks it.</p></div>
-  <div class="source-actions"><button class="button primary" id="load-sample">Load sample diff</button><label class="button secondary" for="file-input">Open screenshot<input id="file-input" type="file" accept="image/png,image/jpeg,image/webp" hidden></label><button class="button secondary" id="capture-screen">Capture screen region</button><p id="source-status" role="status" aria-live="polite">${esc(source?.name || 'No screenshot loaded.')}</p></div>
+  <div class="source-actions"><button class="button primary" id="load-sample">Load sample diff</button><label class="button secondary file-picker" for="file-input">Open screenshot<input id="file-input" type="file" accept="image/png,image/jpeg,image/webp"></label><button class="button secondary" id="capture-screen">Capture screen region</button><p id="source-status" role="status" aria-live="polite">${esc(source?.name || 'No screenshot loaded.')}</p></div>
   <p class="permission-note">Capture asks for screen permission only when you press it. Select a region before it is added. The image stays on this device.</p>
   <div class="work-grid"><section class="canvas-paper" aria-label="Screenshot lens"><div class="canvas-wrap"><canvas id="lens-canvas" width="1200" height="720" aria-label="Screenshot. Click a colour to select it." tabindex="0"></canvas><div id="canvas-empty" class="canvas-empty" ${source ? 'hidden' : ''}><p>No screenshot is open.</p><button id="empty-sample">Load sample diff</button></div></div><p class="canvas-help">Keyboard: use the colour field below, then press Apply selected colour.</p></section>
   <aside class="controls paper-edge" aria-label="Lens controls"><h2>Lens controls</h2><label for="color-input">Selected colour</label><div class="colour-input"><input id="color-input" type="color" value="${rgbToHex(target)}"><output id="color-value">${rgbToHex(target).toUpperCase()}</output></div><button class="button secondary full" id="apply-colour">Apply selected colour</button>
   <fieldset><legend>Reading cue</legend><label><input type="radio" name="mode" value="labels" ${mode === 'labels' ? 'checked' : ''}> Label the signal</label><label><input type="radio" name="mode" value="patterns" ${mode === 'patterns' ? 'checked' : ''}> Add a pattern</label><label><input type="radio" name="mode" value="remap" ${mode === 'remap' ? 'checked' : ''}> Remap the colour</label></fieldset>
   <fieldset id="mapping-options" ${mode === 'remap' ? '' : 'hidden'}><legend>Remap to</legend><label><input type="radio" name="mapping" value="blue" ${mapping === 'blue' ? 'checked' : ''}> Blue</label><label><input type="radio" name="mapping" value="orange" ${mapping === 'orange' ? 'checked' : ''}> Orange</label></fieldset>
-  <div class="meaning"><span class="cue-icon ${mode}"></span><div><b id="meaning-name">${lensName()}</b><p id="meaning-copy">${mode === 'labels' ? 'A text label marks the selected signal.' : mode === 'patterns' ? 'A pattern sits over the selected signal.' : 'The selected signal is remapped.'}</p></div></div>${premiumPanel()}<button id="clear-lens" class="link-button">Clear lens</button></aside></div></section>`;
+  <div class="meaning"><span class="cue-icon ${mode}"></span><div><b id="meaning-name">${mode === 'none' ? 'No reading cue' : lensName()}</b><p id="meaning-copy">${meaningCopy()}</p></div></div>${premiumPanel()}<button id="clear-lens" class="link-button">Clear lens</button></aside></div></section>`;
+}
+
+function meaningCopy() {
+  if (mode === 'none') return 'The original screenshot is shown without an overlay.';
+  if (mode === 'labels') return 'A text label marks the selected signal.';
+  if (mode === 'patterns') return 'A pattern sits over the selected signal.';
+  return 'The selected signal is remapped.';
 }
 
 function draw() {
@@ -95,6 +106,7 @@ function applyLens(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement)
   const image = new Image();
   image.onload = () => {
     context.clearRect(0, 0, canvas.width, canvas.height); context.drawImage(image, 0, 0);
+    if (mode === 'none') return;
     const data = context.getImageData(0, 0, canvas.width, canvas.height);
     const targetDistance = 76;
     if (mode === 'remap') {
@@ -114,7 +126,12 @@ function applyLens(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement)
 function wireWorkspace() {
   draw();
   const canvas = document.querySelector<HTMLCanvasElement>('#lens-canvas')!;
-  canvas.addEventListener('click', (event) => pickAt(event.offsetX, event.offsetY));
+  canvas.addEventListener('click', (event) => {
+    const bounds = canvas.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) * canvas.width / bounds.width;
+    const y = (event.clientY - bounds.top) * canvas.height / bounds.height;
+    pickAt(x, y);
+  });
   canvas.addEventListener('keydown', (event) => { if (event.key === 'Enter') { event.preventDefault(); document.querySelector<HTMLInputElement>('#color-input')?.focus(); } });
   document.querySelector('#load-sample')?.addEventListener('click', loadSample);
   document.querySelector('#empty-sample')?.addEventListener('click', loadSample);
@@ -122,12 +139,12 @@ function wireWorkspace() {
   document.querySelector('#capture-screen')?.addEventListener('click', captureScreen);
   document.querySelector<HTMLInputElement>('#color-input')?.addEventListener('input', (event) => { target = parseHex((event.target as HTMLInputElement).value); document.querySelector('#color-value')!.textContent = rgbToHex(target).toUpperCase(); });
   document.querySelector('#apply-colour')?.addEventListener('click', () => { selectedPoint = null; refreshLens(); });
-  document.querySelectorAll<HTMLInputElement>('input[name="mode"]').forEach((input) => input.addEventListener('change', () => { mode = input.value as LensMode; refreshLens(true); }));
+  document.querySelectorAll<HTMLInputElement>('input[name="mode"]').forEach((input) => input.addEventListener('change', () => { mode = input.value as LensMode; refreshLens(); }));
   document.querySelectorAll<HTMLInputElement>('input[name="mapping"]').forEach((input) => input.addEventListener('change', () => { mapping = input.value as 'blue' | 'orange'; refreshLens(); }));
-  document.querySelector('#clear-lens')?.addEventListener('click', () => { source && (mode = 'patterns'); selectedPoint = null; target = parseHex('#9c2d20'); refreshLens(true); });
-  document.querySelector('#save-preset')?.addEventListener('click', savePreset);
+  document.querySelector('#clear-lens')?.addEventListener('click', () => { mode = 'none'; selectedPoint = null; refreshLens(); });
+  wirePresetActions();
   document.querySelector('#reset-demo')?.addEventListener('click', () => { localStorage.removeItem('demo:color-signal-lens:started'); source = { url: svgDataUrl, name: 'checkout-totals.diff.png', kind: 'sample' }; target = parseHex('#9c2d20'); mode = 'patterns'; renderDemo(); });
-  document.querySelector('#start-real')?.addEventListener('click', () => { localStorage.removeItem('demo:color-signal-lens:started'); source = null; selectedPoint = null; demo = false; history.pushState({}, '', '/lens'); renderLens(); });
+  document.querySelector('#start-real')?.addEventListener('click', () => { localStorage.removeItem('demo:color-signal-lens:started'); source = null; selectedPoint = null; demo = false; focusAfterRender = true; history.pushState({}, '', '/lens'); renderLens(); });
   document.addEventListener('paste', pasteImage, { once: true });
 }
 
@@ -135,11 +152,26 @@ function pickAt(x: number, y: number) {
   if (!source) return;
   const canvas = document.querySelector<HTMLCanvasElement>('#lens-canvas')!;
   const original = new Image();
-  original.onload = () => { const reader = document.createElement('canvas'); reader.width = original.naturalWidth; reader.height = original.naturalHeight; const context = reader.getContext('2d')!; context.drawImage(original, 0, 0); const p = context.getImageData(Math.min(x, canvas.width - 1), Math.min(y, canvas.height - 1), 1, 1).data; target = { r: p[0], g: p[1], b: p[2] }; selectedPoint = { x, y }; refreshLens(); };
+  original.onload = () => { const reader = document.createElement('canvas'); reader.width = original.naturalWidth; reader.height = original.naturalHeight; const context = reader.getContext('2d')!; context.drawImage(original, 0, 0); const bitmapX = Math.max(0, Math.min(Math.floor(x), canvas.width - 1)); const bitmapY = Math.max(0, Math.min(Math.floor(y), canvas.height - 1)); const p = context.getImageData(bitmapX, bitmapY, 1, 1).data; target = { r: p[0], g: p[1], b: p[2] }; selectedPoint = { x: bitmapX, y: bitmapY }; if (mode === 'none') mode = 'patterns'; refreshLens(); };
   original.src = source.url;
 }
 
-function refreshLens(repaint = false) { if (repaint) renderDemo(); else { document.querySelector('#color-input') && ((document.querySelector('#color-input') as HTMLInputElement).value = rgbToHex(target)); document.querySelector('#color-value')!.textContent = rgbToHex(target).toUpperCase(); document.querySelector('#meaning-name')!.textContent = lensName(); document.querySelector('#meaning-copy')!.textContent = mode === 'labels' ? 'A text label marks the selected signal.' : mode === 'patterns' ? 'A pattern sits over the selected signal.' : 'The selected signal is remapped.'; draw(); } }
+function refreshLens() {
+  const colour = document.querySelector<HTMLInputElement>('#color-input');
+  if (colour) colour.value = rgbToHex(target);
+  const value = document.querySelector('#color-value');
+  if (value) value.textContent = rgbToHex(target).toUpperCase();
+  document.querySelectorAll<HTMLInputElement>('input[name="mode"]').forEach((input) => { input.checked = input.value === mode; });
+  const mappingOptions = document.querySelector<HTMLFieldSetElement>('#mapping-options');
+  if (mappingOptions) mappingOptions.hidden = mode !== 'remap';
+  const cue = document.querySelector<HTMLElement>('.cue-icon');
+  if (cue) cue.className = `cue-icon ${mode}`;
+  const name = document.querySelector('#meaning-name');
+  if (name) name.textContent = mode === 'none' ? 'No reading cue' : lensName();
+  const copy = document.querySelector('#meaning-copy');
+  if (copy) copy.textContent = meaningCopy();
+  draw();
+}
 function rerenderWorkspace() { demo ? renderDemo() : renderLens(); }
 function loadSample() { source = { url: svgDataUrl, name: 'checkout-totals.diff.png', kind: 'sample' }; rerenderWorkspace(); }
 function setSourceStatus(message: string) { const status = document.querySelector('#source-status'); if (status) status.textContent = message; }
@@ -207,7 +239,7 @@ async function captureScreen() {
     canvas.getContext('2d')!.drawImage(video, x, y, selectedWidth, selectedHeight, 0, 0, selectedWidth, selectedHeight);
     track.stop();
     await useImage(canvas.toDataURL('image/png'), 'Selected screen region', 'capture');
-  } catch (error) { setSourceStatus(error instanceof Error ? error.message : 'Capture did not complete. Open a screenshot instead.'); }
+  } catch { setSourceStatus('Screen capture did not start. Check screen-sharing permission, then try again or open a screenshot.'); }
 }
 function renderLens() {
   layout(workspace(), 'Color Signal Lens — Inspect a screenshot signal');
@@ -238,9 +270,34 @@ function hasValidLicense() {
   return Boolean(license && cachedLicenseVerdict(license)?.valid);
 }
 
+function readPresets(): Preset[] {
+  try {
+    const value = JSON.parse(localStorage.getItem('color-signal-lens:presets') || '[]') as Partial<Preset>[];
+    if (!Array.isArray(value)) return [];
+    return value.flatMap((preset, index) => {
+      if (typeof preset.name !== 'string' || typeof preset.colour !== 'string' || !['none', 'labels', 'patterns', 'remap'].includes(String(preset.mode))) return [];
+      const savedMapping: 'blue' | 'orange' = preset.mapping === 'orange' ? 'orange' : 'blue';
+      return [{ id: typeof preset.id === 'string' ? preset.id : `saved-${index}`, name: preset.name.slice(0, 32), colour: preset.colour, mode: preset.mode as LensMode, mapping: savedMapping }];
+    }).slice(-12);
+  } catch {
+    localStorage.removeItem('color-signal-lens:presets');
+    return [];
+  }
+}
+
+function writePresets(presets: Preset[]) {
+  localStorage.setItem('color-signal-lens:presets', JSON.stringify(presets.slice(-12)));
+}
+
+function presetList() {
+  const presets = readPresets();
+  if (!presets.length) return '<p id="preset-empty">No presets saved yet.</p>';
+  return `<ul id="preset-list" class="preset-list">${presets.map((preset) => `<li data-preset-id="${esc(preset.id)}"><label for="preset-${esc(preset.id)}">Preset name</label><input id="preset-${esc(preset.id)}" value="${esc(preset.name)}" maxlength="32"><span>${esc(preset.colour.toUpperCase())} · ${esc(preset.mode === 'none' ? 'clear' : preset.mode)}</span><div><button class="preset-apply" type="button">Apply ${esc(preset.name)}</button><button class="preset-rename" type="button">Rename ${esc(preset.name)}</button><button class="preset-delete" type="button">Delete ${esc(preset.name)}</button></div></li>`).join('')}</ul>`;
+}
+
 function premiumContent(message?: string) {
   if (demo) return '<p class="plus-note">Lens Plus presets are unavailable in the demo. The reading controls stay free.</p>';
-  if (hasValidLicense()) return '<div class="preset"><label for="preset-name">Lens Plus preset name</label><div class="preset-row"><input id="preset-name" maxlength="32" placeholder="Code review"><button id="save-preset" class="button secondary">Save preset</button></div><p id="preset-note" aria-live="polite">Saved presets stay on this device.</p></div>';
+  if (hasValidLicense()) return `<section class="preset" aria-labelledby="preset-title"><h3 id="preset-title">Saved presets</h3><label for="preset-name">New preset name</label><div class="preset-row"><input id="preset-name" maxlength="32" placeholder="Code review"><button id="save-preset" class="button secondary">Save preset</button></div><p id="preset-note" aria-live="polite">${esc(message || 'Saved presets stay on this device.')}</p>${presetList()}</section>`;
   const checking = localStorage.getItem(licenseKey) ? 'Checking the Lens Plus license. The reading controls stay free.' : '<a href="/" data-nav>Lens Plus</a> saves named presets. The reading controls stay free.';
   return `<p class="plus-note" role="status" aria-live="polite">${message || checking}</p>`;
 }
@@ -250,18 +307,57 @@ function refreshPremiumPanel(message?: string) {
   const panel = document.querySelector<HTMLElement>('#premium-panel');
   if (!panel) return;
   panel.innerHTML = premiumContent(message);
-  document.querySelector('#save-preset')?.addEventListener('click', savePreset);
+  wirePresetActions();
   wireNavigation(panel);
+}
+function wirePresetActions() {
+  document.querySelector('#save-preset')?.addEventListener('click', savePreset);
+  document.querySelectorAll<HTMLElement>('[data-preset-id]').forEach((row) => {
+    const id = row.dataset.presetId!;
+    row.querySelector('.preset-apply')?.addEventListener('click', () => applyPreset(id));
+    row.querySelector('.preset-rename')?.addEventListener('click', () => renamePreset(id, row));
+    row.querySelector('.preset-delete')?.addEventListener('click', () => deletePreset(id));
+  });
 }
 function savePreset() {
   if (!hasValidLicense()) { refreshPremiumPanel('Check an active Lens Plus license before saving a preset.'); return; }
   const name = (document.querySelector<HTMLInputElement>('#preset-name')?.value || '').trim();
   const note = document.querySelector('#preset-note')!;
   if (!name) { note.textContent = 'Name the preset, then save it.'; return; }
-  const presets = JSON.parse(localStorage.getItem('color-signal-lens:presets') || '[]') as { name: string; colour: string; mode: LensMode; mapping: string }[];
-  presets.push({ name, colour: rgbToHex(target), mode, mapping });
-  localStorage.setItem('color-signal-lens:presets', JSON.stringify(presets.slice(-12)));
-  note.textContent = `${name} is saved on this device.`;
+  const presets = readPresets();
+  const id = globalThis.crypto?.randomUUID?.() || `preset-${Date.now()}`;
+  presets.push({ id, name, colour: rgbToHex(target), mode, mapping });
+  writePresets(presets);
+  refreshPremiumPanel(`${name} is saved on this device.`);
+}
+
+function applyPreset(id: string) {
+  const preset = readPresets().find((item) => item.id === id);
+  if (!preset) return;
+  target = parseHex(preset.colour); mode = preset.mode; mapping = preset.mapping; selectedPoint = null;
+  refreshLens();
+  const note = document.querySelector('#preset-note');
+  if (note) note.textContent = `${preset.name} is applied.`;
+}
+
+function renamePreset(id: string, row: HTMLElement) {
+  const name = (row.querySelector<HTMLInputElement>('input')?.value || '').trim();
+  const note = document.querySelector('#preset-note');
+  if (!name) { if (note) note.textContent = 'Enter a preset name, then rename it.'; return; }
+  const presets = readPresets();
+  const preset = presets.find((item) => item.id === id);
+  if (!preset) return;
+  preset.name = name;
+  writePresets(presets);
+  refreshPremiumPanel(`${name} is renamed.`);
+}
+
+function deletePreset(id: string) {
+  const presets = readPresets();
+  const removed = presets.find((item) => item.id === id);
+  if (!removed) return;
+  writePresets(presets.filter((item) => item.id !== id));
+  refreshPremiumPanel(`${removed.name} is deleted.`);
 }
 
 function renderPrivacy() { layout(`<article class="legal paper-edge"><p class="eyebrow">PRIVACY</p><h1>Your screenshot stays on this device.</h1><p>Color Signal Lens reads pixels in the image you open. It does not upload screenshots, record your screen, or use analytics.</p><h2>Local storage</h2><p>The demo uses a separate local browser key. Reset demo deletes it. A paid license, if you add one, is stored only in your browser so the app can remember it.</p><h2>Screen permission</h2><p>The installed app asks for screen permission only after you press Capture screen region. You choose the region before it is added. You can use files or pasted screenshots instead.</p><p>Last updated: 28 August 2026.</p></article>`, 'Privacy — Color Signal Lens'); }
@@ -374,7 +470,7 @@ async function hydrateDownload() {
     state.textContent = 'The current download matches your computer.';
   } catch { /* Keep the calm fallback if the release list is unavailable. */ }
 }
-function wireNavigation(root: ParentNode = document) { root.querySelectorAll<HTMLAnchorElement>('a[data-nav]').forEach((a) => a.addEventListener('click', (event) => { const href = a.getAttribute('href')!; if (!href.startsWith('/')) return; event.preventDefault(); history.pushState({}, '', href); renderRoute(); })); }
+function wireNavigation(root: ParentNode = document) { root.querySelectorAll<HTMLAnchorElement>('a[data-nav]').forEach((a) => a.addEventListener('click', (event) => { const href = a.getAttribute('href')!; if (!href.startsWith('/')) return; event.preventDefault(); focusAfterRender = true; history.pushState({}, '', href); renderRoute(); })); }
 function renderRoute() { if (location.search.includes('demo=1')) { demo = true; renderDemo(); return; } if (!siteBuild && (location.pathname === '/' || location.pathname === '/lens')) { demo = false; renderLens(); return; } if (location.pathname === '/') renderLanding(); else if (location.pathname === '/lens') { demo = false; renderLens(); } else if (location.pathname === '/demo') renderDemo(); else if (location.pathname === '/privacy') renderPrivacy(); else if (location.pathname === '/terms') renderTerms(); else render404(); }
-window.addEventListener('popstate', renderRoute);
+window.addEventListener('popstate', () => { focusAfterRender = true; renderRoute(); });
 renderRoute();

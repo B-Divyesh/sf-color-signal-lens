@@ -14,6 +14,7 @@ screenshot. Nothing in demo mode is saved with real settings.
    installed desktop app, then select the region to add.
 2. Click a difficult colour signal, or set its colour with the keyboard field.
 3. Choose Label, Pattern, or Remap. The source image remains underneath.
+   Clear lens restores the source image without an overlay.
 
 Screen capture is requested only after the Capture button is pressed. Only the
 region you select is added to the lens. Opened images stay on the device.
@@ -34,7 +35,7 @@ The desktop app uses Tauri 2 and its configuration is in `src-tauri/`.
 
 ## Install and releases
 
-Release builds run on tags such as `v0.1.6` through
+Release builds run on tags such as `v0.1.7` through
 `.github/workflows/release.yml`. The workflow creates unsigned macOS, Windows,
 and Linux artifacts plus checksums. The landing site uses the GitHub API for
 release links, offers both Mac chip choices, and shows a calm release-page
@@ -48,18 +49,20 @@ curl -fsSL https://color-signal-lens.sociobot.in/install.sh | sh
 irm https://color-signal-lens.sociobot.in/install.ps1 | iex
 ```
 
-The macOS script reads your Mac CPU and chooses the matching Intel or
-Apple-Silicon DMG. Both scripts verify SHA-256 before handing off to the
-platform installer.
+The Linux script verifies the AppImage and installs it as
+`~/.local/bin/color-signal-lens`. The macOS script chooses the matching Intel
+or Apple-Silicon DMG, saves it in Downloads, and opens it. The Windows script
+verifies and starts the installer.
 Unsigned apps may require a right-click → Open confirmation on macOS or a
 Windows confirmation.
 
 ## Lens Plus
 
-The free app includes the core reading controls. Lens Plus is a $12 one-time
-purchase for saved named presets. The hosted Sociobot checkout returns a
-license token. It is stored locally and checked no more than once per day when
-online. Restore a purchase by pasting the license on the landing page.
+The free app includes the core reading controls. Lens Plus costs $12 once.
+It adds named presets you can save, apply, rename, and delete. The hosted
+Sociobot checkout returns a license token. It is stored locally and checked
+no more than once per day when online. Restore a purchase by pasting the
+license on the landing page.
 
 ## Privacy and terms
 

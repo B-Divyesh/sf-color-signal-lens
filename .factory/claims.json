@@ -43,10 +43,10 @@
   },
   {
     "id": "named-presets",
-    "claim": "Lens Plus saves named presets on this device.",
+    "claim": "Lens Plus saves, lists, applies, renames, and deletes named presets on this device.",
     "where": "landing Lens Plus section, workspace",
     "test": "npm test -- --grep @claim:named-presets",
-    "sandbox": "fresh browser context with a valid cached license; save a preset and assert its local record"
+    "sandbox": "fresh browser context with a valid cached license; save, reload, apply, rename, delete, and reload again"
   },
   {
     "id": "license-entitlement",
@@ -64,10 +64,10 @@
   },
   {
     "id": "installer-checksums",
-    "claim": "Install scripts verify SHA-256 before handing off the downloaded installer.",
+    "claim": "The Linux install script verifies SHA-256 and leaves an executable Color Signal Lens AppImage on PATH.",
     "where": "README install section",
     "test": "npm run test:unit -- --test-name-pattern=@claim:installer-checksums",
-    "sandbox": "unit fixture checks both platform scripts reject a missing checksum and calculate SHA-256 before their success message"
+    "sandbox": "shell fixture rejects a missing checksum, verifies a fixture AppImage, and asserts the executable survives temporary cleanup"
   },
   {
     "id": "desktop-release",
@@ -89,5 +89,40 @@
     "where": "README install section, install.sh",
     "test": "npm run test:unit -- --test-name-pattern=@claim:macos-shell-installer-architecture",
     "sandbox": "shell fixture lists the Apple-Silicon DMG first, mocks Darwin uname -m for x86_64, i386, arm64, and aarch64, and observes the verified filename"
+  },
+  {
+    "id": "clear-lens",
+    "claim": "Clear lens removes the overlay and restores the original screenshot.",
+    "where": "workspace Clear lens action, README",
+    "test": "npm test -- --grep @claim:clear-lens",
+    "sandbox": "fresh demo; remap the known green pixel, clear the lens, and compare its original RGB value"
+  },
+  {
+    "id": "license-daily-cache",
+    "claim": "A current verified license is checked no more than once per day.",
+    "where": "README Lens Plus section",
+    "test": "npm test -- --grep @claim:license-daily-cache",
+    "sandbox": "fresh context with a current token-bound valid verdict; assert paid controls load with no verification request"
+  },
+  {
+    "id": "license-restore",
+    "claim": "A purchase can be restored by pasting its license on the landing page.",
+    "where": "landing Lens Plus section, README",
+    "test": "npm test -- --grep @claim:license-restore",
+    "sandbox": "fresh context; paste a fixture license, mock the Sociobot valid response, and assert local storage"
+  },
+  {
+    "id": "release-fallback",
+    "claim": "The landing page keeps a direct release-page fallback when GitHub metadata is unavailable.",
+    "where": "README install section, landing install section",
+    "test": "npm test -- --grep @claim:release-fallback",
+    "sandbox": "fresh context with GitHub API blocked; assert calm status and usable direct release link"
+  },
+  {
+    "id": "sociobot-checkout-path",
+    "claim": "Lens Plus purchases use the registered Sociobot checkout path.",
+    "where": "landing Lens Plus purchase action",
+    "test": "npm test -- --grep @claim:sociobot-checkout-path",
+    "sandbox": "fresh landing page; assert the purchase link targets the exact controller registration path"
   }
 ]

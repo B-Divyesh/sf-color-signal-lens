@@ -20,7 +20,7 @@ original screen stays beneath a removable, task-specific reading layer.
 | Orange status | `--orange` | `#A94900` |
 | Blue status | `--blue` | `#075A86` |
 | Lemon note | `--lemon` | `#F4C846` |
-| Focus | `--focus` | `#FFFFFF` |
+| Focus rings | — | `#000000` inner, `#FFFFFF` outer |
 
 The default is deliberately light-on-paper, with an ink stage surrounding the
 working canvas. It keeps the original screenshot readable while blue/orange and
@@ -43,6 +43,9 @@ Selection is direct: open an image or use the shipped sample, click a colour
 signal, then choose labels, patterns, or blue/orange remapping. The only motion
 is a 180ms paper-layer lift on state changes. With reduced motion enabled it
 becomes an instant opacity change.
+
+Keyboard focus uses a black inner outline and white outer halo. One edge
+therefore keeps at least 3:1 contrast on ink, paper, lemon, and orange layers.
 
 ## Asset plan and provenance
 

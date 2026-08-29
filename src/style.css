@@ -5,3 +5,25 @@
 /* Every control keeps a 44px hit area on touch screens. */
 .topbar nav{gap:12px}.topbar nav a{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:0 5px}.demo-banner button{min-height:44px;padding:8px}.controls fieldset label{display:flex;align-items:center;gap:10px;min-height:44px}.controls fieldset input[type="radio"]{width:24px;height:24px;flex:none}footer a,.text-link,.legal a,.plus a:not(.button),.install p a{display:inline-flex;align-items:center;min-width:44px;min-height:44px}@media (max-width:390px){.topbar nav{gap:2px}.topbar nav a{padding:0 3px}}
 .capture-dialog{width:min(980px,calc(100vw - 32px));max-height:calc(100vh - 32px);border:3px solid var(--ink);padding:clamp(18px,3vw,32px);background:var(--paper);color:var(--ink);box-shadow:var(--shadow)}.capture-dialog::backdrop{background:rgba(23,35,46,.82)}.capture-dialog h2{font-size:clamp(1.8rem,4vw,3rem);max-width:18ch}.capture-dialog p{max-width:58ch}.capture-dialog canvas{width:100%;max-height:55vh;border:2px solid var(--ink);background:#fff;cursor:crosshair}.capture-coordinates{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}.capture-coordinates label{font-weight:700}.capture-coordinates input{display:block;width:100%;min-height:44px;border:2px solid var(--ink);padding:6px}.capture-actions{display:flex;justify-content:flex-end;gap:12px}.capture-actions button:not(.button){min-height:44px;border:0;background:transparent;text-decoration:underline;font-weight:700}@media (max-width:520px){.capture-coordinates{grid-template-columns:repeat(2,1fr)}.capture-actions{justify-content:stretch}.capture-actions button{flex:1}}
+
+/* Repair 6: resilient focus, touch sizing, file input, presets, and narrow downloads. */
+html,body{overflow-x:hidden}
+:focus-visible{outline:3px solid #000;outline-offset:3px;box-shadow:0 0 0 6px #fff}
+.wordmark{display:inline-flex;align-items:center;min-width:44px;min-height:44px}
+.file-picker{position:relative}
+.file-picker input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.colour-input input{height:44px}
+.cue-icon.none{background:transparent}
+.install{overflow:hidden}
+.install .button{max-width:100%;white-space:normal;overflow-wrap:anywhere;text-align:center}
+.download-choices{max-width:100%}
+.preset h3{font-size:1.5rem;margin:0 0 12px}
+.preset-row{gap:8px}
+.preset-row input{min-width:0}
+.preset-list{list-style:none;padding:0;margin:18px 0 0}
+.preset-list li{border-top:1px solid var(--ink);padding:12px 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.preset-list label{grid-column:1/-1}
+.preset-list input{min-width:0;min-height:44px;border:2px solid var(--ink);padding:6px}
+.preset-list span{align-self:center;font-size:13px}
+.preset-list div{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px}
+.preset-list button{min-height:44px;border:2px solid var(--ink);background:var(--paper);padding:6px 10px;font-weight:700}

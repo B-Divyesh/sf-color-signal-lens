@@ -1,6 +1,6 @@
 # Copy audit
 
-Audit date: 2026-08-28. The landing and demo sentences below were checked for
+Audit date: 2026-08-29. The landing and demo sentences below were checked for
 the 22-word limit and banned marketing words.
 
 | Sentence | Words | Result |
@@ -21,9 +21,27 @@ the 22-word limit and banned marketing words.
 | Save custom lenses for $12 once. | 7 | Pass |
 | The free lens includes screenshot reading, labels, patterns, and remapping. | 10 | Pass |
 | Plus saves named presets. | 4 | Pass |
+| Install the lens on your computer. | 6 | Pass |
+| Downloads are being published. | 4 | Pass |
+| Open the release page. | 4 | Pass |
+| Installers are unsigned. | 3 | Pass |
+| Your computer may ask you to confirm the app. | 9 | Pass |
+| Color Signal Lens makes screenshot status signals easier to read. | 10 | Pass |
 | Choose the macOS installer that matches your chip. | 8 | Pass |
+| The current download matches your computer. | 6 | Pass |
 | Lens Plus presets are unavailable in the demo. | 8 | Pass |
 | The reading controls stay free. | 5 | Pass |
+| Inspect a screenshot signal. | 4 | Pass |
+| Click a colour in the image. | 7 | Pass |
+| Then choose how the lens marks it. | 7 | Pass |
+| Capture asks for screen permission only when you press it. | 10 | Pass |
+| Select a region before it is added. | 8 | Pass |
+| The image stays on this device. | 7 | Pass |
+| No screenshot is open. | 4 | Pass |
+| The original screenshot is shown without an overlay. | 8 | Pass |
+| Screen capture did not start. | 5 | Pass |
+| Check screen-sharing permission, then try again or open a screenshot. | 10 | Pass |
+| No presets saved yet. | 4 | Pass |
 
 ## Terminology table
 

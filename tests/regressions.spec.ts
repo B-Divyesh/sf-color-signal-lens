@@ -53,22 +53,40 @@ test('a corrupt image keeps the last valid image and announces recovery', async 
 
 test('@claim:capture-consent capture requires and retains a selected region without a native whole-screen command', async ({ page }) => {
   await page.addInitScript(() => {
-    const track = { stop: () => { (window as Window & { captureStopped?: boolean }).captureStopped = true; }, getSettings: () => ({ width: 1200, height: 800 }) };
-    Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: { getDisplayMedia: async () => ({ getVideoTracks: () => [track] }) } });
+    const state = window as Window & { captureStopped?: boolean; captureRequests?: number };
+    state.captureRequests = 0;
+    const track = { stop: () => { state.captureStopped = true; }, getSettings: () => ({ width: 120, height: 80 }) };
+    Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: { getDisplayMedia: async () => { state.captureRequests = (state.captureRequests || 0) + 1; return { getVideoTracks: () => [track] }; } } });
     Object.defineProperty(HTMLMediaElement.prototype, 'srcObject', { configurable: true, get: () => null, set: () => undefined });
     Object.defineProperty(HTMLMediaElement.prototype, 'play', { configurable: true, value: async () => undefined });
+    const original = CanvasRenderingContext2D.prototype.drawImage;
+    CanvasRenderingContext2D.prototype.drawImage = function (source: CanvasImageSource, ...args: number[]) {
+      if (source instanceof HTMLVideoElement) {
+        const sourceX = args.length === 8 ? args[0] : 0;
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        this.fillStyle = sourceX >= 60 ? '#16714a' : '#9c2d20';
+        this.fillRect(0, 0, width, height);
+        if (args.length !== 8) { this.fillStyle = '#16714a'; this.fillRect(width / 2, 0, width / 2, height); }
+        return;
+      }
+      original.call(this, source, ...(args as [number, number]));
+    };
   });
   await page.goto('/demo');
+  expect(await page.evaluate(() => (window as Window & { captureRequests?: number }).captureRequests)).toBe(0);
   await page.getByRole('button', { name: 'Capture screen region' }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
-  await page.locator('#capture-x').fill('100');
-  await page.locator('#capture-y').fill('120');
-  await page.locator('#capture-width').fill('300');
-  await page.locator('#capture-height').fill('200');
+  expect(await page.evaluate(() => (window as Window & { captureRequests?: number }).captureRequests)).toBe(1);
+  await page.locator('#capture-x').fill('60');
+  await page.locator('#capture-y').fill('0');
+  await page.locator('#capture-width').fill('60');
+  await page.locator('#capture-height').fill('80');
   await expect(page.getByRole('button', { name: 'Use selected region' })).toBeEnabled();
   await page.getByRole('button', { name: 'Use selected region' }).click();
   await expect(page.locator('#source-status')).toHaveText('Selected screen region');
   expect(await page.evaluate(() => (window as Window & { captureStopped?: boolean }).captureStopped)).toBe(true);
+  await expect.poll(() => page.locator('#lens-canvas').evaluate((canvas) => ({ width: (canvas as HTMLCanvasElement).width, height: (canvas as HTMLCanvasElement).height, pixel: Array.from((canvas as HTMLCanvasElement).getContext('2d')!.getImageData(30, 40, 1, 1).data.slice(0, 3)).join(',') }))).toEqual({ width: 60, height: 80, pixel: '22,113,74' });
 });
 
 test('landing release lookup handles an empty release list without a console error', async ({ page }) => {
@@ -99,6 +117,31 @@ test('390px navigation, demo controls, and radio rows have 44px touch targets', 
     expect(box, `control ${index} has a bounding box`).not.toBeNull();
     expect(Math.min(box!.width, box!.height), `control ${index} is at least 44px in both dimensions`).toBeGreaterThanOrEqual(44);
   }
+});
+
+test('390px hydrated download and workspace stay within the viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.route('https://api.github.com/**', (route) => route.fulfill({ contentType: 'application/json', body: JSON.stringify([{ assets: [{ name: 'Color.Signal.Lens_0.1.7_amd64.AppImage', browser_download_url: 'https://example.test/Color.Signal.Lens_0.1.7_amd64.AppImage' }] }]) }));
+  await page.goto('/');
+  await expect(page.locator('#download-button')).toContainText('Color.Signal.Lens_0.1.7_amd64.AppImage');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  await page.goto('/demo');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+});
+
+test('capture failures explain the fallback without exposing platform errors', async ({ page }) => {
+  await page.addInitScript(() => Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: { getDisplayMedia: async () => { throw new Error('Invalid constraint'); } } }));
+  await page.goto('/demo');
+  await page.getByRole('button', { name: 'Capture screen region' }).click();
+  await expect(page.locator('#source-status')).toHaveText('Screen capture did not start. Check screen-sharing permission, then try again or open a screenshot.');
+  await expect(page.getByText('Invalid constraint')).toHaveCount(0);
+});
+
+test('static deployment maps known routes and leaves unknown paths to a real 404', () => {
+  const config = JSON.parse(readFileSync('public/staticwebapp.config.json', 'utf8')) as { navigationFallback: { exclude: string[] }; routes: { route: string; rewrite?: string }[]; responseOverrides: Record<string, { rewrite: string }> };
+  for (const route of ['/demo', '/lens', '/privacy', '/terms']) expect(config.routes).toContainEqual(expect.objectContaining({ route, rewrite: '/index.html' }));
+  expect(config.navigationFallback.exclude).toContain('/*');
+  expect(config.responseOverrides['404']).toEqual({ rewrite: '/404.html' });
 });
 
 test('hashed static assets have immutable cache headers configured', () => {
