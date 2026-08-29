@@ -1,0 +1,298 @@
+{
+  "generatedAt": "2026-08-29T13:30:57.696Z",
+  "routeAudits": [
+    {
+      "viewport": "desktop",
+      "route": "/",
+      "status": 200,
+      "title": "Color Signal Lens — Make status colors distinct",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "imagesWithoutAlt": 0,
+      "scrollWidth": 1440,
+      "clientWidth": 1440,
+      "serious": [],
+      "errors": [],
+      "requests": [
+        "https://color-signal-lens.sociobot.in/",
+        "https://color-signal-lens.sociobot.in/assets/index-BF2K8dES.js",
+        "https://color-signal-lens.sociobot.in/assets/style-BWgV3-lU.css",
+        "https://api.github.com/repos/B-Divyesh/sf-color-signal-lens/releases?per_page=1",
+        "https://color-signal-lens.sociobot.in/paper-cut-lens.webp",
+        "https://color-signal-lens.sociobot.in/walkthrough-open.png",
+        "https://color-signal-lens.sociobot.in/walkthrough-select.png",
+        "https://color-signal-lens.sociobot.in/walkthrough-remap.png"
+      ]
+    },
+    {
+      "viewport": "desktop",
+      "route": "/demo",
+      "status": 200,
+      "title": "Demo — Color Signal Lens",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "imagesWithoutAlt": 0,
+      "scrollWidth": 1440,
+      "clientWidth": 1440,
+      "serious": [],
+      "errors": [],
+      "requests": [
+        "https://color-signal-lens.sociobot.in/demo",
+        "https://color-signal-lens.sociobot.in/assets/index-BF2K8dES.js",
+        "https://color-signal-lens.sociobot.in/assets/style-BWgV3-lU.css"
+      ]
+    },
+    {
+      "viewport": "desktop",
+      "route": "/lens",
+      "status": 200,
+      "title": "Color Signal Lens — Inspect screenshot colors",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "imagesWithoutAlt": 0,
+      "scrollWidth": 1440,
+      "clientWidth": 1440,
+      "serious": [],
+      "errors": [],
+      "requests": [
+        "https://color-signal-lens.sociobot.in/lens",
+        "https://color-signal-lens.sociobot.in/assets/index-BF2K8dES.js",
+        "https://color-signal-lens.sociobot.in/assets/style-BWgV3-lU.css"
+      ]
+    },
+    {
+      "viewport": "desktop",
+      "route": "/privacy",
+      "status": 200,
+      "title": "Privacy — Color Signal Lens",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "imagesWithoutAlt": 0,
+      "scrollWidth": 1440,
+      "clientWidth": 1440,
+      "serious": [],
+      "errors": [],
+      "requests": [
+        "https://color-signal-lens.sociobot.in/privacy",
+        "https://color-signal-lens.sociobot.in/assets/index-BF2K8dES.js",
+        "https://color-signal-lens.sociobot.in/assets/style-BWgV3-lU.css"
+      ]
+    },
+    {
+      "viewport": "desktop",
+      "route": "/terms",
+      "status": 200,
+      "title": "Terms — Color Signal Lens",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "imagesWithoutAlt": 0,
+      "scrollWidth": 1440,
+      "clientWidth": 1440,
+      "serious": [],
+      "errors": [],
+      "requests": [
+        "https://color-signal-lens.sociobot.in/terms",
+        "https://color-signal-lens.sociobot.in/assets/index-BF2K8dES.js",
+        "https://color-signal-lens.sociobot.in/assets/style-BWgV3-lU.css"
+      ]
+    },
+    {
+      "viewport": "desktop",
+      "route": "/missing-verification-12",
+      "status": 404,
+      "title": "Page not found — Color Signal Lens",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "imagesWithoutAlt": 0,
+      "scrollWidth": 1440,
+      "clientWidth": 1440,
+      "serious": [],
+      "errors": [
+        "console: Failed to load resource: the server responded with a status of 404 ()"
+      ],
+      "requests": [
+        "https://color-signal-lens.sociobot.in/missing-verification-12",
+        "https://color-signal-lens.sociobot.in/404.css"
+      ]
+    },
+    {
+      "viewport": "mobile",
+      "route": "/",
+      "status": 200,
+      "title": "Color Signal Lens — Make status colors distinct",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "imagesWithoutAlt": 0,
+      "scrollWidth": 390,
+      "clientWidth": 390,
+      "serious": [],
+      "errors": [],
+      "requests": [
+        "https://color-signal-lens.sociobot.in/",
+        "https://color-signal-lens.sociobot.in/assets/index-BF2K8dES.js",
+        "https://color-signal-lens.sociobot.in/assets/style-BWgV3-lU.css",
+        "https://api.github.com/repos/B-Divyesh/sf-color-signal-lens/releases?per_page=1",
+        "https://color-signal-lens.sociobot.in/paper-cut-lens.webp",
+        "https://color-signal-lens.sociobot.in/walkthrough-open.png",
+        "https://color-signal-lens.sociobot.in/walkthrough-select.png",
+        "https://color-signal-lens.sociobot.in/walkthrough-remap.png"
+      ]
+    },
+    {
+      "viewport": "mobile",
+      "route": "/demo",
+      "status": 200,
+      "title": "Demo — Color Signal Lens",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "imagesWithoutAlt": 0,
+      "scrollWidth": 390,
+      "clientWidth": 390,
+      "serious": [],
+      "errors": [],
+      "requests": [
+        "https://color-signal-lens.sociobot.in/demo",
+        "https://color-signal-lens.sociobot.in/assets/index-BF2K8dES.js",
+        "https://color-signal-lens.sociobot.in/assets/style-BWgV3-lU.css"
+      ]
+    },
+    {
+      "viewport": "mobile",
+      "route": "/lens",
+      "status": 200,
+      "title": "Color Signal Lens — Inspect screenshot colors",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "imagesWithoutAlt": 0,
+      "scrollWidth": 390,
+      "clientWidth": 390,
+      "serious": [],
+      "errors": [],
+      "requests": [
+        "https://color-signal-lens.sociobot.in/lens",
+        "https://color-signal-lens.sociobot.in/assets/index-BF2K8dES.js",
+        "https://color-signal-lens.sociobot.in/assets/style-BWgV3-lU.css"
+      ]
+    },
+    {
+      "viewport": "mobile",
+      "route": "/privacy",
+      "status": 200,
+      "title": "Privacy — Color Signal Lens",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "imagesWithoutAlt": 0,
+      "scrollWidth": 390,
+      "clientWidth": 390,
+      "serious": [],
+      "errors": [],
+      "requests": [
+        "https://color-signal-lens.sociobot.in/privacy",
+        "https://color-signal-lens.sociobot.in/assets/index-BF2K8dES.js",
+        "https://color-signal-lens.sociobot.in/assets/style-BWgV3-lU.css"
+      ]
+    },
+    {
+      "viewport": "mobile",
+      "route": "/terms",
+      "status": 200,
+      "title": "Terms — Color Signal Lens",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "imagesWithoutAlt": 0,
+      "scrollWidth": 390,
+      "clientWidth": 390,
+      "serious": [],
+      "errors": [],
+      "requests": [
+        "https://color-signal-lens.sociobot.in/terms",
+        "https://color-signal-lens.sociobot.in/assets/index-BF2K8dES.js",
+        "https://color-signal-lens.sociobot.in/assets/style-BWgV3-lU.css"
+      ]
+    },
+    {
+      "viewport": "mobile",
+      "route": "/missing-verification-12",
+      "status": 404,
+      "title": "Page not found — Color Signal Lens",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "imagesWithoutAlt": 0,
+      "scrollWidth": 390,
+      "clientWidth": 390,
+      "serious": [],
+      "errors": [
+        "console: Failed to load resource: the server responded with a status of 404 ()"
+      ],
+      "requests": [
+        "https://color-signal-lens.sociobot.in/missing-verification-12",
+        "https://color-signal-lens.sociobot.in/404.css"
+      ]
+    }
+  ],
+  "demo": {
+    "banner": true,
+    "focus": {
+      "outlineColor": "rgb(0, 0, 0)",
+      "outlineWidth": "3px",
+      "boxShadow": "rgb(255, 255, 255) 0px 0px 0px 6px"
+    },
+    "samplePixel": [
+      245,
+      221,
+      221,
+      255
+    ],
+    "boundaryOutputs": [
+      "#000000",
+      "#FFFFFF"
+    ],
+    "clearState": "No reading cue",
+    "motion": {
+      "transitionDuration": "1e-05s",
+      "animationDuration": "1e-05s"
+    },
+    "demoKeysAfterReset": [],
+    "overflow": {
+      "scrollWidth": 390,
+      "clientWidth": 390
+    },
+    "requests": [
+      "https://color-signal-lens.sociobot.in/",
+      "https://color-signal-lens.sociobot.in/assets/index-BF2K8dES.js",
+      "https://color-signal-lens.sociobot.in/assets/style-BWgV3-lU.css",
+      "https://api.github.com/repos/B-Divyesh/sf-color-signal-lens/releases?per_page=1",
+      "https://color-signal-lens.sociobot.in/paper-cut-lens.webp",
+      "https://color-signal-lens.sociobot.in/walkthrough-open.png",
+      "https://color-signal-lens.sociobot.in/walkthrough-select.png",
+      "https://color-signal-lens.sociobot.in/walkthrough-remap.png"
+    ],
+    "crossOriginRequests": [
+      "https://api.github.com/repos/B-Divyesh/sf-color-signal-lens/releases?per_page=1"
+    ],
+    "errors": []
+  },
+  "invalidInput": {
+    "before": true,
+    "recovery": "Could not open broken.png. Choose a valid PNG, JPEG, or WebP image.",
+    "stillEmpty": true
+  },
+  "zoom": {
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "h1Visible": true,
+    "controlsVisible": true
+  }
+}
