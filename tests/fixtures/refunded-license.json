@@ -1,0 +1,12 @@
+{
+  "source": "Factory paid-unlock contract supplied with work order color-signal-lens-polish-5",
+  "captured_at": "2026-08-29",
+  "product_slug": "color-signal-lens",
+  "event": "purchase.refunded",
+  "entitlement_after_event": "revoked",
+  "verification_response": {
+    "valid": false,
+    "reason": "revoked",
+    "expires_at": null
+  }
+}

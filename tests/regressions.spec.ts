@@ -174,7 +174,7 @@ test('390px demo shows the sample result and active cue before scrolling', async
   const cue = await page.locator('#demo-active-cue').boundingBox();
   expect(canvas).not.toBeNull();
   expect(cue).not.toBeNull();
-  expect(canvas!.y).toBeLessThan(844);
+  expect(canvas!.y + canvas!.height).toBeLessThanOrEqual(844);
   expect(cue!.y + cue!.height).toBeLessThanOrEqual(844);
   await expect(page.getByRole('button', { name: 'Load sample screenshot' })).toHaveCount(0);
 });

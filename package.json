@@ -1,6 +1,6 @@
 {
   "name": "color-signal-lens",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,7 +10,7 @@
     "build:app": "vite build --mode desktop",
     "build:site": "vite build --mode site && cp public/robots.txt dist/site/robots.txt && cp public/sitemap.xml dist/site/sitemap.xml && cp public/staticwebapp.config.json dist/site/staticwebapp.config.json && cp public/404.html dist/site/404.html",
     "test": "npm run test:unit && playwright test",
-    "test:unit": "tsx --test src/lens.test.ts tests/release.test.ts tests/installers.test.ts",
+    "test:unit": "tsx --test src/lens.test.ts tests/release.test.ts tests/installers.test.ts tests/copy-audit.test.ts",
     "tauri": "node scripts/tauri-cli.mjs",
     "check": "tsc --noEmit"
   },

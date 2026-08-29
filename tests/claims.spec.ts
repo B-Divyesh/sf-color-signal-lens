@@ -84,7 +84,7 @@ test('@claim:local-screenshots keeps screenshot data local across routes and inp
   });
   const crossOriginRequests: string[] = [];
   page.on('request', (request) => { if (new URL(request.url()).origin !== 'http://127.0.0.1:4173') crossOriginRequests.push(request.url()); });
-  for (const path of ['/demo', '/lens', '/privacy', '/terms']) await page.goto(path);
+  for (const path of ['/', '/demo', '/lens', '/privacy', '/terms']) await page.goto(path);
   await page.goto('/lens');
   await page.locator('#file-input').setInputFiles({ name: 'private.png', mimeType: 'image/png', buffer: readFileSync('src-tauri/icons/icon.png') });
   await expect(page.locator('#source-status')).toHaveText('private.png');
@@ -238,10 +238,60 @@ test('@claim:lens-plus-price matches the recorded Sociobot checkout contract', a
   expect(contract).toMatchObject({ product_slug: 'color-signal-lens', product_name: 'Color Signal Lens Plus', amount_cents: 1200, currency: 'USD', billing_mode: 'one_time' });
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Save named presets for $12 once.' })).toBeVisible();
-  await expect(page.getByText('Sociobot/Dodo is the merchant of record. Refunds are handled by Sociobot/Dodo. A refund revokes the license automatically.')).toBeVisible();
   await page.getByRole('link', { name: 'Terms' }).click();
-  await expect(page.getByText('Lens Plus costs $12 as a one-time purchase through the registered Sociobot checkout.')).toBeVisible();
-  await expect(page.getByText('Sociobot/Dodo is the merchant of record. Refunds are handled by Sociobot/Dodo. A refund revokes the license automatically.')).toBeVisible();
+  await expect(page.getByText("Lens Plus costs $12 as a one-time purchase through Sociobot's payment page.")).toBeVisible();
+});
+
+test('@claim:merchant-of-record matches the recorded payment and refund contract', async ({ page }) => {
+  const contract = JSON.parse(readFileSync('tests/fixtures/checkout-contract.json', 'utf8')) as {
+    source: string;
+    merchant_of_record: string;
+    payment_handler: string;
+    refund_handler: string;
+  };
+  expect(contract.source).toContain('Factory paid-unlock contract');
+  expect(contract).toMatchObject({
+    merchant_of_record: 'Sociobot/Dodo',
+    payment_handler: 'Sociobot/Dodo',
+    refund_handler: 'Sociobot/Dodo',
+  });
+  const disclosure = 'Sociobot/Dodo is the merchant of record. It processes the payment and handles refunds.';
+  await page.goto('/');
+  await expect(page.getByText(disclosure, { exact: false })).toBeVisible();
+  await page.goto('/lens');
+  await expect(page.getByText(disclosure, { exact: false })).toBeVisible();
+  await page.goto('/terms');
+  await expect(page.getByText(disclosure, { exact: false })).toBeVisible();
+  expect(readFileSync('README.md', 'utf8').replace(/\s+/g, ' ')).toContain(disclosure);
+});
+
+test('@claim:refund-revocation locks presets after a refunded purchase', async ({ page }) => {
+  const fixture = JSON.parse(readFileSync('tests/fixtures/refunded-license.json', 'utf8')) as {
+    event: string;
+    entitlement_after_event: string;
+    verification_response: { valid: boolean; reason: string; expires_at: null };
+  };
+  expect(fixture).toMatchObject({
+    event: 'purchase.refunded',
+    entitlement_after_event: 'revoked',
+    verification_response: { valid: false, reason: 'revoked', expires_at: null },
+  });
+  await page.addInitScript(() => {
+    localStorage.setItem('sb_license:color-signal-lens', 'refunded-fixture');
+    localStorage.setItem('sb_license_check:color-signal-lens', JSON.stringify({ checked: Date.now() - 86_400_001, valid: true, license: 'refunded-fixture' }));
+    localStorage.setItem('color-signal-lens:presets', JSON.stringify([{ id: 'saved-before-refund', name: 'Code review', colour: '#9c2d20', mode: 'patterns', mapping: 'blue' }]));
+  });
+  await page.route('https://api.sociobot.in/api/v1/products/color-signal-lens/verify?license=refunded-fixture', (route) => route.fulfill({
+    contentType: 'application/json',
+    body: JSON.stringify(fixture.verification_response),
+  }));
+  await page.goto('/lens');
+  await expect(page.getByText('This license is no longer active. Buy Lens Plus to save named presets.')).toBeVisible();
+  await expect(page.locator('#preset-name')).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Saved presets' })).toHaveCount(0);
+  expect(await page.evaluate(() => localStorage.getItem('sb_license:color-signal-lens'))).toBeNull();
+  expect(await page.evaluate(() => localStorage.getItem('color-signal-lens:presets'))).toContain('saved-before-refund');
+  expect(readFileSync('README.md', 'utf8').replace(/\s+/g, ' ')).toContain('A refund removes access to saved presets.');
 });
 
 test('@claim:demo-reset discards the sample demo namespace', async ({ page }) => {

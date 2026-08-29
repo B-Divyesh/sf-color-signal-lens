@@ -7,7 +7,7 @@ Try the sample at <https://color-signal-lens.sociobot.in/demo>. It opens a
 checkout diff with added and removed totals. Demo changes stay separate and
 never change your settings.
 
-## Use it
+## Use Color Signal Lens
 
 1. Open a screenshot, paste an image, or capture a screen region.
 2. Click a status color, or set a color with the keyboard color field.
@@ -51,10 +51,10 @@ landing page links to the Releases page.
 ## Lens Plus
 
 The free app includes all reading controls. Lens Plus costs $12 as a one-time
-purchase and saves named presets on this device. The purchase action uses the
-Sociobot checkout path. Buy and restore a license inside the desktop app or
-on the landing page. Sociobot/Dodo is the merchant of record. Refunds are
-handled by Sociobot/Dodo, and a refund revokes the license automatically.
+purchase and saves named presets on this device. Buy Lens Plus opens Sociobot's
+payment page. Buy and restore a license inside the desktop app or on the
+landing page. Sociobot/Dodo is the merchant of record. It processes the payment
+and handles refunds. A refund removes access to saved presets.
 
 The free screenshot reader works offline after the installed desktop app has
 loaded. The browser sample is for trying the app before installation.
@@ -64,7 +64,7 @@ loaded. The browser sample is for trying the app before installation.
 Read <https://color-signal-lens.sociobot.in/privacy> for screenshot processing,
 local storage, and screen permission details. Read
 <https://color-signal-lens.sociobot.in/terms> for product limits and purchase
-terms. The app has no analytics and loads no third-party runtime scripts.
+terms. The app has no analytics and loads no code from other websites.
 
 ## License
 

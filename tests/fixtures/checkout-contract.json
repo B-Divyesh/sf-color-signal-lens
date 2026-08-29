@@ -1,9 +1,12 @@
 {
-  "source": "Recorded checkout contract fixture",
+  "source": "Factory paid-unlock contract supplied with work order color-signal-lens-polish-5",
   "captured_at": "2026-08-29",
   "product_slug": "color-signal-lens",
   "product_name": "Color Signal Lens Plus",
   "amount_cents": 1200,
   "currency": "USD",
-  "billing_mode": "one_time"
+  "billing_mode": "one_time",
+  "merchant_of_record": "Sociobot/Dodo",
+  "payment_handler": "Sociobot/Dodo",
+  "refund_handler": "Sociobot/Dodo"
 }
