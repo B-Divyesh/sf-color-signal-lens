@@ -19,6 +19,7 @@ let imageReady = false;
 let selectedPoint: { x: number; y: number } | null = null;
 let demo = location.pathname === '/demo' || new URLSearchParams(location.search).get('demo') === '1';
 let focusAfterRender = false;
+let downloadHydration: AbortController | null = null;
 
 const esc = (text: string) => text.replace(/[&<>"]/g, (v) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[v]!));
 const lensName = () => detectStatusName(target);
@@ -79,7 +80,7 @@ function renderLanding() {
   <section id="how" class="how"><p class="eyebrow">HOW IT WORKS</p><h2>How Color Signal Lens works</h2><ol><li><span>01</span><img src="${asset('/walkthrough-open.png')}" width="640" height="400" loading="lazy" decoding="async" alt="Color Signal Lens with a sample checkout screenshot open."><h3>Open a screenshot</h3><p>Open a file, paste an image, or capture a screen region when you choose.</p></li><li><span>02</span><img src="${asset('/walkthrough-select.png')}" width="640" height="400" loading="lazy" decoding="async" alt="A green status color selected in the sample checkout screenshot."><h3>Choose a status color</h3><p>Click the color that is hard to tell apart.</p></li><li><span>03</span><img src="${asset('/walkthrough-remap.png')}" width="640" height="400" loading="lazy" decoding="async" alt="The selected green status color shown in blue with a pattern cue."><h3>Choose a reading cue</h3><p>Add a label, a pattern, or blue-orange colors over that status color.</p></li></ol></section>
   <section class="limits paper-edge"><div><p class="eyebrow">PRIVACY AND LIMITS</p><h2>It changes neither the screenshot nor your display.</h2><p>It processes only the image you open. It does not filter your whole display.</p></div><a class="button secondary" href="/privacy" data-nav>Read privacy details</a></section>
   <section class="plus"><p class="eyebrow">LENS PLUS</p><h2>Save named presets for $12 once.</h2><p>The free app includes screenshot reading, labels, patterns, and blue-orange colors. Lens Plus saves named presets.</p><a class="button primary" href="https://api.sociobot.in/api/v1/products/color-signal-lens/checkout">Buy Lens Plus</a><button class="link-button" id="restore-license">Restore license</button><div id="license-area"></div></section>
-  <section class="install"><p class="eyebrow">DESKTOP APP</p><h2>Install Color Signal Lens.</h2><p id="download-state">Downloads are being published. <a href="https://github.com/B-Divyesh/sf-color-signal-lens/releases">Open the release downloads</a>.</p><a id="download-button" class="button secondary" href="https://github.com/B-Divyesh/sf-color-signal-lens/releases">Open release downloads</a></section>`, 'Color Signal Lens — Make status colors distinct');
+  <section class="install"><p class="eyebrow">DESKTOP APP</p><h2>Install Color Signal Lens.</h2><p id="download-state">Choose a download from the Releases page.</p><a id="download-button" class="button secondary" href="https://github.com/B-Divyesh/sf-color-signal-lens/releases">Open release downloads</a></section>`, 'Color Signal Lens — Make status colors distinct');
   document.querySelector('#restore-license')?.addEventListener('click', showRestore);
   void acceptLicense();
   hydrateDownload();
@@ -480,22 +481,40 @@ function showMobileDownloads(state: Element, button: HTMLAnchorElement) {
   button.textContent = 'Open desktop downloads';
 }
 
+function cancelDownloadHydration() {
+  downloadHydration?.abort();
+  downloadHydration = null;
+}
+
+function canApplyDownloadHydration(controller: AbortController, state: Element, button: HTMLAnchorElement) {
+  return downloadHydration === controller
+    && !controller.signal.aborted
+    && !demo
+    && location.pathname === '/'
+    && document.contains(state)
+    && document.contains(button);
+}
+
 async function hydrateDownload() {
   const state = document.querySelector('#download-state');
   const button = document.querySelector<HTMLAnchorElement>('#download-button');
-  if (!state || !button) return;
+  if (!state || !button || demo || location.pathname !== '/') return;
+  cancelDownloadHydration();
+  const controller = new AbortController();
+  downloadHydration = controller;
   const cacheKey = 'color-signal-lens:release';
   let release: CachedRelease | null = null;
   try {
     release = JSON.parse(localStorage.getItem(cacheKey) || 'null');
     if (!release || Date.now() - release.cached > 3_600_000) {
-      const response = await fetch('https://api.github.com/repos/B-Divyesh/sf-color-signal-lens/releases?per_page=1');
+      const response = await fetch('https://api.github.com/repos/B-Divyesh/sf-color-signal-lens/releases?per_page=1', { signal: controller.signal });
       if (!response.ok) throw new Error('Could not list releases');
       const releases = await response.json() as { assets: ReleaseAsset[] }[];
-      if (!releases[0]) return;
+      if (!canApplyDownloadHydration(controller, state, button) || !releases[0]) return;
       release = { cached: Date.now(), assets: releases[0].assets };
       localStorage.setItem(cacheKey, JSON.stringify(release));
     }
+    if (!canApplyDownloadHydration(controller, state, button)) return;
     const agent = navigator.userAgent;
     if (isMobileDevice(agent)) {
       showMobileDownloads(state, button);
@@ -512,7 +531,11 @@ async function hydrateDownload() {
     const platform = agent.includes('Windows') ? 'Windows' : 'Linux';
     button.textContent = `Download for ${platform}`;
     state.textContent = `Download the ${platform} installer.`;
-  } catch { /* Keep the release-page fallback if metadata is unavailable. */ }
+  } catch {
+    // Keep the Releases-page fallback when metadata is unavailable or navigation cancels this lookup.
+  } finally {
+    if (downloadHydration === controller) downloadHydration = null;
+  }
 }
 
 function focusHashTarget(hash = location.hash) {
@@ -548,6 +571,7 @@ function wireNavigation(root: ParentNode = document) {
 }
 function renderRoute() {
   const params = new URLSearchParams(location.search);
+  if (location.pathname !== '/' || params.get('demo') === '1') cancelDownloadHydration();
   if (location.pathname === '/demo' || params.get('demo') === '1') { demo = true; renderDemo(); }
   else if (!siteBuild && (location.pathname === '/' || location.pathname === '/lens')) { demo = false; renderLens(); }
   else if (location.pathname === '/') renderLanding();

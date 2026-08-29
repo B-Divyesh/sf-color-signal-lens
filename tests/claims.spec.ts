@@ -2,8 +2,25 @@ import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 
 test('@claim:sample-lens enters the isolated sample from the landing action', async ({ page }) => {
-  await page.route('https://api.github.com/repos/B-Divyesh/sf-color-signal-lens/releases?per_page=1', (route) => route.fulfill({ contentType: 'application/json', body: '[]' }));
+  const releaseUrl = 'https://api.github.com/repos/B-Divyesh/sf-color-signal-lens/releases?per_page=1';
+  let noteReleaseRequest: () => void = () => undefined;
+  const releaseRequested = new Promise<void>((resolve) => { noteReleaseRequest = resolve; });
+  let releaseResponse: () => void = () => undefined;
+  const releaseGate = new Promise<void>((resolve) => { releaseResponse = resolve; });
+  await page.route(releaseUrl, async (route) => {
+    noteReleaseRequest();
+    await releaseGate;
+    try {
+      await route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify([{ assets: [{ name: 'Color.Signal.Lens_0.1.8_amd64.AppImage', browser_download_url: 'https://example.test/Color.Signal.Lens_0.1.8_amd64.AppImage' }] }]),
+      });
+    } catch {
+      // The landing lookup is intentionally aborted as the demo opens.
+    }
+  });
   await page.goto('/');
+  await releaseRequested;
   const before = await page.evaluate(() => Object.fromEntries(Object.entries(localStorage)));
   await page.getByRole('link', { name: 'Try it with sample data' }).click();
   await expect(page).toHaveURL(/\/demo$/);
@@ -12,6 +29,13 @@ test('@claim:sample-lens enters the isolated sample from the landing action', as
   const canvas = page.locator('#lens-canvas');
   await expect(canvas).toBeVisible();
   await expect.poll(() => canvas.evaluate((element) => Array.from((element as HTMLCanvasElement).getContext('2d')!.getImageData(984, 504, 1, 1).data.slice(0, 3)).join(','))).not.toBe('22,113,74');
+  releaseResponse();
+  await expect.poll(() => page.evaluate(() => Object.fromEntries(Object.entries(localStorage).filter(([key]) => !key.startsWith('demo:'))))).toEqual(before);
+  await page.getByRole('button', { name: 'Reset demo' }).click();
+  await expect(page.getByText('Demo — sample data, nothing is saved')).toBeVisible();
+  await expect.poll(() => page.evaluate(() => Object.fromEntries(Object.entries(localStorage).filter(([key]) => !key.startsWith('demo:'))))).toEqual(before);
+  await page.getByRole('button', { name: 'Start for real' }).click();
+  await expect(page).toHaveURL(/\/lens$/);
   expect(await page.evaluate(() => Object.fromEntries(Object.entries(localStorage).filter(([key]) => !key.startsWith('demo:'))))).toEqual(before);
 });
 
@@ -248,7 +272,7 @@ test('@claim:license-restore stores and verifies a pasted license', async ({ pag
 test('@claim:release-fallback keeps a direct release link when metadata is unavailable', async ({ page }) => {
   await page.route('https://api.github.com/**', (route) => route.abort());
   await page.goto('/');
-  await expect(page.getByText('Downloads are being published.')).toBeVisible();
+  await expect(page.getByText('Choose a download from the Releases page.')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Open release downloads' })).toHaveAttribute('href', 'https://github.com/B-Divyesh/sf-color-signal-lens/releases');
 });
 

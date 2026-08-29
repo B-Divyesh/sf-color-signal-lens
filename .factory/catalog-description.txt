@@ -1,1 +1,1 @@
-Make screenshot status colors distinct with labels, patterns, or blue-orange colors.
+Mark screenshot status colors with labels, patterns, and blue-orange colors.

@@ -130,7 +130,7 @@ test('landing release lookup handles an empty release list without a console err
   page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
   await page.route('https://api.github.com/repos/B-Divyesh/sf-color-signal-lens/releases?per_page=1', (route) => route.fulfill({ contentType: 'application/json', body: '[]' }));
   await page.goto('/');
-  await expect(page.getByText('Downloads are being published.')).toBeVisible();
+  await expect(page.getByText('Choose a download from the Releases page.')).toBeVisible();
   expect(errors).toEqual([]);
 });
 

@@ -6,7 +6,7 @@ Audit date: 2026-08-29. This covers every visitor-facing copy unit from the land
 
 | Copy | Words | Result |
 | --- | ---: | --- |
-| Make screenshot status colors distinct with labels, patterns, or blue-orange colors. | 11 | Pass; catalog starts with a verb and is under 120 characters |
+| Mark screenshot status colors with labels, patterns, and blue-orange colors. | 10 | Pass; catalog starts with a verb and is under 120 characters |
 | Make screenshot status colors easier to tell apart with labels, patterns, and blue-orange colors. | 14 | Pass; home description and social metadata |
 | Color Signal Lens — Make status colors distinct | 8 | Pass; home title |
 | Demo — Color Signal Lens | 4 | Pass; demo title |
@@ -58,7 +58,7 @@ Audit date: 2026-08-29. This covers every visitor-facing copy unit from the land
 | Restore license | 2 | Pass |
 | Desktop app | 2 | Pass |
 | Install Color Signal Lens. | 4 | Pass |
-| Downloads are being published. | 4 | Pass |
+| Choose a download from the Releases page. | 7 | Pass; release fallback directs visitors to the available next step without claiming a publishing state |
 | Open the release downloads | 4 | Pass |
 | Open release downloads | 3 | Pass |
 | Downloads require macOS, Windows, or Linux. | 6 | Pass; `desktop-download-platforms` |

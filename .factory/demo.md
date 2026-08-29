@@ -10,5 +10,6 @@ demo** restores the sample and removes every `demo:color-signal-lens:*` key.
 **Start for real** discards the sample and opens `/lens`.
 
 Demo storage uses only the `demo:color-signal-lens:*` namespace. It never reads
-or writes real license or preset keys. The sample is bundled with the app, so
-the loaded demo remains usable offline.
+or writes real license, preset, or release-cache keys. A landing-page release
+lookup is cancelled before demo mode opens. The sample is bundled with the app,
+so the loaded demo remains usable offline.
