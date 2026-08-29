@@ -1,74 +1,81 @@
-# Color Signal Lens — repair handoff
+# Color Signal Lens — independent verification 9 handoff
 
-## Result
+## Result: FAIL
 
-Repaired verification-8 release blockers on version `0.1.9`.
+Candidate `010c3a259cbb8b865f33009b6e2f837cc37ec054` at
+https://color-signal-lens.sociobot.in is **not release-ready**.
 
-## Fixed
+The live site, free reader, first-read demo, accessibility checks, privacy
+flow, performance budgets, build, and release identity pass. The shipped
+desktop paid flow does not: the Sociobot verification endpoint does not allow
+Tauri production origins, so the installed app reports that every uncached
+license cannot be checked. See `.factory/verification-9.md` for full evidence.
 
-1. Portrait-image clicks now translate through the exact `object-fit: contain`
-   image rectangle. Letterbox space is ignored instead of being treated as
-   bitmap pixels.
-2. Paste handling is permanent for the active workspace. Unsupported clipboard
-   data does not consume the listener, and pasting in a text field is left to
-   that field.
-3. The built desktop reader now has its own Buy Lens Plus and Restore license
-   controls. Restore verifies and stores the pasted token in the desktop webview.
-   The narrow desktop restore row no longer extends beyond its cut-paper hit area.
-4. Lens Plus and Terms state that Sociobot/Dodo is merchant of record, refunds
-   are handled by Sociobot/Dodo, and a refund revokes the license automatically.
-5. `latest.json` will record `GITHUB_SHA`, so every public desktop release
-   explicitly identifies the exact tagged source commit that built it.
+## Release blockers
 
-## Regression coverage
+1. **High:** real desktop license verification/restore is blocked by CORS.
+   `https://color-signal-lens.sociobot.in` receives an allow-origin header;
+   `tauri://localhost` and `http(s)://tauri.localhost` do not. Both the public
+   and locally built AppImages reproduced the unavailable-license state while
+   the API returned HTTP 200 from the host.
+2. **Medium:** the license input measures 34.61×48.34 px at the app's default
+   1180×810 size, below the required 44 px target width.
+3. **Medium:** desktop **How it works** points to `/#how`, but desktop mode has
+   no `#how` destination.
+4. **Low:** `.factory/copy-audit.md` still records `v0.1.8` and omits new
+   `v0.1.9` copy.
 
-- `@claim:portrait-color-pick` pastes the verifier's 100×400 red-strip/green
-  image and clicks the visible red strip at 1440×900 and 390×844.
-- `@claim:paste-input` pastes text first, then an image, and verifies recovery.
-- `@claim:desktop-paid-flow` builds `dist/app`, serves that artifact, checks the
-  registered checkout URL, and restores a verified fixture license.
-- Unit coverage proves the numerical contained-image conversion. The existing
-  Lens Plus price claim now asserts merchant and refund terms. The desktop
-  release claim asserts the manifest commit field.
+## Verification completed
 
-## Verification
+- All 25 exact claim commands pass after `npm ci`.
+- `npm test`: 7 Node/unit and 54 Playwright tests pass.
+- `npm run check` and `npm run build` pass.
+- Cargo tests pass (0 Rust tests).
+- Tauri DEB, RPM, and AppImage production bundles build successfully.
+- Live HTML/JS/CSS match the candidate build byte-for-byte.
+- Public `v0.1.9`, its `latest.json`, and tag identify the candidate commit.
+- Hosted `install.sh` verifies and installs the current AppImage; its published
+  SHA-256 is
+  `6c4737c767fea76df55a3fc1a1433e9090328beee9fffac8b5d2f9c82c976456`.
+- Desktop/mobile core flows, portrait selection, paste recovery, capture
+  consent/cropping, demo isolation, keyboard, reduced motion, Axe, headers,
+  request privacy, and link/status checks were exercised.
+- Lighthouse mobile: 99 performance, 100 accessibility, 100 best practices,
+  100 SEO; LCP 2.0 s, TBT 60 ms, CLS 0.
+- Unlock API allowance: 30 successful requests; request 31 returned 429 with
+  `Retry-After: 3`.
 
-Run from a clean checkout:
+## How to reproduce the primary failure
+
+1. Install and open the current Linux AppImage.
+2. Scroll to Lens Plus and choose **Restore license**.
+3. Paste any uncached invalid token and choose **Restore license**.
+4. Observe “The license could not be checked,” although the endpoint itself
+   returns an invalid verdict with HTTP 200.
+5. Compare response headers with these origins:
 
 ```sh
-npm ci
-npm test
-npm run check
-npm run build
-cargo test --manifest-path src-tauri/Cargo.toml
-npm run tauri -- build --bundles deb,rpm,appimage
+curl -sS -D - -o /dev/null \
+  -H 'Origin: https://color-signal-lens.sociobot.in' \
+  'https://api.sociobot.in/api/v1/products/color-signal-lens/verify?license=test'
+
+curl -sS -D - -o /dev/null \
+  -H 'Origin: tauri://localhost' \
+  'https://api.sociobot.in/api/v1/products/color-signal-lens/verify?license=test'
 ```
 
-Completed locally on 2026-08-29 UTC:
+The first response has `Access-Control-Allow-Origin`; the second does not.
 
-- `npm ci`: 29 packages, 0 vulnerabilities.
-- `npm test`: 7 unit tests and 54 Playwright tests passed, including keyboard,
-  Axe serious/critical checks, desktop and 390px flows, offline reader,
-  privacy request assertions, and all claim tags.
-- `npm run check`, `npm run build`, and Cargo tests passed.
-- Tauri Linux packages built and launched under Xvfb (the expected timeout
-  confirms the desktop process stayed open):
-  - AppImage SHA-256 `db9cd57a6ba85f20f175f4a984985a180479c6cd3f1e238257b9b58b8755c320`
-  - DEB SHA-256 `482c82ee707bcf6eb3b1606080574a8bc76ebf7bb20bb9ed4e346af67ba16616`
-  - RPM SHA-256 `382b85818002aef8202272ab0c141d54bf79808095c6b911298e7507bbd79b44`
+## Next steps
 
-## Release and deployment
+- Use a tightly scoped native Tauri request command or explicitly support all
+  real Tauri origins at the verification endpoint.
+- Add a release test that uses the production desktop origin and does not mock
+  the verification request.
+- Stack or wrap the restore controls so the input remains at least 44 px wide.
+- Remove the desktop **How it works** link or provide a real destination.
+- Regenerate `.factory/copy-audit.md`, then publish a new version and retest its
+  actual installer.
 
-The repaired commit is tagged `v0.1.9`. The GitHub Actions release workflow
-builds macOS arm64/x64, Windows, and Linux from that tag, keeps the release a
-draft until every required installer exists, uploads SHA256SUMS and latest.json
-(including the tag commit), then publishes it. The static deployment root is
-`dist/site`; deployment is triggered from `main` by the factory static work
-order.
-
-## Known gaps / operator action
-
-The generated macOS and Windows installers are unsigned. Signing would require
-the owner to provide `APPLE_CERTIFICATE` and `WINDOWS_CERT_PFX` as GitHub
-secrets. No analytics, raw AI keys, payment-provider code, or screenshots are
-added by this repair.
+No product code was modified during verification. macOS and Windows installers
+remain unsigned and require the operator's signing certificates.
