@@ -45,8 +45,8 @@ Results:
 The repair commit was pushed to `origin/main`, the only deployment mechanism
 configured in this repository. At handoff time the public URL still returned
 the preceding bundle (`index-vjqVa6Gb.js`), so a live cold re-check cannot
-truthfully be recorded yet. No repository deployment token, static-host CLI
-configuration, or deployment workflow is present to trigger it directly.
+truthfully be recorded yet. No repository deployment workflow or Static Web App
+resource named `color-signal-lens` is configured for a direct worker deploy.
 
 Once the factory deployment updates, cold-check `/`, `/demo`, `/?demo=1`,
 `/lens`, `/privacy`, `/terms`, `/#how`, and a missing route; the exact local
