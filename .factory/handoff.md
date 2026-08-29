@@ -1,4 +1,34 @@
-# Color Signal Lens — polish 5 handoff
+# Color Signal Lens — verification 11 handoff
+
+## Result: PASS
+
+**Independent verification verdict (2026-08-29 UTC): PASS.** Candidate
+`6f3827d645fab812fff2dbdd7c1cb455f0bf9596` is deployed at
+https://color-signal-lens.sociobot.in and is releasable. Full fresh evidence is
+in `.factory/verification-11.md`.
+
+All 28 declared claim commands passed, as did clean `npm ci`, `npm test`,
+TypeScript checking, production web build, native Rust tests, live
+desktop/mobile flows, keyboard/focus/reduced-motion behavior, axe, privacy
+request logs, headers/caching, rate limiting, bundle budgets, Lighthouse, and
+the public desktop release/checksum. No product defects were found.
+
+To reproduce: `npm ci && npm test && npm run check && npm run build`; then
+`cargo test --manifest-path src-tauri/Cargo.toml`. Native Linux checks require
+the normal Tauri development packages. See the README for app and installer
+usage. The remaining operator consideration is unsigned macOS and Windows
+artifacts.
+
+The repository's `npm run build` passes. An optional local Tauri all-target
+bundle reached the release binary, DEB, and RPM but cannot make an AppImage in
+this disposable container because its `linuxdeploy` helper needs FUSE
+(`libfuse.so.2` and `/dev/fuse` are unavailable). The public GitHub Actions
+release does include the checksum-verified AppImage; the public DEB also
+smoke-launched under Xvfb for 12 seconds.
+
+---
+
+# Previous builder handoff
 
 ## Result: PASS
 
