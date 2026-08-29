@@ -1,0 +1,149 @@
+{
+  "asset": "assets/index-BwsUZcwm.js",
+  "focus": {
+    "url": "https://color-signal-lens.sociobot.in/#how",
+    "top": 67.046875,
+    "active": "How Color Signal Lens works",
+    "announcement": "How Color Signal Lens works"
+  },
+  "demo": {
+    "banner": true,
+    "canvasBottom": 619.09375,
+    "cueBottom": 391.09375,
+    "realKeysUnchanged": true
+  },
+  "routes": [
+    {
+      "path": "/",
+      "status": 200,
+      "title": "Color Signal Lens — Make status colors distinct",
+      "canonical": "https://color-signal-lens.sociobot.in/",
+      "overflow": false,
+      "unexpectedErrors": 0,
+      "expected404DocumentDiagnostic": 0
+    },
+    {
+      "path": "/demo",
+      "status": 200,
+      "title": "Demo — Color Signal Lens",
+      "canonical": "https://color-signal-lens.sociobot.in/demo",
+      "overflow": false,
+      "unexpectedErrors": 0,
+      "expected404DocumentDiagnostic": 0
+    },
+    {
+      "path": "/?demo=1",
+      "status": 200,
+      "title": "Demo — Color Signal Lens",
+      "canonical": "https://color-signal-lens.sociobot.in/demo",
+      "overflow": false,
+      "unexpectedErrors": 0,
+      "expected404DocumentDiagnostic": 0
+    },
+    {
+      "path": "/lens",
+      "status": 200,
+      "title": "Color Signal Lens — Inspect screenshot colors",
+      "canonical": "https://color-signal-lens.sociobot.in/lens",
+      "overflow": false,
+      "unexpectedErrors": 0,
+      "expected404DocumentDiagnostic": 0
+    },
+    {
+      "path": "/privacy",
+      "status": 200,
+      "title": "Privacy — Color Signal Lens",
+      "canonical": "https://color-signal-lens.sociobot.in/privacy",
+      "overflow": false,
+      "unexpectedErrors": 0,
+      "expected404DocumentDiagnostic": 0
+    },
+    {
+      "path": "/terms",
+      "status": 200,
+      "title": "Terms — Color Signal Lens",
+      "canonical": "https://color-signal-lens.sociobot.in/terms",
+      "overflow": false,
+      "unexpectedErrors": 0,
+      "expected404DocumentDiagnostic": 0
+    },
+    {
+      "path": "/missing-review-route",
+      "status": 404,
+      "title": "Page not found — Color Signal Lens",
+      "canonical": "https://color-signal-lens.sociobot.in/404.html",
+      "overflow": false,
+      "unexpectedErrors": 0,
+      "expected404DocumentDiagnostic": 1
+    }
+  ],
+  "axe": [
+    {
+      "path": "/",
+      "width": 390,
+      "seriousCritical": 0
+    },
+    {
+      "path": "/demo",
+      "width": 390,
+      "seriousCritical": 0
+    },
+    {
+      "path": "/lens",
+      "width": 390,
+      "seriousCritical": 0
+    },
+    {
+      "path": "/privacy",
+      "width": 390,
+      "seriousCritical": 0
+    },
+    {
+      "path": "/terms",
+      "width": 390,
+      "seriousCritical": 0
+    },
+    {
+      "path": "/missing-review-route",
+      "width": 390,
+      "seriousCritical": 0
+    },
+    {
+      "path": "/",
+      "width": 1440,
+      "seriousCritical": 0
+    },
+    {
+      "path": "/demo",
+      "width": 1440,
+      "seriousCritical": 0
+    },
+    {
+      "path": "/lens",
+      "width": 1440,
+      "seriousCritical": 0
+    },
+    {
+      "path": "/privacy",
+      "width": 1440,
+      "seriousCritical": 0
+    },
+    {
+      "path": "/terms",
+      "width": 1440,
+      "seriousCritical": 0
+    },
+    {
+      "path": "/missing-review-route",
+      "width": 1440,
+      "seriousCritical": 0
+    }
+  ],
+  "errors": [],
+  "headers": {
+    "content-security-policy": "default-src 'self'; img-src 'self' data: blob:; style-src 'self'; script-src 'self'; connect-src 'self' https://api.github.com https://api.sociobot.in; font-src 'self' data:; base-uri 'self'; form-action 'self' https://api.sociobot.in; frame-ancestors 'none'",
+    "x-content-type-options": "nosniff",
+    "referrer-policy": "strict-origin-when-cross-origin"
+  },
+  "reducedMotion": "auto"
+}

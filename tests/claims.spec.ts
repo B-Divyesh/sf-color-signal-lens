@@ -33,9 +33,29 @@ test('@claim:demo-isolation keeps licensed real settings unchanged from the land
   expect(await page.evaluate(() => localStorage.getItem('sb_license:color-signal-lens'))).toBe('fixture-license');
   await page.goto('/?demo=1');
   await expect(page.getByText('Demo — sample data, nothing is saved')).toBeVisible();
+  await page.getByRole('button', { name: 'Start for real' }).click();
+  await expect(page).toHaveURL(/\/lens$/);
+  expect(await page.evaluate(() => localStorage.getItem('color-signal-lens:presets'))).toBe(realPresets);
+  expect(await page.evaluate(() => localStorage.getItem('sb_license:color-signal-lens'))).toBe('fixture-license');
+  expect(await page.evaluate(() => Object.keys(localStorage).filter((key) => key.startsWith('demo:')))).toEqual([]);
 });
 
 test('@claim:local-screenshots keeps screenshot data local across routes and inputs', async ({ page }) => {
+  await page.addInitScript(() => {
+    const track = { stop: () => undefined, getSettings: () => ({ width: 120, height: 80 }) };
+    Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: { getDisplayMedia: async () => ({ getVideoTracks: () => [track] }) } });
+    Object.defineProperty(HTMLMediaElement.prototype, 'srcObject', { configurable: true, get: () => null, set: () => undefined });
+    Object.defineProperty(HTMLMediaElement.prototype, 'play', { configurable: true, value: async () => undefined });
+    const original = CanvasRenderingContext2D.prototype.drawImage;
+    CanvasRenderingContext2D.prototype.drawImage = function (source: CanvasImageSource, ...args: number[]) {
+      if (source instanceof HTMLVideoElement) {
+        this.fillStyle = '#16714a';
+        this.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        return;
+      }
+      original.call(this, source, ...(args as [number, number]));
+    };
+  });
   const crossOriginRequests: string[] = [];
   page.on('request', (request) => { if (new URL(request.url()).origin !== 'http://127.0.0.1:4173') crossOriginRequests.push(request.url()); });
   for (const path of ['/demo', '/lens', '/privacy', '/terms']) await page.goto(path);
@@ -49,6 +69,13 @@ test('@claim:local-screenshots keeps screenshot data local across routes and inp
     document.dispatchEvent(new ClipboardEvent('paste', { clipboardData: data, bubbles: true }));
   });
   await expect(page.locator('#source-status')).toHaveText('Pasted screenshot');
+  await page.getByRole('button', { name: 'Capture screen region' }).click();
+  await page.locator('#capture-x').fill('0');
+  await page.locator('#capture-y').fill('0');
+  await page.locator('#capture-width').fill('60');
+  await page.locator('#capture-height').fill('40');
+  await page.getByRole('button', { name: 'Use selected region' }).click();
+  await expect(page.locator('#source-status')).toHaveText('Selected screen region');
   const scripts = await page.locator('script[src]').evaluateAll((nodes) => nodes.map((node) => new URL((node as HTMLScriptElement).src).origin));
   expect(scripts).toEqual(['http://127.0.0.1:4173']);
   expect(crossOriginRequests.filter((url) => !url.startsWith('https://api.github.com/'))).toEqual([]);
