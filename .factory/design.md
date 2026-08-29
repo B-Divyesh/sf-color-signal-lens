@@ -2,9 +2,9 @@
 
 ## Direction: paper-cut diorama
 
-Color Signal Lens is a close-up work tool, not a screen-wide colour filter. The
+Color Signal Lens is a close-up work tool, not a screen-wide color filter. The
 interface is a small desk stage made from layered cut paper: a dark ink base,
-warm paper panels, and overlapping swatches that lift status signals above the
+warm paper panels, and overlapping swatches that lift status colors above the
 source image. The physical layers make the product's promise visible: the
 original screen stays beneath a removable, task-specific reading layer.
 
@@ -24,7 +24,7 @@ original screen stays beneath a removable, task-specific reading layer.
 
 The default is deliberately light-on-paper, with an ink stage surrounding the
 working canvas. It keeps the original screenshot readable while blue/orange and
-patterns provide redundant status signals. Contrast-bearing copy uses ink on
+patterns provide redundant status colors. Contrast-bearing copy uses ink on
 paper or white on ink; status always also has a label or pattern.
 
 ## Type and spacing
@@ -38,9 +38,9 @@ spacing scale is 4, 8, 12, 16, 24, 32, 48, and 72px. Controls are at least
 ## Shape, interaction, motion
 
 Panels have uneven, hand-cut polygon edges, thin ink outlines, and offset
-paper shadows. Pattern chips are recognisable by shape as well as colour.
-Selection is direct: open an image or use the shipped sample, click a colour
-signal, then choose labels, patterns, or blue/orange remapping. The only motion
+paper shadows. Pattern chips are recognizable by shape as well as color.
+Selection is direct: open an image or use the shipped sample, click a status
+color, then choose a label, pattern, or blue-orange colors. The only motion
 is a 180ms paper-layer lift on state changes. With reduced motion enabled it
 becomes an instant opacity change.
 

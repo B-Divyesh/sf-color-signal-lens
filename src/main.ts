@@ -58,7 +58,7 @@ function layout(content: string, route: string, path = location.pathname) {
     </header>
     <div id="route-announcement" class="sr-only" aria-live="polite"></div>
     <main id="main" tabindex="-1">${content}</main>
-    <footer><p>Color Signal Lens makes screenshot status signals easier to read.</p><p><a href="/privacy" data-nav>Privacy</a> · <a href="/terms" data-nav>Terms</a> · Built by Param Factory · v0.1.7</p></footer>`;
+    <footer><p>Color Signal Lens makes screenshot status colors easier to read.</p><p><a href="/privacy" data-nav>Privacy</a> · <a href="/terms" data-nav>Terms</a> · Built by Param Factory · v0.1.8</p></footer>`;
   wireNavigation();
   pageTitle(route, path);
 }
@@ -67,12 +67,12 @@ function renderLanding() {
   layout(`
   <section class="hero paper-edge"><div class="hero-copy"><p class="eyebrow">PRIVATE DESKTOP UTILITY</p><h1>Make status colors distinct.</h1><p class="lede">For people who cannot rely on red and green during code reviews, charts, or status screens.</p>
   <div class="hero-actions"><a class="button primary" href="/demo" data-nav>Try it with sample data</a><span>See a sample screenshot with an overlay. Nothing is saved.</span></div>
-  <ul class="facts"><li>Works from a screenshot</li><li>Runs on your device</li><li>Lens Plus: $12 once</li></ul></div>
+  <ul class="facts"><li>Screenshots are not uploaded</li><li>Free reader works offline after install</li><li>Lens Plus: $12 once</li></ul></div>
   <figure class="hero-art"><img src="${asset('/paper-cut-lens.webp')}" width="1200" height="800" fetchpriority="high" decoding="async" alt="A paper-cut software panel viewed through a large circular lens with blue and orange status marks."></figure></section>
   <section class="live-preview" aria-labelledby="preview-title"><div><p class="eyebrow">SCREENSHOT PREVIEW</p><h2 id="preview-title">Preview the screenshot changes.</h2><p>Open a screenshot, choose a status color, then add a label, pattern, or blue-orange colors.</p><a class="text-link" href="/demo" data-nav>Open the sample screenshot →</a></div><div class="preview-swatch"><span class="dot orange"></span><span class="stripe"></span><b>Removed</b><span class="dot blue"></span><span class="dots"></span><b>Added</b></div></section>
   <section id="how" class="how"><p class="eyebrow">HOW IT WORKS</p><h2>How Color Signal Lens works</h2><ol><li><span>01</span><img src="${asset('/walkthrough-open.png')}" width="640" height="400" loading="lazy" decoding="async" alt="Color Signal Lens with a sample checkout screenshot open."><h3>Open a screenshot</h3><p>Open a file, paste an image, or capture a screen region when you choose.</p></li><li><span>02</span><img src="${asset('/walkthrough-select.png')}" width="640" height="400" loading="lazy" decoding="async" alt="A green status color selected in the sample checkout screenshot."><h3>Choose a status color</h3><p>Click the color that is hard to tell apart.</p></li><li><span>03</span><img src="${asset('/walkthrough-remap.png')}" width="640" height="400" loading="lazy" decoding="async" alt="The selected green status color shown in blue with a pattern cue."><h3>Choose a reading cue</h3><p>Add a label, a pattern, or blue-orange colors over that status color.</p></li></ol></section>
   <section class="limits paper-edge"><div><p class="eyebrow">PRIVACY AND LIMITS</p><h2>It changes neither the screenshot nor your display.</h2><p>It processes only the image you open. It does not filter your whole display.</p></div><a class="button secondary" href="/privacy" data-nav>Read privacy details</a></section>
-  <section class="plus"><p class="eyebrow">LENS PLUS</p><h2>Save custom lenses for $12 once.</h2><p>The free lens includes screenshot reading, labels, patterns, and blue-orange colors. Plus saves named presets.</p><a class="button primary" href="https://api.sociobot.in/api/v1/products/color-signal-lens/checkout">Buy Lens Plus</a><button class="link-button" id="restore-license">Restore license</button><div id="license-area"></div></section>
+  <section class="plus"><p class="eyebrow">LENS PLUS</p><h2>Save named presets for $12 once.</h2><p>The free app includes screenshot reading, labels, patterns, and blue-orange colors. Lens Plus saves named presets.</p><a class="button primary" href="https://api.sociobot.in/api/v1/products/color-signal-lens/checkout">Buy Lens Plus</a><button class="link-button" id="restore-license">Restore license</button><div id="license-area"></div></section>
   <section class="install"><p class="eyebrow">DESKTOP APP</p><h2>Install Color Signal Lens.</h2><p id="download-state">Downloads are being published. <a href="https://github.com/B-Divyesh/sf-color-signal-lens/releases">Open the release downloads</a>.</p><a id="download-button" class="button secondary" href="https://github.com/B-Divyesh/sf-color-signal-lens/releases">Open release downloads</a></section>`, 'Color Signal Lens — Make status colors distinct');
   document.querySelector('#restore-license')?.addEventListener('click', showRestore);
   void acceptLicense();
@@ -383,7 +383,7 @@ function deletePreset(id: string) {
 }
 
 function renderPrivacy() { layout(`<article class="legal paper-edge"><p class="eyebrow">PRIVACY</p><h1>Your screenshot stays on this device.</h1><p>Color Signal Lens processes the screenshot you open in the app. It does not upload screenshot data or use analytics.</p><h2>Local storage</h2><p>The demo uses separate browser keys beginning with demo:. Reset demo deletes those keys. A paid license is stored in your browser only when you add it.</p><h2>Screen permission</h2><p>The app asks for screen permission only after you press Capture screen region. You choose the region before it is added. You can use files or pasted screenshots instead.</p><p>Last updated: 29 August 2026.</p></article>`, 'Privacy — Color Signal Lens'); }
-function renderTerms() { layout(`<article class="legal paper-edge"><p class="eyebrow">TERMS</p><h1>Use the overlay to read your own screen.</h1><p>Color Signal Lens helps you inspect screenshots that you choose.</p><h2>Lens Plus</h2><p>Lens Plus costs $12 as a one-time purchase. Sociobot and Dodo are the merchant of record.</p><h2>Limits</h2><p>You are responsible for the screenshots you open.</p><p>Last updated: 29 August 2026.</p></article>`, 'Terms — Color Signal Lens'); }
+function renderTerms() { layout(`<article class="legal paper-edge"><p class="eyebrow">TERMS</p><h1>Use the overlay to read your own screen.</h1><p>Color Signal Lens helps you inspect screenshots that you choose.</p><h2>Lens Plus</h2><p>Lens Plus costs $12 as a one-time purchase through the registered Sociobot checkout.</p><h2>Limits</h2><p>You are responsible for the screenshots you open.</p><p>Last updated: 29 August 2026.</p></article>`, 'Terms — Color Signal Lens'); }
 function render404() { layout(`<article class="legal paper-edge"><p class="eyebrow">NOT FOUND</p><h1>Page not found</h1><p>Return to Color Signal Lens to open a screenshot.</p><a class="button primary" href="/" data-nav>Return home</a></article>`, 'Page not found — Color Signal Lens', '/404'); }
 
 function storeLicense(license: string) {
@@ -464,6 +464,16 @@ function showMacChoices(state: Element, button: HTMLAnchorElement, assets: Relea
   return true;
 }
 
+function isMobileDevice(agent: string) {
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(agent);
+}
+
+function showMobileDownloads(state: Element, button: HTMLAnchorElement) {
+  state.textContent = 'Downloads require macOS, Windows, or Linux.';
+  button.href = 'https://github.com/B-Divyesh/sf-color-signal-lens/releases';
+  button.textContent = 'Open desktop downloads';
+}
+
 async function hydrateDownload() {
   const state = document.querySelector('#download-state');
   const button = document.querySelector<HTMLAnchorElement>('#download-button');
@@ -481,6 +491,10 @@ async function hydrateDownload() {
       localStorage.setItem(cacheKey, JSON.stringify(release));
     }
     const agent = navigator.userAgent;
+    if (isMobileDevice(agent)) {
+      showMobileDownloads(state, button);
+      return;
+    }
     if (agent.includes('Mac')) {
       showMacChoices(state, button, release.assets);
       return;
@@ -489,8 +503,9 @@ async function hydrateDownload() {
     const download = release.assets.find((item) => wanted.test(item.name));
     if (!download) return;
     button.href = download.browser_download_url;
-    button.textContent = `Download ${download.name}`;
-    state.textContent = 'Download the installer for this computer.';
+    const platform = agent.includes('Windows') ? 'Windows' : 'Linux';
+    button.textContent = `Download for ${platform}`;
+    state.textContent = `Download the ${platform} installer.`;
   } catch { /* Keep the release-page fallback if metadata is unavailable. */ }
 }
 function wireNavigation(root: ParentNode = document) { root.querySelectorAll<HTMLAnchorElement>('a[data-nav]').forEach((a) => a.addEventListener('click', (event) => { const href = a.getAttribute('href')!; if (!href.startsWith('/')) return; const target = new URL(href, location.origin); if (target.pathname === location.pathname && target.hash) return; event.preventDefault(); focusAfterRender = !target.hash; history.pushState({}, '', href); renderRoute(); if (target.hash) requestAnimationFrame(() => { const section = document.querySelector<HTMLElement>(target.hash); section?.scrollIntoView(); section?.setAttribute('tabindex', '-1'); section?.focus(); }); })); }

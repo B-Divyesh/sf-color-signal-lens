@@ -2,12 +2,17 @@ import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 
 test('@claim:sample-lens enters the isolated sample from the landing action', async ({ page }) => {
+  await page.route('https://api.github.com/repos/B-Divyesh/sf-color-signal-lens/releases?per_page=1', (route) => route.fulfill({ contentType: 'application/json', body: '[]' }));
   await page.goto('/');
+  const before = await page.evaluate(() => Object.fromEntries(Object.entries(localStorage)));
   await page.getByRole('link', { name: 'Try it with sample data' }).click();
   await expect(page).toHaveURL(/\/demo$/);
   await expect(page.getByText('Demo — sample data, nothing is saved')).toBeVisible();
   await expect(page.getByText('checkout-totals.diff.png')).toBeVisible();
-  await expect(page.locator('#lens-canvas')).toBeVisible();
+  const canvas = page.locator('#lens-canvas');
+  await expect(canvas).toBeVisible();
+  await expect.poll(() => canvas.evaluate((element) => Array.from((element as HTMLCanvasElement).getContext('2d')!.getImageData(984, 504, 1, 1).data.slice(0, 3)).join(','))).not.toBe('22,113,74');
+  expect(await page.evaluate(() => Object.fromEntries(Object.entries(localStorage).filter(([key]) => !key.startsWith('demo:'))))).toEqual(before);
 });
 
 test('@claim:demo-isolation keeps licensed real settings unchanged from the landing demo action', async ({ page }) => {
@@ -143,11 +148,13 @@ test('@claim:license-entitlement rejects an invalid license on a direct workspac
   expect(await page.evaluate(() => localStorage.getItem('sb_license:color-signal-lens'))).toBeNull();
 });
 
-test('@claim:lens-plus-price displays the exact one-time Lens Plus price', async ({ page }) => {
+test('@claim:lens-plus-price matches the recorded Sociobot checkout contract', async ({ page }) => {
+  const contract = JSON.parse(readFileSync('tests/fixtures/checkout-contract.json', 'utf8')) as { product_slug: string; product_name: string; amount_cents: number; currency: string; billing_mode: string };
+  expect(contract).toMatchObject({ product_slug: 'color-signal-lens', product_name: 'Color Signal Lens Plus', amount_cents: 1200, currency: 'USD', billing_mode: 'one_time' });
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Save custom lenses for $12 once.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Save named presets for $12 once.' })).toBeVisible();
   await page.getByRole('link', { name: 'Terms' }).click();
-  await expect(page.getByText('Lens Plus costs $12 as a one-time purchase.')).toBeVisible();
+  await expect(page.getByText('Lens Plus costs $12 as a one-time purchase through the registered Sociobot checkout.')).toBeVisible();
 });
 
 test('@claim:demo-reset discards the sample demo namespace', async ({ page }) => {
@@ -223,27 +230,54 @@ test('@claim:sociobot-checkout-path keeps the registered controller purchase URL
   await expect(page.getByRole('link', { name: 'Buy Lens Plus' })).toHaveAttribute('href', 'https://api.sociobot.in/api/v1/products/color-signal-lens/checkout');
 });
 
-test('@claim:merchant-disclosure names the Lens Plus merchant of record', async ({ page }) => {
-  await page.goto('/terms');
-  await expect(page.getByText('Sociobot and Dodo are the merchant of record.')).toBeVisible();
-});
-
-test('@claim:macos-installer-architecture offers correctly labelled DMGs for Intel and Apple-Silicon Macs', async ({ browser }) => {
+test('@claim:desktop-download-platforms gives desktop installers only to desktop platforms', async ({ browser }) => {
   const assets = [
     { name: 'Color.Signal.Lens_0.1.7_aarch64.dmg', browser_download_url: 'https://example.test/Color.Signal.Lens_0.1.7_aarch64.dmg' },
     { name: 'Color.Signal.Lens_0.1.7_x64.dmg', browser_download_url: 'https://example.test/Color.Signal.Lens_0.1.7_x64.dmg' },
+    { name: 'Color.Signal.Lens_0.1.7_x64_en-US.msi', browser_download_url: 'https://example.test/Color.Signal.Lens_0.1.7_x64_en-US.msi' },
+    { name: 'Color.Signal.Lens_0.1.7_amd64.AppImage', browser_download_url: 'https://example.test/Color.Signal.Lens_0.1.7_amd64.AppImage' },
   ];
   for (const [kind, userAgent] of [
     ['Intel', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 Chrome/128 Safari/537.36'],
     ['Apple Silicon', 'Mozilla/5.0 (Macintosh; ARM Mac OS X 14_0) AppleWebKit/537.36 Chrome/128 Safari/537.36'],
+    ['Windows', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/128 Safari/537.36'],
+    ['Linux', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/128 Safari/537.36'],
   ]) {
     const context = await browser.newContext({ userAgent });
     const page = await context.newPage();
     await page.route('https://api.github.com/repos/B-Divyesh/sf-color-signal-lens/releases?per_page=1', (route) => route.fulfill({ contentType: 'application/json', body: JSON.stringify([{ assets }]) }));
     await page.goto('/');
-    await expect(page.getByRole('link', { name: 'Download for Intel Mac' }), `${kind} Mac can choose the Intel installer`).toHaveAttribute('href', /_x64\.dmg$/);
-    await expect(page.getByRole('link', { name: 'Download for Apple Silicon' }), `${kind} Mac can choose the Apple-Silicon installer`).toHaveAttribute('href', /_aarch64\.dmg$/);
-    await expect(page.locator('#download-state')).toHaveText('Choose the macOS installer that matches your chip.');
+    if (kind === 'Intel' || kind === 'Apple Silicon') {
+      await expect(page.getByRole('link', { name: 'Download for Intel Mac' }), `${kind} Mac can choose the Intel installer`).toHaveAttribute('href', /_x64\.dmg$/);
+      await expect(page.getByRole('link', { name: 'Download for Apple Silicon' }), `${kind} Mac can choose the Apple-Silicon installer`).toHaveAttribute('href', /_aarch64\.dmg$/);
+      await expect(page.locator('#download-state')).toHaveText('Choose the macOS installer that matches your chip.');
+    } else {
+      await expect(page.getByRole('link', { name: `Download for ${kind}` })).toBeVisible();
+      await expect(page.locator('#download-state')).toHaveText(`Download the ${kind} installer.`);
+    }
     await context.close();
   }
+
+  for (const [kind, userAgent] of [
+    ['Android', 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 Chrome/128 Mobile Safari/537.36'],
+    ['iPhone', 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1'],
+  ]) {
+    const context = await browser.newContext({ userAgent });
+    const page = await context.newPage();
+    await page.route('https://api.github.com/repos/B-Divyesh/sf-color-signal-lens/releases?per_page=1', (route) => route.fulfill({ contentType: 'application/json', body: JSON.stringify([{ assets }]) }));
+    await page.goto('/');
+    await expect(page.locator('#download-state'), `${kind} gets the platform requirement instead of an installer`).toHaveText('Downloads require macOS, Windows, or Linux.');
+    await expect(page.getByRole('link', { name: 'Open desktop downloads' })).toHaveAttribute('href', 'https://github.com/B-Divyesh/sf-color-signal-lens/releases');
+    await expect(page.getByRole('link', { name: /Download for/ })).toHaveCount(0);
+    await context.close();
+  }
+});
+
+test('@claim:offline-reader keeps the free screenshot reader usable after the desktop app has loaded', async ({ page, context }) => {
+  await page.goto('/demo');
+  await context.setOffline(true);
+  await page.getByLabel('Use blue-orange colors').check();
+  await page.getByLabel('Blue', { exact: true }).check();
+  await expect(page.getByText('The selected status color uses blue-orange colors.', { exact: true })).toBeVisible();
+  await context.setOffline(false);
 });

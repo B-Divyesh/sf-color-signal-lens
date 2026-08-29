@@ -119,11 +119,12 @@ test('390px navigation, demo controls, and radio rows have 44px touch targets', 
   }
 });
 
-test('390px hydrated download and workspace stay within the viewport', async ({ page }) => {
+test('390px mobile download state and workspace stay within the viewport', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.route('https://api.github.com/**', (route) => route.fulfill({ contentType: 'application/json', body: JSON.stringify([{ assets: [{ name: 'Color.Signal.Lens_0.1.7_amd64.AppImage', browser_download_url: 'https://example.test/Color.Signal.Lens_0.1.7_amd64.AppImage' }] }]) }));
   await page.goto('/');
-  await expect(page.locator('#download-button')).toContainText('Color.Signal.Lens_0.1.7_amd64.AppImage');
+  await expect(page.locator('#download-button')).toContainText('Download for Linux');
+  await expect(page.locator('#download-state')).toHaveText('Download the Linux installer.');
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   await page.goto('/demo');
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);

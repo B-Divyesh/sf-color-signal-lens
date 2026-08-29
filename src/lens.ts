@@ -17,7 +17,7 @@ export const detectStatusName = (target: Rgb) => {
   if (target.r > target.g * 1.25 && target.r > target.b * 1.25) return 'Removed / needs attention';
   if (target.g > target.r * 1.1 && target.g > target.b * 1.1) return 'Added / ready';
   if (target.b > target.r * 1.15) return 'Information';
-  return 'Selected signal';
+  return 'Selected status color';
 };
 
 export const remapPixel = (pixel: Rgb, target: Rgb, mapping: 'blue' | 'orange') =>
@@ -38,7 +38,7 @@ export const sampleSvg = `
   <text x="76" y="542" fill="#16714a" font-family="monospace" font-size="30">+  applyMemberDiscount(total)</text>
   <rect x="878" y="252" width="210" height="72" rx="36" fill="#9c2d20"/><text x="920" y="297" fill="#fff" font-family="Arial" font-size="24">removed</text>
   <rect x="878" y="467" width="210" height="72" rx="36" fill="#16714a"/><text x="936" y="512" fill="#fff" font-family="Arial" font-size="24">added</text>
-  <text x="74" y="675" fill="#4a5965" font-family="Arial" font-size="19">Sample screenshot — click a coloured line or status chip.</text>
+  <text x="74" y="675" fill="#4a5965" font-family="Arial" font-size="19">Sample screenshot — click a colored line or status chip.</text>
 </svg>`;
 
 export const svgDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(sampleSvg)}`;

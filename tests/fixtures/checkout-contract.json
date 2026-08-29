@@ -1,0 +1,9 @@
+{
+  "source": "Recorded checkout contract fixture",
+  "captured_at": "2026-08-29",
+  "product_slug": "color-signal-lens",
+  "product_name": "Color Signal Lens Plus",
+  "amount_cents": 1200,
+  "currency": "USD",
+  "billing_mode": "one_time"
+}

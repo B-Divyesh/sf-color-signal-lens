@@ -3,9 +3,9 @@
 Make screenshot status colors distinct. It is for people who cannot rely on red
 and green in software diffs, charts, or status panels.
 
-Try the isolated browser demo at `/demo` or `/?demo=1`. It opens a sample
-checkout diff with added and removed totals. Demo data uses separate browser
-keys and never changes real settings.
+Try the sample at <https://color-signal-lens.sociobot.in/demo>. It opens a
+checkout diff with added and removed totals. Demo changes stay separate and
+never change your settings.
 
 ## Use it
 
@@ -55,11 +55,15 @@ purchase and saves named presets on this device. The purchase action uses the
 Sociobot checkout path. Restore a purchase by pasting its license on the
 landing page.
 
+The free screenshot reader works offline after the installed desktop app has
+loaded. The browser sample is for trying the app before installation.
+
 ## Privacy and terms
 
-Read `/privacy` for screenshot processing, local storage, and screen permission
-details. Read `/terms` for product limits and purchase terms. The app has no
-analytics and loads no third-party runtime scripts.
+Read <https://color-signal-lens.sociobot.in/privacy> for screenshot processing,
+local storage, and screen permission details. Read
+<https://color-signal-lens.sociobot.in/terms> for product limits and purchase
+terms. The app has no analytics and loads no third-party runtime scripts.
 
 ## License
 
