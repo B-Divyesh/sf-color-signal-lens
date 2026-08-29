@@ -1,0 +1,310 @@
+{
+  "checkedAt": "2026-08-29T12:40:47.351Z",
+  "origin": "https://color-signal-lens.sociobot.in",
+  "matrix": [
+    {
+      "viewport": 390,
+      "path": "/",
+      "status": 200,
+      "structure": {
+        "title": "Color Signal Lens — Make status colors distinct",
+        "lang": "en",
+        "h1": 1,
+        "main": 1,
+        "canonical": "https://color-signal-lens.sociobot.in/",
+        "description": "Make screenshot status colors easier to tell apart with labels, patterns, and blue-orange colors.",
+        "twitterTitle": "Color Signal Lens — Make status colors distinct",
+        "legalLinks": [
+          "Privacy",
+          "Terms"
+        ],
+        "overflow": 0
+      },
+      "seriousOrCritical": [],
+      "errors": []
+    },
+    {
+      "viewport": 390,
+      "path": "/demo",
+      "status": 200,
+      "structure": {
+        "title": "Demo — Color Signal Lens",
+        "lang": "en",
+        "h1": 1,
+        "main": 1,
+        "canonical": "https://color-signal-lens.sociobot.in/demo",
+        "description": "Try Color Signal Lens with a sample checkout screenshot. Demo data stays separate from your settings.",
+        "twitterTitle": "Demo — Color Signal Lens",
+        "legalLinks": [
+          "Privacy",
+          "Terms"
+        ],
+        "overflow": 0
+      },
+      "seriousOrCritical": [],
+      "errors": []
+    },
+    {
+      "viewport": 390,
+      "path": "/lens",
+      "status": 200,
+      "structure": {
+        "title": "Color Signal Lens — Inspect screenshot colors",
+        "lang": "en",
+        "h1": 1,
+        "main": 1,
+        "canonical": "https://color-signal-lens.sociobot.in/lens",
+        "description": "Open a screenshot and mark one status color with a label, pattern, or blue-orange colors.",
+        "twitterTitle": "Color Signal Lens — Inspect screenshot colors",
+        "legalLinks": [
+          "Privacy",
+          "Terms"
+        ],
+        "overflow": 0
+      },
+      "seriousOrCritical": [],
+      "errors": []
+    },
+    {
+      "viewport": 390,
+      "path": "/privacy",
+      "status": 200,
+      "structure": {
+        "title": "Privacy — Color Signal Lens",
+        "lang": "en",
+        "h1": 1,
+        "main": 1,
+        "canonical": "https://color-signal-lens.sociobot.in/privacy",
+        "description": "Read how Color Signal Lens handles screenshots, local storage, and screen permission.",
+        "twitterTitle": "Privacy — Color Signal Lens",
+        "legalLinks": [
+          "Privacy",
+          "Terms"
+        ],
+        "overflow": 0
+      },
+      "seriousOrCritical": [],
+      "errors": []
+    },
+    {
+      "viewport": 390,
+      "path": "/terms",
+      "status": 200,
+      "structure": {
+        "title": "Terms — Color Signal Lens",
+        "lang": "en",
+        "h1": 1,
+        "main": 1,
+        "canonical": "https://color-signal-lens.sociobot.in/terms",
+        "description": "Read Color Signal Lens terms, product limits, and Lens Plus purchase details.",
+        "twitterTitle": "Terms — Color Signal Lens",
+        "legalLinks": [
+          "Privacy",
+          "Terms"
+        ],
+        "overflow": 0
+      },
+      "seriousOrCritical": [],
+      "errors": []
+    },
+    {
+      "viewport": 390,
+      "path": "/missing-polish-6-route",
+      "status": 404,
+      "structure": {
+        "title": "Page not found — Color Signal Lens",
+        "lang": "en",
+        "h1": 1,
+        "main": 1,
+        "canonical": "https://color-signal-lens.sociobot.in/404.html",
+        "description": "This Color Signal Lens page was not found. Return home to open a screenshot.",
+        "twitterTitle": "Page not found — Color Signal Lens",
+        "legalLinks": [
+          "Privacy",
+          "Terms"
+        ],
+        "overflow": 0
+      },
+      "seriousOrCritical": [],
+      "errors": [
+        "Failed to load resource: the server responded with a status of 404 ()"
+      ]
+    },
+    {
+      "viewport": 1440,
+      "path": "/",
+      "status": 200,
+      "structure": {
+        "title": "Color Signal Lens — Make status colors distinct",
+        "lang": "en",
+        "h1": 1,
+        "main": 1,
+        "canonical": "https://color-signal-lens.sociobot.in/",
+        "description": "Make screenshot status colors easier to tell apart with labels, patterns, and blue-orange colors.",
+        "twitterTitle": "Color Signal Lens — Make status colors distinct",
+        "legalLinks": [
+          "Privacy",
+          "Terms"
+        ],
+        "overflow": 0
+      },
+      "seriousOrCritical": [],
+      "errors": []
+    },
+    {
+      "viewport": 1440,
+      "path": "/demo",
+      "status": 200,
+      "structure": {
+        "title": "Demo — Color Signal Lens",
+        "lang": "en",
+        "h1": 1,
+        "main": 1,
+        "canonical": "https://color-signal-lens.sociobot.in/demo",
+        "description": "Try Color Signal Lens with a sample checkout screenshot. Demo data stays separate from your settings.",
+        "twitterTitle": "Demo — Color Signal Lens",
+        "legalLinks": [
+          "Privacy",
+          "Terms"
+        ],
+        "overflow": 0
+      },
+      "seriousOrCritical": [],
+      "errors": []
+    },
+    {
+      "viewport": 1440,
+      "path": "/lens",
+      "status": 200,
+      "structure": {
+        "title": "Color Signal Lens — Inspect screenshot colors",
+        "lang": "en",
+        "h1": 1,
+        "main": 1,
+        "canonical": "https://color-signal-lens.sociobot.in/lens",
+        "description": "Open a screenshot and mark one status color with a label, pattern, or blue-orange colors.",
+        "twitterTitle": "Color Signal Lens — Inspect screenshot colors",
+        "legalLinks": [
+          "Privacy",
+          "Terms"
+        ],
+        "overflow": 0
+      },
+      "seriousOrCritical": [],
+      "errors": []
+    },
+    {
+      "viewport": 1440,
+      "path": "/privacy",
+      "status": 200,
+      "structure": {
+        "title": "Privacy — Color Signal Lens",
+        "lang": "en",
+        "h1": 1,
+        "main": 1,
+        "canonical": "https://color-signal-lens.sociobot.in/privacy",
+        "description": "Read how Color Signal Lens handles screenshots, local storage, and screen permission.",
+        "twitterTitle": "Privacy — Color Signal Lens",
+        "legalLinks": [
+          "Privacy",
+          "Terms"
+        ],
+        "overflow": 0
+      },
+      "seriousOrCritical": [],
+      "errors": []
+    },
+    {
+      "viewport": 1440,
+      "path": "/terms",
+      "status": 200,
+      "structure": {
+        "title": "Terms — Color Signal Lens",
+        "lang": "en",
+        "h1": 1,
+        "main": 1,
+        "canonical": "https://color-signal-lens.sociobot.in/terms",
+        "description": "Read Color Signal Lens terms, product limits, and Lens Plus purchase details.",
+        "twitterTitle": "Terms — Color Signal Lens",
+        "legalLinks": [
+          "Privacy",
+          "Terms"
+        ],
+        "overflow": 0
+      },
+      "seriousOrCritical": [],
+      "errors": []
+    },
+    {
+      "viewport": 1440,
+      "path": "/missing-polish-6-route",
+      "status": 404,
+      "structure": {
+        "title": "Page not found — Color Signal Lens",
+        "lang": "en",
+        "h1": 1,
+        "main": 1,
+        "canonical": "https://color-signal-lens.sociobot.in/404.html",
+        "description": "This Color Signal Lens page was not found. Return home to open a screenshot.",
+        "twitterTitle": "Page not found — Color Signal Lens",
+        "legalLinks": [
+          "Privacy",
+          "Terms"
+        ],
+        "overflow": 0
+      },
+      "seriousOrCritical": [],
+      "errors": [
+        "Failed to load resource: the server responded with a status of 404 ()"
+      ]
+    }
+  ],
+  "demo": {
+    "before": {
+      "sb_license:color-signal-lens": "REAL-LICENSE",
+      "sb_license_check:color-signal-lens": "{\"checked\":1788007246676,\"valid\":true,\"license\":\"REAL-LICENSE\"}",
+      "color-signal-lens:presets": "[{\"id\":\"real-1\",\"name\":\"Real preset\",\"colour\":\"#16714a\",\"mode\":\"patterns\",\"mapping\":\"blue\"}]"
+    },
+    "afterEntry": {
+      "sb_license:color-signal-lens": "REAL-LICENSE",
+      "sb_license_check:color-signal-lens": "{\"checked\":1788007246676,\"valid\":true,\"license\":\"REAL-LICENSE\"}",
+      "color-signal-lens:presets": "[{\"id\":\"real-1\",\"name\":\"Real preset\",\"colour\":\"#16714a\",\"mode\":\"patterns\",\"mapping\":\"blue\"}]"
+    },
+    "afterReset": {
+      "sb_license:color-signal-lens": "REAL-LICENSE",
+      "color-signal-lens:presets": "[{\"id\":\"real-1\",\"name\":\"Real preset\",\"colour\":\"#16714a\",\"mode\":\"patterns\",\"mapping\":\"blue\"}]",
+      "sb_license_check:color-signal-lens": "{\"checked\":1788007246676,\"valid\":true,\"license\":\"REAL-LICENSE\"}"
+    },
+    "afterExit": {
+      "sb_license:color-signal-lens": "REAL-LICENSE",
+      "color-signal-lens:presets": "[{\"id\":\"real-1\",\"name\":\"Real preset\",\"colour\":\"#16714a\",\"mode\":\"patterns\",\"mapping\":\"blue\"}]",
+      "sb_license_check:color-signal-lens": "{\"checked\":1788007246676,\"valid\":true,\"license\":\"REAL-LICENSE\"}"
+    },
+    "realStorageUnchanged": true,
+    "resetState": {
+      "demoKeys": [],
+      "banner": true,
+      "cue": "Active cue: Pattern for the removed status color.",
+      "canvasBottom": 619,
+      "paidControls": 0
+    },
+    "exitState": {
+      "path": "/lens",
+      "h1": "Inspect a screenshot status color.",
+      "focused": "Inspect a screenshot status color.",
+      "demoKeys": []
+    },
+    "requestOrigins": [
+      "https://color-signal-lens.sociobot.in",
+      "https://api.github.com"
+    ]
+  },
+  "focus": {
+    "url": "https://color-signal-lens.sociobot.in/#how",
+    "top": 0,
+    "focused": "How Color Signal Lens works",
+    "announced": "How Color Signal Lens works",
+    "backUrl": "https://color-signal-lens.sociobot.in/privacy",
+    "backFocused": "Your screenshot stays on this device."
+  }
+}

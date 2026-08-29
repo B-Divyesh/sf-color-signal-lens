@@ -1,0 +1,62 @@
+{
+  "tag": "v0.1.12",
+  "commit": "afcd9aabd454f62a8900bb660aca5a505185491f",
+  "publishedAt": "2026-08-29T12:44:25Z",
+  "releaseUrl": "https://github.com/B-Divyesh/sf-color-signal-lens/releases/tag/v0.1.12",
+  "workflowUrl": "https://github.com/B-Divyesh/sf-color-signal-lens/actions/runs/33252969696",
+  "jobs": {
+    "ubuntu-22.04": "success",
+    "windows-latest": "success",
+    "macos-x86_64": "success",
+    "macos-aarch64": "success",
+    "release-manifest": "success"
+  },
+  "assetCount": 11,
+  "requiredAssets": {
+    "linux": [
+      "Color.Signal.Lens_0.1.12_amd64.AppImage",
+      "Color.Signal.Lens_0.1.12_amd64.deb",
+      "Color.Signal.Lens-0.1.12-1.x86_64.rpm"
+    ],
+    "windows": [
+      "Color.Signal.Lens_0.1.12_x64-setup.exe",
+      "Color.Signal.Lens_0.1.12_x64_en-US.msi"
+    ],
+    "macos": [
+      "Color.Signal.Lens_0.1.12_x64.dmg",
+      "Color.Signal.Lens_0.1.12_aarch64.dmg"
+    ],
+    "metadata": [
+      "SHA256SUMS",
+      "latest.json"
+    ]
+  },
+  "downloadButtons": {
+    "linux": {
+      "label": "Download for Linux",
+      "asset": "Color.Signal.Lens_0.1.12_amd64.AppImage",
+      "status": 200
+    },
+    "windows": {
+      "label": "Download for Windows",
+      "asset": "Color.Signal.Lens_0.1.12_x64-setup.exe",
+      "status": 200
+    },
+    "macosIntel": {
+      "label": "Download for Intel Mac",
+      "asset": "Color.Signal.Lens_0.1.12_x64.dmg",
+      "status": 200
+    },
+    "macosAppleSilicon": {
+      "label": "Download for Apple Silicon",
+      "asset": "Color.Signal.Lens_0.1.12_aarch64.dmg",
+      "status": 200
+    }
+  },
+  "downloadedChecksum": {
+    "asset": "Color.Signal.Lens_0.1.12_amd64.deb",
+    "sha256": "c484759c98a84e179cd060afe71a3c42124bab05ddb373082e3eb98eeb31049e",
+    "matchesPublishedSHA256SUMS": true
+  },
+  "latestJsonValid": true
+}
