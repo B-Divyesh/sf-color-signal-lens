@@ -37,6 +37,13 @@ test('@claim:local-screenshots keeps screenshot data local across routes and inp
   await page.goto('/lens');
   await page.locator('#file-input').setInputFiles({ name: 'private.png', mimeType: 'image/png', buffer: readFileSync('src-tauri/icons/icon.png') });
   await expect(page.locator('#source-status')).toHaveText('private.png');
+  await page.evaluate(async () => {
+    const response = await fetch('/apple-touch-icon.png');
+    const data = new DataTransfer();
+    data.items.add(new File([await response.blob()], 'private-paste.png', { type: 'image/png' }));
+    document.dispatchEvent(new ClipboardEvent('paste', { clipboardData: data, bubbles: true }));
+  });
+  await expect(page.locator('#source-status')).toHaveText('Pasted screenshot');
   const scripts = await page.locator('script[src]').evaluateAll((nodes) => nodes.map((node) => new URL((node as HTMLScriptElement).src).origin));
   expect(scripts).toEqual(['http://127.0.0.1:4173']);
   expect(crossOriginRequests.filter((url) => !url.startsWith('https://api.github.com/'))).toEqual([]);
