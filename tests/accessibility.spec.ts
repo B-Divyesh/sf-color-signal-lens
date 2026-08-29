@@ -1,20 +1,17 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-test('demo has no serious or critical accessibility violations', async ({ page }) => {
-  await page.goto('/demo');
-  const results = await new AxeBuilder({ page }).analyze();
-  const important = results.violations.filter((violation) => violation.impact === 'serious' || violation.impact === 'critical');
-  expect(important).toEqual([]);
-});
-
-test('390px demo has no serious or critical accessibility violations', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/demo');
-  const results = await new AxeBuilder({ page }).analyze();
-  const important = results.violations.filter((violation) => violation.impact === 'serious' || violation.impact === 'critical');
-  expect(important).toEqual([]);
-});
+for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
+  for (const path of ['/', '/demo', '/lens', '/privacy', '/terms', '/missing-review-route']) {
+    test(`${path} has no serious or critical accessibility violations at ${viewport.width}px`, async ({ page }) => {
+      await page.setViewportSize(viewport);
+      await page.goto(path);
+      const results = await new AxeBuilder({ page }).analyze();
+      const important = results.violations.filter((violation) => violation.impact === 'serious' || violation.impact === 'critical');
+      expect(important).toEqual([]);
+    });
+  }
+}
 
 test('keyboard users can skip to the workspace and move from canvas to colour input', async ({ page }) => {
   await page.goto('/demo');

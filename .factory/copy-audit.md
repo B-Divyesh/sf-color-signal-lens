@@ -2,6 +2,19 @@
 
 Audit date: 2026-08-29. This covers every visitor-facing copy unit from the landing page, demo, workspace, legal routes, conditional states, and README. Counts split on spaces; links, filenames, versions, and hyphenated words count as one word. Commands are excluded. No item exceeds 22 words or contains a banned marketing word.
 
+## Catalog and metadata
+
+| Copy | Words | Result |
+| --- | ---: | --- |
+| Make screenshot status colors distinct with labels, patterns, or blue-orange colors. | 11 | Pass; catalog starts with a verb and is under 120 characters |
+| Make screenshot status colors easier to tell apart with labels, patterns, and blue-orange colors. | 14 | Pass; home description and social metadata |
+| Color Signal Lens — Make status colors distinct | 8 | Pass; home title |
+| Demo — Color Signal Lens | 4 | Pass; demo title |
+| Color Signal Lens — Inspect screenshot colors | 7 | Pass; workspace title |
+| Privacy — Color Signal Lens | 4 | Pass; privacy title |
+| Terms — Color Signal Lens | 4 | Pass; terms title |
+| Page not found — Color Signal Lens | 7 | Pass; 404 title |
+
 ## Landing and conditional states
 
 | Copy | Words | Result |

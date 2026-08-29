@@ -51,6 +51,42 @@ test('a corrupt image keeps the last valid image and announces recovery', async 
   await expect.poll(() => page.locator('#lens-canvas').evaluate((canvas) => (canvas as HTMLCanvasElement).toDataURL())).toBe(before);
 });
 
+test('every route has its own title, metadata, landmarks, and legal links', async ({ page }) => {
+  const routes = [
+    ['/', 'Color Signal Lens — Make status colors distinct', 'https://color-signal-lens.sociobot.in/'],
+    ['/demo', 'Demo — Color Signal Lens', 'https://color-signal-lens.sociobot.in/demo'],
+    ['/?demo=1', 'Demo — Color Signal Lens', 'https://color-signal-lens.sociobot.in/demo'],
+    ['/lens', 'Color Signal Lens — Inspect screenshot colors', 'https://color-signal-lens.sociobot.in/lens'],
+    ['/privacy', 'Privacy — Color Signal Lens', 'https://color-signal-lens.sociobot.in/privacy'],
+    ['/terms', 'Terms — Color Signal Lens', 'https://color-signal-lens.sociobot.in/terms'],
+  ] as const;
+  for (const [path, title, canonical] of routes) {
+    await page.goto(path);
+    await expect(page).toHaveTitle(title);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await expect(page.locator('main')).toHaveCount(1);
+    await expect(page.locator('h1')).toHaveCount(1);
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /\S/);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', canonical);
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', title);
+    await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute('content', title);
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', 'https://color-signal-lens.sociobot.in/social-card.png');
+    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute('content', 'https://color-signal-lens.sociobot.in/social-card.png');
+    await expect(page.locator('footer').getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
+    await expect(page.locator('footer').getByRole('link', { name: 'Terms' })).toHaveAttribute('href', '/terms');
+  }
+});
+
+test('the app 404 has plain recovery copy, metadata, and the shared legal footer', async ({ page }) => {
+  await page.goto('/missing-review-route');
+  await expect(page).toHaveTitle('Page not found — Color Signal Lens');
+  await expect(page.getByRole('heading', { name: 'Page not found' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Return home' })).toHaveAttribute('href', '/');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://color-signal-lens.sociobot.in/404.html');
+  await expect(page.locator('footer').getByRole('link', { name: 'Privacy' })).toBeVisible();
+  await expect(page.locator('footer').getByRole('link', { name: 'Terms' })).toBeVisible();
+});
+
 test('@claim:capture-consent capture requires and retains a selected region without a native whole-screen command', async ({ page }) => {
   await page.addInitScript(() => {
     const state = window as Window & { captureStopped?: boolean; captureRequests?: number };

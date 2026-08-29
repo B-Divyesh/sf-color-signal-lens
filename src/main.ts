@@ -89,7 +89,7 @@ function renderDemo() {
   demo = true;
   if (!source) source = { url: svgDataUrl, name: 'checkout-totals.diff.png', kind: 'sample' };
   localStorage.setItem('demo:color-signal-lens:started', '1');
-  layout(`<aside class="demo-banner" role="status"><b>Demo — sample data, nothing is saved</b><span><button id="reset-demo">Reset demo</button><button id="start-real">Start for real</button></span></aside>${workspace(true)}`, 'Demo — Color Signal Lens');
+  layout(`<aside class="demo-banner" role="status"><b>Demo — sample data, nothing is saved</b><span><button id="reset-demo">Reset demo</button><button id="start-real">Start for real</button></span></aside>${workspace(true)}`, 'Demo — Color Signal Lens', '/demo');
   wireWorkspace();
 }
 
