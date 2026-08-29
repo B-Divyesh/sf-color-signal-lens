@@ -1,4 +1,13 @@
-# Color Signal Lens polish 2 handoff
+# Color Signal Lens review 3 handoff
+
+## Review result
+
+Reviewer-only work order: no product code or product assets were modified.
+The new adversarial report is `.factory/review-3.md`. Its verdict is **FAIL**
+with one blocking finding, F-3-1: the live same-document **How it works** link
+scrolls but does not move focus to its destination. The next worker should
+implement the explicit anchor focus/announcement behavior and its keyboard
+regression test before seeking another review.
 
 ## Result
 
