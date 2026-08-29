@@ -60,6 +60,12 @@ function layout(content: string, route: string, path = location.pathname) {
     <main id="main" tabindex="-1">${content}</main>
     <footer><p>Color Signal Lens makes screenshot status colors easier to read.</p><p><a href="/privacy" data-nav>Privacy</a> · <a href="/terms" data-nav>Terms</a> · Built by Param Factory · v0.1.8</p></footer>`;
   wireNavigation();
+  document.querySelector<HTMLAnchorElement>('.skip')?.addEventListener('click', (event) => {
+    event.preventDefault();
+    const main = document.querySelector<HTMLElement>('#main');
+    main?.scrollIntoView({ block: 'start' });
+    main?.focus({ preventScroll: true });
+  });
   pageTitle(route, path);
 }
 
@@ -508,12 +514,48 @@ async function hydrateDownload() {
     state.textContent = `Download the ${platform} installer.`;
   } catch { /* Keep the release-page fallback if metadata is unavailable. */ }
 }
-function wireNavigation(root: ParentNode = document) { root.querySelectorAll<HTMLAnchorElement>('a[data-nav]').forEach((a) => a.addEventListener('click', (event) => { const href = a.getAttribute('href')!; if (!href.startsWith('/')) return; const target = new URL(href, location.origin); if (target.pathname === location.pathname && target.hash) return; event.preventDefault(); focusAfterRender = !target.hash; history.pushState({}, '', href); renderRoute(); if (target.hash) requestAnimationFrame(() => { const section = document.querySelector<HTMLElement>(target.hash); section?.scrollIntoView(); section?.setAttribute('tabindex', '-1'); section?.focus(); }); })); }
+
+function focusHashTarget(hash = location.hash) {
+  if (!hash) return false;
+  const target = document.getElementById(decodeURIComponent(hash.slice(1)));
+  if (!target) return false;
+  const focusTarget = target.matches('h1, h2, h3, h4, h5, h6')
+    ? target
+    : target.querySelector<HTMLElement>('h1, h2, h3, h4, h5, h6') || target;
+  target.scrollIntoView({ block: 'start' });
+  focusTarget.setAttribute('tabindex', '-1');
+  focusTarget.focus({ preventScroll: true });
+  const announcement = document.querySelector<HTMLElement>('#route-announcement');
+  if (announcement) announcement.textContent = focusTarget.textContent?.trim() || 'Section opened';
+  return true;
+}
+
+function wireNavigation(root: ParentNode = document) {
+  root.querySelectorAll<HTMLAnchorElement>('a[data-nav]').forEach((anchor) => anchor.addEventListener('click', (event) => {
+    const href = anchor.getAttribute('href')!;
+    if (!href.startsWith('/')) return;
+    const target = new URL(href, location.origin);
+    const sameDocument = target.pathname === location.pathname && target.search === location.search;
+    event.preventDefault();
+    focusAfterRender = !target.hash;
+    history.pushState({}, '', href);
+    if (sameDocument && target.hash) {
+      requestAnimationFrame(() => focusHashTarget(target.hash));
+      return;
+    }
+    renderRoute();
+  }));
+}
 function renderRoute() {
   const params = new URLSearchParams(location.search);
-  if (location.pathname === '/demo' || params.get('demo') === '1') { demo = true; renderDemo(); return; }
-  if (!siteBuild && (location.pathname === '/' || location.pathname === '/lens')) { demo = false; renderLens(); return; }
-  if (location.pathname === '/') renderLanding(); else if (location.pathname === '/lens') renderLens(); else if (location.pathname === '/privacy') renderPrivacy(); else if (location.pathname === '/terms') renderTerms(); else render404();
+  if (location.pathname === '/demo' || params.get('demo') === '1') { demo = true; renderDemo(); }
+  else if (!siteBuild && (location.pathname === '/' || location.pathname === '/lens')) { demo = false; renderLens(); }
+  else if (location.pathname === '/') renderLanding();
+  else if (location.pathname === '/lens') renderLens();
+  else if (location.pathname === '/privacy') renderPrivacy();
+  else if (location.pathname === '/terms') renderTerms();
+  else render404();
+  if (location.hash) requestAnimationFrame(() => focusHashTarget());
 }
 window.addEventListener('popstate', () => { focusAfterRender = true; renderRoute(); });
 renderRoute();

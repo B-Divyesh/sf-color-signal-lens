@@ -143,13 +143,31 @@ test('390px demo shows the sample result and active cue before scrolling', async
   await expect(page.getByRole('button', { name: 'Load sample screenshot' })).toHaveCount(0);
 });
 
-test('How it works reaches its section through mouse, keyboard, back, and a direct hash link', async ({ page }) => {
+test('How it works reaches and announces its section through keyboard, Back, and a direct hash link', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  await page.getByRole('link', { name: 'How it works' }).click();
+  const link = page.getByRole('link', { name: 'How it works' });
+  await link.focus();
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/\/#how$/);
   await expect.poll(() => page.evaluate(() => document.querySelector('#how')!.getBoundingClientRect().top)).toBeLessThan(80);
+  await expect(page.getByRole('heading', { name: 'How Color Signal Lens works' })).toBeFocused();
+  await expect(page.locator('#route-announcement')).toHaveText('How Color Signal Lens works');
   await page.goBack();
   await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole('heading', { name: 'Make status colors distinct.' })).toBeFocused();
   await page.goto('/#how');
+  await expect.poll(() => page.evaluate(() => document.querySelector('#how')!.getBoundingClientRect().top)).toBeLessThan(80);
+  await expect(page.getByRole('heading', { name: 'How Color Signal Lens works' })).toBeFocused();
+  await expect(page.locator('#route-announcement')).toHaveText('How Color Signal Lens works');
+});
+
+test('How it works renders, focuses, and announces the landing section from another route', async ({ page }) => {
+  await page.goto('/privacy');
+  await page.getByRole('link', { name: 'How it works' }).click();
+  await expect(page).toHaveURL(/\/#how$/);
+  await expect(page.getByRole('heading', { name: 'How Color Signal Lens works' })).toBeFocused();
+  await expect(page.locator('#route-announcement')).toHaveText('How Color Signal Lens works');
   await expect.poll(() => page.evaluate(() => document.querySelector('#how')!.getBoundingClientRect().top)).toBeLessThan(80);
 });
 
