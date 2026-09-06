@@ -1,6 +1,6 @@
 # Copy audit
 
-Audit date: 2026-08-29. This covers every visitor-facing copy unit from the landing page, demo, workspace, legal routes, conditional states, and README. Counts split on spaces; links, filenames, versions, and hyphenated words count as one word. Commands are excluded. No item exceeds 22 words or contains a banned marketing word.
+Audit date: 2026-09-06. This covers every visitor-facing copy unit from the landing page, demo, workspace, legal routes, conditional states, and README. Counts split on spaces; links, filenames, versions, and hyphenated words count as one word. Commands are excluded. No item exceeds 22 words or contains a banned marketing word.
 
 ## Catalog and metadata
 
@@ -82,7 +82,7 @@ Audit date: 2026-08-29. This covers every visitor-facing copy unit from the land
 | Privacy | 1 | Pass |
 | Terms | 1 | Pass |
 | Built by Param Factory | 4 | Pass |
-| v0.1.12 | 1 | Pass |
+| v0.1.13 | 1 | Pass |
 
 ## Demo and workspace
 
@@ -192,6 +192,12 @@ Audit date: 2026-08-29. This covers every visitor-facing copy unit from the land
 | Only the region you select is added. | 7 | Pass; `capture-consent` |
 | Screenshot data stays in the app. | 6 | Pass; `local-screenshots` |
 | Develop | 1 | Pass |
+| Use Node.js 22 and the stable Rust toolchain (rustc 1.77.2 or newer). | 12 | Pass; developer prerequisite |
+| Install Rust with rustup if rustc and cargo are not already available. | 12 | Pass; developer prerequisite |
+| On Debian or Ubuntu, install the native Tauri 2 build packages first: | 12 | Pass; developer prerequisite |
+| Then install the JavaScript packages and start either interface: | 9 | Pass; developer instruction |
+| npm run dev opens the browser site. npm run dev:native starts the Tauri desktop window and its Vite frontend. | 19 | Pass; browser and native developer instructions |
+| Run all checks with: | 4 | Pass; developer instruction |
 | The static deploy root is dist/site. | 6 | Pass |
 | The Tauri 2 configuration is in src-tauri/. | 7 | Pass |
 | Install and releases | 3 | Pass |

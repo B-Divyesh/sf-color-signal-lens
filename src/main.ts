@@ -63,7 +63,7 @@ function layout(content: string, route: string, path = location.pathname) {
     </header>
     <div id="route-announcement" class="sr-only" aria-live="polite"></div>
     <main id="main" tabindex="-1">${content}</main>
-    <footer><p>Color Signal Lens makes screenshot status colors easier to read.</p><p><a href="/privacy" data-nav>Privacy</a> · <a href="/terms" data-nav>Terms</a> · Built by Param Factory · v0.1.12</p></footer>`;
+    <footer><p>Color Signal Lens makes screenshot status colors easier to read.</p><p><a href="/privacy" data-nav>Privacy</a> · <a href="/terms" data-nav>Terms</a> · Built by Param Factory · v0.1.13</p></footer>`;
   wireNavigation();
   document.querySelector<HTMLAnchorElement>('.skip')?.addEventListener('click', (event) => {
     event.preventDefault();
@@ -93,7 +93,7 @@ function renderLanding() {
 function renderDemo() {
   demo = true;
   if (!source) source = { url: svgDataUrl, name: 'checkout-totals.diff.png', kind: 'sample' };
-  layout(`<aside class="demo-banner" role="status"><b>Demo — sample data, nothing is saved</b><span><button id="reset-demo">Reset demo</button><button id="start-real">Start for real</button></span></aside>${workspace(true)}`, 'Demo — Color Signal Lens', '/demo');
+  layout(`<aside class="demo-banner" aria-label="Demo mode"><b>Demo — sample data, nothing is saved</b><span><button id="reset-demo">Reset demo</button><button id="start-real">Start for real</button></span></aside>${workspace(true)}`, 'Demo — Color Signal Lens', '/demo');
   wireWorkspace();
 }
 

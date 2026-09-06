@@ -19,13 +19,35 @@ the region you select is added. Screenshot data stays in the app.
 
 ## Develop
 
+Use Node.js 22 and the stable Rust toolchain (`rustc` 1.77.2 or newer).
+Install Rust with [rustup](https://rustup.rs/) if `rustc` and `cargo` are not
+already available.
+
+On Debian or Ubuntu, install the native Tauri 2 build packages first:
+
+```sh
+sudo apt-get update
+sudo apt-get install -y build-essential curl file libayatana-appindicator3-dev librsvg2-dev libssl-dev libwebkit2gtk-4.1-dev libxdo-dev patchelf pkg-config wget
+```
+
+Then install the JavaScript packages and start either interface:
+
 ```sh
 npm ci
 npm run dev
-npm run dev:desktop
+npm run dev:native
+```
+
+`npm run dev` opens the browser site. `npm run dev:native` starts the Tauri
+desktop window and its Vite frontend.
+
+Run all checks with:
+
+```sh
 npm test
 npm run build
 cargo test --manifest-path src-tauri/Cargo.toml
+cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
 ```
 
 The static deploy root is `dist/site`. The Tauri 2 configuration is in

@@ -3,12 +3,11 @@ import AxeBuilder from '@axe-core/playwright';
 
 for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
   for (const path of ['/', '/demo', '/lens', '/privacy', '/terms', '/missing-review-route']) {
-    test(`${path} has no serious or critical accessibility violations at ${viewport.width}px`, async ({ page }) => {
+    test(`${path} has no accessibility violations at ${viewport.width}px`, async ({ page }) => {
       await page.setViewportSize(viewport);
       await page.goto(path);
       const results = await new AxeBuilder({ page }).analyze();
-      const important = results.violations.filter((violation) => violation.impact === 'serious' || violation.impact === 'critical');
-      expect(important).toEqual([]);
+      expect(results.violations).toEqual([]);
     });
   }
 }
