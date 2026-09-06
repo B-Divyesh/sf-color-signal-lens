@@ -1,0 +1,272 @@
+{
+  "generatedAt": "2026-09-06T04:15:49.853Z",
+  "routes": [
+    {
+      "viewport": "desktop",
+      "path": "/",
+      "status": 200,
+      "expectedStatus": 200,
+      "expectedTitle": "Color Signal Lens — Make status colors distinct",
+      "title": "Color Signal Lens — Make status colors distinct",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "scrollWidth": 1440,
+      "clientWidth": 1440,
+      "axe": [],
+      "errors": []
+    },
+    {
+      "viewport": "desktop",
+      "path": "/demo",
+      "status": 200,
+      "expectedStatus": 200,
+      "expectedTitle": "Demo — Color Signal Lens",
+      "title": "Demo — Color Signal Lens",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "scrollWidth": 1440,
+      "clientWidth": 1440,
+      "axe": [],
+      "errors": []
+    },
+    {
+      "viewport": "desktop",
+      "path": "/lens",
+      "status": 200,
+      "expectedStatus": 200,
+      "expectedTitle": "Color Signal Lens — Inspect screenshot colors",
+      "title": "Color Signal Lens — Inspect screenshot colors",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "scrollWidth": 1440,
+      "clientWidth": 1440,
+      "axe": [],
+      "errors": []
+    },
+    {
+      "viewport": "desktop",
+      "path": "/privacy",
+      "status": 200,
+      "expectedStatus": 200,
+      "expectedTitle": "Privacy — Color Signal Lens",
+      "title": "Privacy — Color Signal Lens",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "scrollWidth": 1440,
+      "clientWidth": 1440,
+      "axe": [],
+      "errors": []
+    },
+    {
+      "viewport": "desktop",
+      "path": "/terms",
+      "status": 200,
+      "expectedStatus": 200,
+      "expectedTitle": "Terms — Color Signal Lens",
+      "title": "Terms — Color Signal Lens",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "scrollWidth": 1440,
+      "clientWidth": 1440,
+      "axe": [],
+      "errors": []
+    },
+    {
+      "viewport": "desktop",
+      "path": "/missing-repair-10-route",
+      "status": 404,
+      "expectedStatus": 404,
+      "expectedTitle": "Page not found — Color Signal Lens",
+      "title": "Page not found — Color Signal Lens",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "scrollWidth": 1440,
+      "clientWidth": 1440,
+      "axe": [],
+      "errors": [
+        "Failed to load resource: the server responded with a status of 404 ()"
+      ]
+    },
+    {
+      "viewport": "phone",
+      "path": "/",
+      "status": 200,
+      "expectedStatus": 200,
+      "expectedTitle": "Color Signal Lens — Make status colors distinct",
+      "title": "Color Signal Lens — Make status colors distinct",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "scrollWidth": 390,
+      "clientWidth": 390,
+      "axe": [],
+      "errors": []
+    },
+    {
+      "viewport": "phone",
+      "path": "/demo",
+      "status": 200,
+      "expectedStatus": 200,
+      "expectedTitle": "Demo — Color Signal Lens",
+      "title": "Demo — Color Signal Lens",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "scrollWidth": 390,
+      "clientWidth": 390,
+      "axe": [],
+      "errors": []
+    },
+    {
+      "viewport": "phone",
+      "path": "/lens",
+      "status": 200,
+      "expectedStatus": 200,
+      "expectedTitle": "Color Signal Lens — Inspect screenshot colors",
+      "title": "Color Signal Lens — Inspect screenshot colors",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "scrollWidth": 390,
+      "clientWidth": 390,
+      "axe": [],
+      "errors": []
+    },
+    {
+      "viewport": "phone",
+      "path": "/privacy",
+      "status": 200,
+      "expectedStatus": 200,
+      "expectedTitle": "Privacy — Color Signal Lens",
+      "title": "Privacy — Color Signal Lens",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "scrollWidth": 390,
+      "clientWidth": 390,
+      "axe": [],
+      "errors": []
+    },
+    {
+      "viewport": "phone",
+      "path": "/terms",
+      "status": 200,
+      "expectedStatus": 200,
+      "expectedTitle": "Terms — Color Signal Lens",
+      "title": "Terms — Color Signal Lens",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "scrollWidth": 390,
+      "clientWidth": 390,
+      "axe": [],
+      "errors": []
+    },
+    {
+      "viewport": "phone",
+      "path": "/missing-repair-10-route",
+      "status": 404,
+      "expectedStatus": 404,
+      "expectedTitle": "Page not found — Color Signal Lens",
+      "title": "Page not found — Color Signal Lens",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "missingAlt": 0,
+      "scrollWidth": 390,
+      "clientWidth": 390,
+      "axe": [],
+      "errors": [
+        "Failed to load resource: the server responded with a status of 404 ()"
+      ]
+    }
+  ],
+  "firstRead": {
+    "headline": "Make status colors distinct.",
+    "audience": "For people who cannot rely on red and green during code reviews, charts, or status screens.",
+    "action": "Try it with sample data",
+    "bounds": {
+      "headline": {
+        "x": 18,
+        "y": 162.59375,
+        "width": 247.96875,
+        "height": 151.734375
+      },
+      "audience": {
+        "x": 18,
+        "y": 340.328125,
+        "width": 354,
+        "height": 81.796875
+      },
+      "action": {
+        "x": 18,
+        "y": 448.125,
+        "width": 248.65625,
+        "height": 48.34375
+      },
+      "facts": {
+        "x": 18,
+        "y": 585.84375,
+        "width": 354,
+        "height": 81.0625
+      }
+    }
+  },
+  "demo": {
+    "populated": {
+      "banner": true,
+      "sample": "checkout-totals.diff.png",
+      "cue": "Active cue: The selected status color uses blue-orange colors.",
+      "canvas": true
+    },
+    "realStorageUnchanged": true,
+    "nonDemoKeys": [
+      "color-signal-lens:presets",
+      "color-signal-lens:release",
+      "sb_license:color-signal-lens",
+      "unrelated-real-key"
+    ],
+    "demoKeysAfterReset": [],
+    "bannerAfterReset": true,
+    "realEmpty": true,
+    "motion": {
+      "transitionDuration": "1e-05s",
+      "animationDuration": "1e-05s"
+    }
+  },
+  "recovery": {
+    "message": "Could not open broken.png. Choose a valid PNG, JPEG, or WebP image.",
+    "preserved": true
+  },
+  "offline": {
+    "cue": true,
+    "requests": [
+      "https://color-signal-lens.sociobot.in/demo",
+      "https://color-signal-lens.sociobot.in/assets/index-8ZiAbq-t.js",
+      "https://color-signal-lens.sociobot.in/assets/style-BWgV3-lU.css"
+    ],
+    "crossOrigin": []
+  },
+  "navigation": {
+    "focused": true,
+    "announced": "How Color Signal Lens works",
+    "restored": true
+  }
+}

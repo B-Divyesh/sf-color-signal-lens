@@ -1,0 +1,75 @@
+{
+  "tag_name": "v0.1.13",
+  "draft": false,
+  "prerelease": false,
+  "target_commitish": "ffe9d5a9b10e0ce98c2178f39a106aef928f5115",
+  "published_at": "2026-09-06T03:56:20Z",
+  "assets": [
+    {
+      "name": "Color.Signal.Lens-0.1.13-1.x86_64.rpm",
+      "size": 7345022,
+      "digest": "sha256:f23dc35f31ae4f82d66941380a1a86576bf3067023acca1afdb646f375401ff6",
+      "browser_download_url": "https://github.com/B-Divyesh/sf-color-signal-lens/releases/download/v0.1.13/Color.Signal.Lens-0.1.13-1.x86_64.rpm"
+    },
+    {
+      "name": "Color.Signal.Lens_0.1.13_aarch64.dmg",
+      "size": 10034578,
+      "digest": "sha256:95714f2526d73842be3453c0b33bfe5abf59dd5563a46876b17622550584c846",
+      "browser_download_url": "https://github.com/B-Divyesh/sf-color-signal-lens/releases/download/v0.1.13/Color.Signal.Lens_0.1.13_aarch64.dmg"
+    },
+    {
+      "name": "Color.Signal.Lens_0.1.13_amd64.AppImage",
+      "size": 84765176,
+      "digest": "sha256:b0da508b5fef1156a54cad469cb094a2d4ebe63aa7a27446ea464802694f88bb",
+      "browser_download_url": "https://github.com/B-Divyesh/sf-color-signal-lens/releases/download/v0.1.13/Color.Signal.Lens_0.1.13_amd64.AppImage"
+    },
+    {
+      "name": "Color.Signal.Lens_0.1.13_amd64.deb",
+      "size": 7344484,
+      "digest": "sha256:e4547d8011b53d0674f2735b65ae98a95e6e9226d731862e0d42094b6a0f0411",
+      "browser_download_url": "https://github.com/B-Divyesh/sf-color-signal-lens/releases/download/v0.1.13/Color.Signal.Lens_0.1.13_amd64.deb"
+    },
+    {
+      "name": "Color.Signal.Lens_0.1.13_x64-setup.exe",
+      "size": 5141252,
+      "digest": "sha256:3ae3730039faa4cb6c2593e6729008ebfae34196b2718ac9be8285b1e38e454d",
+      "browser_download_url": "https://github.com/B-Divyesh/sf-color-signal-lens/releases/download/v0.1.13/Color.Signal.Lens_0.1.13_x64-setup.exe"
+    },
+    {
+      "name": "Color.Signal.Lens_0.1.13_x64.dmg",
+      "size": 10118227,
+      "digest": "sha256:7f77b4f2211af0a08671215a280445f4e6a1a13fc4a072daee726719fb817cfb",
+      "browser_download_url": "https://github.com/B-Divyesh/sf-color-signal-lens/releases/download/v0.1.13/Color.Signal.Lens_0.1.13_x64.dmg"
+    },
+    {
+      "name": "Color.Signal.Lens_0.1.13_x64_en-US.msi",
+      "size": 6488064,
+      "digest": "sha256:b72b29657f3f808bb4eb43774e9534264d2054104e2cedec41a59454f8e6a8a7",
+      "browser_download_url": "https://github.com/B-Divyesh/sf-color-signal-lens/releases/download/v0.1.13/Color.Signal.Lens_0.1.13_x64_en-US.msi"
+    },
+    {
+      "name": "Color.Signal.Lens_aarch64.app.tar.gz",
+      "size": 8373727,
+      "digest": "sha256:48aaa2f175a6d1e2d940ad9f316cec94892a83ba1ad67b1a2750e02434f627fc",
+      "browser_download_url": "https://github.com/B-Divyesh/sf-color-signal-lens/releases/download/v0.1.13/Color.Signal.Lens_aarch64.app.tar.gz"
+    },
+    {
+      "name": "Color.Signal.Lens_x64.app.tar.gz",
+      "size": 8459771,
+      "digest": "sha256:0b25750a5ad534881337e33b1b16c78de947aa4e04dedda7c0843efb9cda00ac",
+      "browser_download_url": "https://github.com/B-Divyesh/sf-color-signal-lens/releases/download/v0.1.13/Color.Signal.Lens_x64.app.tar.gz"
+    },
+    {
+      "name": "latest.json",
+      "size": 576,
+      "digest": "sha256:02500fe7ae8deb3c29341a21f42e1723415c0d988244b018a438531607d2429c",
+      "browser_download_url": "https://github.com/B-Divyesh/sf-color-signal-lens/releases/download/v0.1.13/latest.json"
+    },
+    {
+      "name": "SHA256SUMS",
+      "size": 925,
+      "digest": "sha256:d81bc630eaa1270cf08d8118961c57ad79641f22df9e999906e5b8b5d7f3ce93",
+      "browser_download_url": "https://github.com/B-Divyesh/sf-color-signal-lens/releases/download/v0.1.13/SHA256SUMS"
+    }
+  ]
+}
