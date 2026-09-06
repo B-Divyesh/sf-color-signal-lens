@@ -1,0 +1,15 @@
+{
+  "tool": "@axe-core/playwright 4.13.0",
+  "viewports": [390, 1440],
+  "routes": ["/", "/demo", "/lens", "/privacy", "/terms", "/missing-review-8"],
+  "violations": [
+    {
+      "route": "/demo",
+      "viewports": [390, 1440],
+      "id": "aria-allowed-role",
+      "impact": "minor",
+      "target": ".demo-banner",
+      "html": "<aside class=\"demo-banner\" role=\"status\">"
+    }
+  ]
+}

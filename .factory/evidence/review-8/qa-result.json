@@ -1,0 +1,8 @@
+{
+  "verdict": "FAIL",
+  "finding_count": 2,
+  "untested_claim_count": 0,
+  "candidate_commit": "afcd9aabd454f62a8900bb660aca5a505185491f",
+  "live_url": "https://color-signal-lens.sociobot.in",
+  "report": ".factory/review-8.md"
+}
